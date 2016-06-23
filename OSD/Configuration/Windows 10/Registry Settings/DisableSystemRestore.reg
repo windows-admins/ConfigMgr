@@ -1,0 +1,7 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore]
+"DisableSR"=dword:00000001
+
+;Delete existing system restores (check the drive letter during OSD or use the TS variable)
+;vssadmin delete shadows /for=%OSDisk% /all

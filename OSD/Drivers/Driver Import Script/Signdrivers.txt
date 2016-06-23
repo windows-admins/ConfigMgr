@@ -1,0 +1,1 @@
+$cert = (dir cert:currentuser\my\ -CodeSigningCert); Set-AuthenticodeSignature .\ImportDrivers.ps1 $cert

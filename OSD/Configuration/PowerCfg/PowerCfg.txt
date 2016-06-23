@@ -1,0 +1,4 @@
+Change power plan (MAX POWER!)
+Power settings:
+powercfg -import DeploymentPowerScheme.pow 12345678-1337-1337-1337-1234567890ab
+powercfg -setactive 12345678-1337-1337-1337-1234567890ab

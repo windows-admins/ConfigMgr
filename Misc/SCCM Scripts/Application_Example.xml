@@ -1,0 +1,45 @@
+<Applications>
+	<Application>
+		<!-- APPLICATION -->
+		<Name>Microsoft_Bob 2019</Name>
+		<Publisher>Microsoft</Publisher>
+		<SoftwareVersion>2019</SoftwareVersion>
+		<Licensed>No</Licensed>
+		<ManualInstallation>No</ManualInstallation>
+		<AppV>No</AppV>
+		<!-- DEPLOYMENT TYPE(S) -->
+		<DeploymentType>
+			<Name>Test 4</Name>
+			<ContentLocation>\\<FQDN>\Source$\Apps\Microsoft\Bob\2019\</ContentLocation>
+			<InstallationProgram>Setup.exe</InstallationProgram>
+			<UninstallProgram>Uninstall.exe</UninstallProgram>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<ScriptContent>CHANGE ME</ScriptContent>
+			<ScriptType>VBS</ScriptType>
+		</DeploymentType>
+	</Application>
+	<Application>
+		<!-- APPLICATION -->
+		<Name>Microsoft_Bob 2020</Name>
+		<Publisher>Microsoft</Publisher>
+		<SoftwareVersion>2020</SoftwareVersion>
+		<Licensed>No</Licensed>
+		<ManualInstallation>No</ManualInstallation>
+		<AppV>No</AppV>
+		<!-- DEPLOYMENT TYPE(S) -->
+		<DeploymentType>
+			<MSIInstallationFileLocation>\\<FQDN>\Source$\Apps\Microsoft\Bob\2020\MicrosoftBob.msi</MSIInstallationFileLocation>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+		</DeploymentType>
+		<DeploymentType>
+			<Name>Microsoft Bob 2020 - VBS Script</Name>
+			<ContentLocation>\\<FQDN>\Source$\Apps\Microsoft\Bob\2020\</ContentLocation>
+			<InstallationProgram>MicrosoftBob.exe /silent</InstallationProgram>
+			<UninstallProgram>Uninstall.exe</UninstallProgram>
+			<InstallationBehaviorType>InstallForSystem</InstallationBehaviorType>
+			<ScriptContent>One line scripts only please</ScriptContent>
+			<!-- Allowed Values: Powershell, VBScript, JScript -->
+			<ScriptType>VBScript</ScriptType>
+		</DeploymentType>
+	</Application>
+</Applications>
