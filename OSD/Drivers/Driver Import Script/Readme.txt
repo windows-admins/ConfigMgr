@@ -17,6 +17,7 @@ Pre-Flight steps:
 	-Note: Slight exceptions for WinPE and VM (and other) drivers
 		+WinPE drivers go under the manufacturer in a WinPE folder.  The WinPE version and architecture goes under this (for the third tier).
 		+Oddball and one-off drivers go under the "Other" folder. Because of this, they are only two layers deep ("Other" counts for the first tier).
+		+EXAMPLE: \Other\Dell\DockDriver\
 *If a driver package needs to be re-run for any reason, manually delete the *.hash file found in the driver package folder.
 
 Running the script:
