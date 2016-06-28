@@ -1,8 +1,8 @@
 Param(
-	[string]$serverName = "X01337AA00100V.umpq.umpquabank.com"
-	,[string]$CMSite = "UB1"
-	,[string]$driverStore = "\\X01337AA00100V.umpq.umpquabank.com\Source$\OSD\Drivers"
-	,[string]$CMPackageSource = "\\X01337AA00100V.umpq.umpquabank.com\Source$\OSD\Driver Packages"
+	[string]$serverName = "SERVER.fqdn.com"
+	,[string]$CMSite = "P01"
+	,[string]$driverStore = "\\SERVER.fqdn.com\Source$\OSD\Drivers"
+	,[string]$CMPackageSource = "\\SERVER.fqdn.com\Source$\OSD\Driver Packages"
 	,[bool]$VerboseLogging = $false
 )
 
