@@ -232,7 +232,7 @@ Function SDS-ImportDriver
 	)
 
 	$driverPath = $dv.FullName
-	LogIt -message ("Importing driver :" + $driverPath) -component "SDS-ImportDriver" -type "Verbose" -LogFile $LogFile
+	LogIt -message ("Importing driver: " + $driverPath) -component "SDS-ImportDriver" -type "Verbose" -LogFile $LogFile
 	#Write-Host "Importing driver $driverPath"
 
         $driverINF = split-path $dv.FullName -leaf 
@@ -248,6 +248,7 @@ Function SDS-ImportDriver
 	}
 	Else
 	{
+        
 		$DriverImport = Import-CMDriver -UncFileLocation $dv.FullName -AdministrativeCategory $category -DriverPackage $package -EnableAndAllowInstall $true -ImportDuplicateDriverOption "AppendCategory"
 
 		If($DriverImport)
