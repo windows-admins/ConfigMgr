@@ -1,0 +1,737 @@
+<!-- THIS WILL NOT IMPORT INTO SCCM. -->
+<!-- THIS IS FOR REFERENCE ONLY.     -->
+<!-- DO NOT TRY AND USE THIS.        -->
+<?xml version="1.0"?>
+<sequence version="3.00">
+    <globalVarList>
+        <variable name="OSDEnableTCPIPFiltering" property="EnableTCPIPFiltering">false</variable>
+        <variable name="OSDAdapterCount" property="NumAdapters">0</variable>
+    </globalVarList>
+    <group name="Build the Reference Machine" description="Actions to build a reference machine">
+        <step type="SMS_TaskSequence_SetVariableAction" name="Image Type: Win10 x64 Build and Capture" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>tsenv.exe "ImageType=Win10 x64 Build and Capture"</action>
+            <defaultVarList>
+                <variable name="VariableName" property="VariableName" hidden="true">ImageType</variable>
+                <variable name="VariableValue" property="VariableValue" hidden="true">Win10 x64 Build and Capture</variable>
+            </defaultVarList>
+        </step>
+        <step type="SMS_TaskSequence_RebootAction" name="Restart in Windows PE" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <condition>
+                <expression type="SMS_TaskSequence_VariableConditionExpression">
+                    <variable name="Operator">equals</variable>
+                    <variable name="Value">false</variable>
+                    <variable name="Variable">_SMSTSInWinPE</variable>
+                </expression>
+            </condition>
+            <action>smsboot.exe /target:WinPE</action>
+            <defaultVarList>
+                <variable name="SMSRebootMessage" property="Message">A new Microsoft Windows operating system is being installed.  The computer must reboot to continue.</variable>
+                <variable name="SMSRebootTimeout" property="MessageTimeout">10</variable>
+                <variable name="SMSRebootTarget" property="Target" hidden="true">WinPE</variable>
+            </defaultVarList>
+        </step>
+        <step type="SMS_TaskSequence_PartitionDiskAction" name="Partition Disk 0 - BIOS" description="This action partitions and formats the disk for new deployments of BIOS-based computers. This step will not run for Unified Extensible Firmware Interface (UEFI)-based computers." runIn="WinPE" successCodeList="0" retryCount="0" runFromNet="false">
+            <condition>
+                <expression type="SMS_TaskSequence_VariableConditionExpression">
+                    <variable name="Operator">notEquals</variable>
+                    <variable name="Value">true</variable>
+                    <variable name="Variable">_SMSTSBootUEFI</variable>
+                </expression>
+            </condition>
+            <action>osddiskpart.exe</action>
+            <defaultVarList>
+                <variable name="OSDDiskIndex" property="DiskIndex">0</variable>
+                <variable name="OSDDiskType" property="DiskType">Basic</variable>
+                <variable name="OSDDiskpartBiosCompatibilityMode" property="DiskpartBiosCompatibilityMode">false</variable>
+                <variable name="OSDGPTBootDisk" property="GPTBootDisk">false</variable>
+                <variable name="OSDPartitionStyle" property="PartitionStyle">MBR</variable>
+                <variable name="OSDPartitions" property="Partitions" hidden="true">1</variable>
+                <variable name="OSDPartitions0AssignVolumeLetter" property="Partitions0AssignVolumeLetter">true</variable>
+                <variable name="OSDPartitions0Bootable" property="Partitions0Bootable">false</variable>
+                <variable name="OSDPartitions0FileSystem" property="Partitions0FileSystem">NTFS</variable>
+                <variable name="OSDPartitions0QuickFormat" property="Partitions0QuickFormat">true</variable>
+                <variable name="OSDPartitions0Size" property="Partitions0Size">100</variable>
+                <variable name="OSDPartitions0SizeUnits" property="Partitions0SizeUnits">PERCENT</variable>
+                <variable name="OSDPartitions0Type" property="Partitions0Type">PRIMARY</variable>
+                <variable name="OSDPartitions0VolumeLetterVariable" property="Partitions0VolumeLetterVariable">OSDisk</variable>
+                <variable name="OSDPartitions0VolumeName" property="Partitions0VolumeName">Windows</variable>
+            </defaultVarList>
+        </step>
+        <group name="Power Settings" description="">
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Copy Power Settings" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0029F xcopy .\DeploymentPowerScheme.pow %temp%</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">xcopy .\DeploymentPowerScheme.pow %temp%</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Import Power Settings" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: powercfg -import %temp%\DeploymentPowerScheme.pow 12345678-1337-1337-1337-1234567890ab</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">powercfg -import %temp%\DeploymentPowerScheme.pow 12345678-1337-1337-1337-1234567890ab</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Power Settings Set" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: powercfg -setactive 12345678-1337-1337-1337-1234567890ab</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">powercfg -setactive 12345678-1337-1337-1337-1234567890ab</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+        </group>
+        <step type="SMS_TaskSequence_SetVariableAction" name="Set Variable for Drive Letter" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>tsenv.exe "OSDPreserveDriveLetter=False"</action>
+            <defaultVarList>
+                <variable name="VariableName" property="VariableName" hidden="true">OSDPreserveDriveLetter</variable>
+                <variable name="VariableValue" property="VariableValue" hidden="true">False</variable>
+            </defaultVarList>
+        </step>
+        <step type="SMS_TaskSequence_ApplyOperatingSystemAction" name="Apply Operating System" description="Actions to apply operating system" runIn="WinPE" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>OSDApplyOS.exe /image:ABC0023F,%OSDImageIndex% /runfromnet:False</action>
+            <defaultVarList>
+                <variable name="OSDImageIndex" property="ImageIndex">1</variable>
+                <variable name="ImagePackageID" property="ImagePackageID" hidden="true">ABC0023F</variable>
+                <variable name="RunFromNet" property="RunFromNet" hidden="true">false</variable>
+            </defaultVarList>
+        </step>
+        <step type="SMS_TaskSequence_ApplyWindowsSettingsAction" name="Apply Windows Settings" description="Actions to apply Windows settings" runIn="WinPE" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>osdwinsettings.exe /config</action>
+            <defaultVarList>
+                <variable name="OSDLocalAdminPassword" property="AdminPassword">
+                </variable>
+                <variable name="OSDComputerName" property="ComputerName">%_SMSTSMachineName%</variable>
+                <variable name="OSDProductKey" property="ProductKey">
+                </variable>
+                <variable name="OSDRandomAdminPassword" property="RandomAdminPassword">false</variable>
+                <variable name="OSDRegisteredOrgName" property="RegisteredOrgName">ORG</variable>
+                <variable name="OSDRegisteredUserName" property="RegisteredUserName">USER</variable>
+                <variable name="OSDServerLicenseConnectionLimit" property="ServerLicenseConnectionLimit">5</variable>
+                <variable name="OSDTimeZone" property="TimeZone">Pacific Standard Time</variable>
+            </defaultVarList>
+        </step>
+        <step type="SMS_TaskSequence_ApplyNetworkSettingsAction" name="Apply Network Settings" description="Actions to configure network settings" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>osdnetsettings.exe configure</action>
+            <defaultVarList>
+                <variable name="OSDJoinAccount" property="DomainUsername">
+                </variable>
+                <variable name="OSDEnableTCPIPFiltering" property="EnableTCPIPFiltering" hidden="true">false</variable>
+                <variable name="OSDNetworkJoinType" property="NetworkJoinType">1</variable>
+                <variable name="OSDAdapterCount" property="NumAdapters" hidden="true">0</variable>
+                <variable name="OSDWorkgroupName" property="WorkgroupName">WORKGROUP</variable>
+            </defaultVarList>
+        </step>
+        <group name="Apply Windows Settings" description="">
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="File and applicaiton associations" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0029F dism /image:%OSDisk%\ /import-defaultappassociations:appassociations.xml</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">dism /image:%OSDisk%\ /import-defaultappassociations:appassociations.xml</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="*** Start Menu Layout New" description="" continueOnError="true" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0029F xcopy .\AppsFolderLayout.bin  %OSDisk%\Users\Default\AppData\Local\Microsoft\Windows</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">xcopy .\AppsFolderLayout.bin  %OSDisk%\Users\Default\AppData\Local\Microsoft\Windows</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="*** Start Menu Layout New" description="" continueOnError="true" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0029F xcopy .\AppsFolderLayout.bin  %OSDisk%\Users\Default\AppData\Local\Microsoft\Windows\Shell\</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">xcopy .\AppsFolderLayout.bin  %OSDisk%\Users\Default\AppData\Local\Microsoft\Windows\Shell\</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+        </group>
+        <step type="SMS_TaskSequence_AutoApplyAction" name="Apply Device Drivers" description="" disable="true" runIn="WinPE" successCodeList="0" retryCount="0" runFromNet="false">
+            <condition>
+                <expression type="SMS_TaskSequence_VariableConditionExpression">
+                    <variable name="Operator">notEquals</variable>
+                    <variable name="Value">FullMedia</variable>
+                    <variable name="Variable">_SMSTSMediaType</variable>
+                </expression>
+            </condition>
+            <action>osddriverclient.exe /auto /bestmatch:%OSDAutoApplyDriverBestMatch% /unsigned:%OSDAllowUnsignedDriver%</action>
+            <defaultVarList>
+                <variable name="OSDAutoApplyDriverBestMatch" property="BestMatch">true</variable>
+                <variable name="OSDAllowUnsignedDriver" property="UnsignedDriver">false</variable>
+            </defaultVarList>
+        </step>
+        <step type="SMS_TaskSequence_SetupWindowsAndSMSAction" name="Setup Windows and Configuration Manager" description="Actions to setup Windows and Configuration Manager client" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>OSDSetupWindows.exe</action>
+            <defaultVarList>
+                <variable name="SMSClientInstallProperties" property="ClientInstallProperties">SMSMP=SCCM11.ad.org</variable>
+                <variable name="_SMSClientPackageID" property="ClientPackageID">ABC00001</variable>
+            </defaultVarList>
+        </step>
+        <step type="SMS_TaskSequence_RebootAction" name="Restart Computer" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>smsboot.exe /target:HD</action>
+            <defaultVarList>
+                <variable name="SMSRebootMessage" property="Message">
+                </variable>
+                <variable name="SMSRebootTimeout" property="MessageTimeout">1</variable>
+                <variable name="SMSRebootTarget" property="Target" hidden="true">HD</variable>
+            </defaultVarList>
+        </step>
+        <step type="BDD_UsePackage" name="Use Toolkit Package" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <condition>
+                <operator type="not">
+                    <expression type="SMS_TaskSequence_FolderConditionExpression">
+                        <variable name="Path">%ScriptRoot%</variable>
+                    </expression>
+                </operator>
+            </condition>
+            <action>smsswd.exe /run:ABC002D0 cscript.exe Scripts\ZTISCCM.wsf</action>
+            <defaultVarList>
+                <variable name="BDDPackageID" property="PackageID" hidden="true">ABC002D0</variable>
+            </defaultVarList>
+        </step>
+        <step type="BDD_Gather" name="Gather" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>smsswd.exe /run: cscript.exe "%DeployRoot%\Scripts\ZTIGather.wsf"</action>
+            <defaultVarList>
+                <variable name="GatherLocalOnly" property="GatherLocalOnly">true</variable>
+                <variable name="RulesFile" property="RulesFile">
+                </variable>
+            </defaultVarList>
+        </step>
+        <group name="Power Settings" description="">
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Copy Power Settings" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0029F xcopy .\DeploymentPowerScheme.pow %temp%</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">xcopy .\DeploymentPowerScheme.pow %temp%</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Import Power Settings" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: powercfg -import %temp%\DeploymentPowerScheme.pow 12345678-1337-1337-1337-1234567890ab</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">powercfg -import %temp%\DeploymentPowerScheme.pow 12345678-1337-1337-1337-1234567890ab</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Power Settings Set" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: powercfg -setactive 12345678-1337-1337-1337-1234567890ab</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">powercfg -setactive 12345678-1337-1337-1337-1234567890ab</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+        </group>
+        <group name="Install Windows Updates" description="">
+            <group name="Updates Pass I" description="" continueOnError="true">
+                <step type="SMS_TaskSequence_InstallUpdateAction" name="Install Software Updates" description="" runIn="FullOS" successCodeList="0" retryCount="3" runFromNet="false">
+                    <action>TSInstallSWUpdate.exe /target:%SMSInstallUpdateTarget%</action>
+                    <defaultVarList>
+                        <variable name="RetryCount" property="RetryCount" hidden="true">3</variable>
+                        <variable name="SMSInstallUpdateTarget" property="Target">All</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RebootAction" name="Restart Computer" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+                    <action>smsboot.exe /target:HD</action>
+                    <defaultVarList>
+                        <variable name="SMSRebootMessage" property="Message">
+                        </variable>
+                        <variable name="SMSRebootTimeout" property="MessageTimeout">1</variable>
+                        <variable name="SMSRebootTarget" property="Target" hidden="true">HD</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Trigger Updates Scan" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run: WMIC /namespace:\\root\ccm path sms_client CALL TriggerSchedule "{00000000-0000-0000-0000-000000000113}" /NOINTERACTIVE</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">WMIC /namespace:\\root\ccm path sms_client CALL TriggerSchedule "{00000000-0000-0000-0000-000000000113}" /NOINTERACTIVE</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+            </group>
+        </group>
+        <group name="Certificates" description="">
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Clairvia SSL Root" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0026C %OSDisk%\Windows\SysWow64\certutil.exe -addstore  "Root" .\Entrust_net_certification_authority_2048.cer</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">%OSDisk%\Windows\SysWow64\certutil.exe -addstore  "Root" .\Entrust_net_certification_authority_2048.cer</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0026C</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Clairvia SSL CA" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0026C %OSDisk%\Windows\SysWow64\certutil.exe -addstore "CA" .\Entrust_net_certification_authority_2048.cer</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">%OSDisk%\Windows\SysWow64\certutil.exe -addstore "CA" .\Entrust_net_certification_authority_2048.cer</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0026C</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Clairvia SSL AuthRoot" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0026C %OSDisk%\Windows\SysWow64\certutil.exe -addstore "AuthRoot" .\Entrust_net_certification_authority_2048.cer</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">%OSDisk%\Windows\SysWow64\certutil.exe -addstore "AuthRoot" .\Entrust_net_certification_authority_2048.cer</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0026C</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+        </group>
+        <group name="Registry Modifications" description="">
+            <group name="Windows" description="">
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable Advertising ID" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableAdvertisingID.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableAdvertisingID.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable System Restore" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableSystemRestore.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableSystemRestore.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable First Logon Animation" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableFirstLogonAnimation.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableFirstLogonAnimation.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable Store Cloud Content" description="Disables Featured Apps from Windows Store" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableStoreCloudContent.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableStoreCloudContent.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable Telemetry" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableTelemetry.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableTelemetry.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable User Generated Feedback" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableUserGeneratedFeedback.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableUserGeneratedFeedback.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable Typing Telemetry" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableTypingTelemetry.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableTypingTelemetry.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable WiFi Sense" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableWiFiSense.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableWiFiSense.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="WMI Service Settings" description="Changes WMI to be in a higher level group so it starts sooner" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\WMIGroupPriority.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\WMIGroupPriority.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Group Policy Service Settings" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\GroupPolicyServiceConfiguration.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\GroupPolicyServiceConfiguration.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable IE First Run Window" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableIEFirstRun.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableIEFirstRun.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable Master Browser" description="Prevents workstations from becoming master browsers or holding elections" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableMasterBrowser.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableMasterBrowser.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable Windows Automatic Updates" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\DisableWindowsAutomaticUpdates.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\DisableWindowsAutomaticUpdates.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Lock Screen Image" description="" disable="true" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\LockScreenImage.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\LockScreenImage.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+            </group>
+            <group name="Google" description="">
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Disable Google Chrome Updates" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\Disable-Chrome-Updates.reg"</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\Disable-Chrome-Updates.reg"</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+            </group>
+            <group name="Citrix" description="">
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Citrix Disable Prompt" description="" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run: reg add HKLM\Software\Citrix\PNAgent /v SuppressURLPromptAtLogin /t REG_DWORD /d 1</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg add HKLM\Software\Citrix\PNAgent /v SuppressURLPromptAtLogin /t REG_DWORD /d 1</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Citrix Roaming RegKeys I" description="" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run: reg add "HKLM\Software\Citrix\ICA Client\Engine\Configuration\Advanced\Modules\Thinwire3.0" /v Tw2IgnoreValidationErrors /t REG_SZ /d TRUE</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg add "HKLM\Software\Citrix\ICA Client\Engine\Configuration\Advanced\Modules\Thinwire3.0" /v Tw2IgnoreValidationErrors /t REG_SZ /d TRUE</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Citrix Roaming RegKeys II" description="" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run: reg add "HKLM\Software\Citrix\ICA Client\Engine\Configuration\Advanced\Modules\Thinwire3.0" /v Tw2IgnoreExecutionErrors /t REG_SZ /d TRUE</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">reg add "HKLM\Software\Citrix\ICA Client\Engine\Configuration\Advanced\Modules\Thinwire3.0" /v Tw2IgnoreExecutionErrors /t REG_SZ /d TRUE</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+            </group>
+        </group>
+        <group name="Install Core Applications" description="">
+            <group name="Windows Configuration" description="">
+                <step type="BDD_InstallRoles" name="Install Roles and Features" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run: cscript.exe "%DeployRoot%\Scripts\ZTIOSRole.wsf"</action>
+                    <defaultVarList>
+                        <variable name="OSFeatures" property="OSFeatures">NetFx3,WCF-NonHTTP-Activation</variable>
+                        <variable name="OSRoleIndex" property="OSRoleIndex">13</variable>
+                        <variable name="OSRoleServices" property="OSRoleServices">
+                        </variable>
+                        <variable name="OSRoles" property="OSRoles">
+                        </variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Set WMI to run as own process" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run: winmgmt /standalonehost</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">winmgmt /standalonehost</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+            </group>
+            <group name="Frameworks" description="">
+                <step type="SMS_TaskSequence_InstallApplicationAction" name="Microsoft Visual C++ Redistributables" description="" runIn="FullOS" successCodeList="0" retryCount="2" runFromNet="false">
+                    <action>smsappinstall.exe /app:ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_a8ea36e8-1169-4891-956a-2f114bfd4e79,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_33c435a0-206d-4201-91d3-956a94fb73a0,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_fd8c1d46-6561-4a4f-8b20-7925eac5016c,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_5c040e98-396c-4ef6-8ff5-2f8b261237c8,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_8a2fe988-890f-4045-9c14-f0584c121cea,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_31e57893-7cb0-4346-aa3e-286aa42b4afc /basevar: /continueOnError:False</action>
+                    <defaultVarList>
+                        <variable name="OSDApp" property="AppInfo" hidden="true">6</variable>
+                        <variable name="OSDApp0Description" property="AppInfo0Description">Valid</variable>
+                        <variable name="OSDApp0DisplayName" property="AppInfo0DisplayName">Microsoft Visual C++ 2005</variable>
+                        <variable name="OSDApp0Name" property="AppInfo0Name">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_a8ea36e8-1169-4891-956a-2f114bfd4e79</variable>
+                        <variable name="OSDApp1Description" property="AppInfo1Description">Valid</variable>
+                        <variable name="OSDApp1DisplayName" property="AppInfo1DisplayName">Microsoft Visual C++ 2008</variable>
+                        <variable name="OSDApp1Name" property="AppInfo1Name">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_33c435a0-206d-4201-91d3-956a94fb73a0</variable>
+                        <variable name="OSDApp2Description" property="AppInfo2Description">Valid</variable>
+                        <variable name="OSDApp2DisplayName" property="AppInfo2DisplayName">Microsoft Visual C++ 2010</variable>
+                        <variable name="OSDApp2Name" property="AppInfo2Name">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_fd8c1d46-6561-4a4f-8b20-7925eac5016c</variable>
+                        <variable name="OSDApp3Description" property="AppInfo3Description">Valid</variable>
+                        <variable name="OSDApp3DisplayName" property="AppInfo3DisplayName">Microsoft Visual C++ 2012</variable>
+                        <variable name="OSDApp3Name" property="AppInfo3Name">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_5c040e98-396c-4ef6-8ff5-2f8b261237c8</variable>
+                        <variable name="OSDApp4Description" property="AppInfo4Description">Valid</variable>
+                        <variable name="OSDApp4DisplayName" property="AppInfo4DisplayName">Microsoft Visual C++ 2013</variable>
+                        <variable name="OSDApp4Name" property="AppInfo4Name">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_8a2fe988-890f-4045-9c14-f0584c121cea</variable>
+                        <variable name="OSDApp5Description" property="AppInfo5Description">Valid</variable>
+                        <variable name="OSDApp5DisplayName" property="AppInfo5DisplayName">Microsoft Visual C++ 2015</variable>
+                        <variable name="OSDApp5Name" property="AppInfo5Name">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_31e57893-7cb0-4346-aa3e-286aa42b4afc</variable>
+                        <variable name="ApplicationName" property="ApplicationName" hidden="true">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_a8ea36e8-1169-4891-956a-2f114bfd4e79,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_33c435a0-206d-4201-91d3-956a94fb73a0,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_fd8c1d46-6561-4a4f-8b20-7925eac5016c,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_5c040e98-396c-4ef6-8ff5-2f8b261237c8,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_8a2fe988-890f-4045-9c14-f0584c121cea,ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_31e57893-7cb0-4346-aa3e-286aa42b4afc</variable>
+                        <variable name="ContinueOnInstallError" property="ContinueOnInstallError" hidden="true">false</variable>
+                        <variable name="OSDAppCount" property="NumApps">6</variable>
+                        <variable name="RetryCount" property="RetryCount" hidden="true">2</variable>
+                    </defaultVarList>
+                </step>
+            </group>
+            <step type="SMS_TaskSequence_InstallApplicationAction" name="Microsoft Office 2016 Standard" description="" runIn="FullOS" successCodeList="0" retryCount="2" runFromNet="false">
+                <action>smsappinstall.exe /app:ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_b82f9dc8-8a4b-4a1f-9e51-1f9a5f471252 /basevar: /continueOnError:False</action>
+                <defaultVarList>
+                    <variable name="OSDApp" property="AppInfo" hidden="true">1</variable>
+                    <variable name="OSDApp0Description" property="AppInfo0Description">Valid</variable>
+                    <variable name="OSDApp0DisplayName" property="AppInfo0DisplayName">Microsoft Office Standard 2016</variable>
+                    <variable name="OSDApp0Name" property="AppInfo0Name">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_b82f9dc8-8a4b-4a1f-9e51-1f9a5f471252</variable>
+                    <variable name="ApplicationName" property="ApplicationName" hidden="true">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_b82f9dc8-8a4b-4a1f-9e51-1f9a5f471252</variable>
+                    <variable name="ContinueOnInstallError" property="ContinueOnInstallError" hidden="true">false</variable>
+                    <variable name="OSDAppCount" property="NumApps">1</variable>
+                    <variable name="RetryCount" property="RetryCount" hidden="true">2</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RebootAction" name="Restart Computer" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+                <action>smsboot.exe /target:HD</action>
+                <defaultVarList>
+                    <variable name="SMSRebootMessage" property="Message">
+                    </variable>
+                    <variable name="SMSRebootTimeout" property="MessageTimeout">1</variable>
+                    <variable name="SMSRebootTarget" property="Target" hidden="true">HD</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_InstallApplicationAction" name="Skype for Business" description="" runIn="FullOS" successCodeList="0" retryCount="2" runFromNet="false">
+                <action>smsappinstall.exe /app:ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_48c1ecc6-e859-47de-b2bb-fdae4b11e4b3 /basevar: /continueOnError:False</action>
+                <defaultVarList>
+                    <variable name="OSDApp" property="AppInfo" hidden="true">1</variable>
+                    <variable name="OSDApp0Description" property="AppInfo0Description">Valid</variable>
+                    <variable name="OSDApp0DisplayName" property="AppInfo0DisplayName">Skype for Business 2016</variable>
+                    <variable name="OSDApp0Name" property="AppInfo0Name">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_48c1ecc6-e859-47de-b2bb-fdae4b11e4b3</variable>
+                    <variable name="ApplicationName" property="ApplicationName" hidden="true">ScopeId_B91C4CD4-5E0B-4285-B358-941C196D5592/Application_48c1ecc6-e859-47de-b2bb-fdae4b11e4b3</variable>
+                    <variable name="ContinueOnInstallError" property="ContinueOnInstallError" hidden="true">false</variable>
+                    <variable name="OSDAppCount" property="NumApps">1</variable>
+                    <variable name="RetryCount" property="RetryCount" hidden="true">2</variable>
+                </defaultVarList>
+            </step>
+        </group>
+        <group name="Install Windows Updates" description="">
+            <group name="Updates Pass II" description="">
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Scan for Updates" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run: WMIC /namespace:\\root\ccm path sms_client CALL TriggerSchedule "{00000000-0000-0000-0000-000000000113}" /NOINTERACTIVE</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">WMIC /namespace:\\root\ccm path sms_client CALL TriggerSchedule "{00000000-0000-0000-0000-000000000113}" /NOINTERACTIVE</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_InstallUpdateAction" name="Install Software Updates" description="" runIn="FullOS" successCodeList="0" retryCount="3" runFromNet="false">
+                    <action>TSInstallSWUpdate.exe /target:%SMSInstallUpdateTarget%</action>
+                    <defaultVarList>
+                        <variable name="RetryCount" property="RetryCount" hidden="true">3</variable>
+                        <variable name="SMSInstallUpdateTarget" property="Target">All</variable>
+                    </defaultVarList>
+                </step>
+            </group>
+            <group name="Updates Pass III" description="">
+                <step type="SMS_TaskSequence_RunCommandLineAction" name="Scan for Updates" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                    <action>smsswd.exe /run: WMIC /namespace:\\root\ccm path sms_client CALL TriggerSchedule "{00000000-0000-0000-0000-000000000113}" /NOINTERACTIVE</action>
+                    <defaultVarList>
+                        <variable name="CommandLine" property="CommandLine" hidden="true">WMIC /namespace:\\root\ccm path sms_client CALL TriggerSchedule "{00000000-0000-0000-0000-000000000113}" /NOINTERACTIVE</variable>
+                        <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                        <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                        <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_InstallUpdateAction" name="Install Software Updates" description="" runIn="FullOS" successCodeList="0" retryCount="3" runFromNet="false">
+                    <action>TSInstallSWUpdate.exe /target:%SMSInstallUpdateTarget%</action>
+                    <defaultVarList>
+                        <variable name="RetryCount" property="RetryCount" hidden="true">3</variable>
+                        <variable name="SMSInstallUpdateTarget" property="Target">All</variable>
+                    </defaultVarList>
+                </step>
+                <step type="SMS_TaskSequence_RebootAction" name="Restart Computer" description="" runIn="WinPEandFullOS" successCodeList="0" retryCount="0" runFromNet="false">
+                    <action>smsboot.exe /target:HD</action>
+                    <defaultVarList>
+                        <variable name="SMSRebootMessage" property="Message">
+                        </variable>
+                        <variable name="SMSRebootTimeout" property="MessageTimeout">1</variable>
+                        <variable name="SMSRebootTarget" property="Target" hidden="true">HD</variable>
+                    </defaultVarList>
+                </step>
+            </group>
+        </group>
+        <group name="Task Sequence Clean Up" description="">
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Import Windows 10 Disk Cleanup" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0029F reg import ".\Registry Tweaks\Windows10DiskCleanup.reg"</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">reg import ".\Registry Tweaks\Windows10DiskCleanup.reg"</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Run Once Clean Up" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0029F cscript .\RunOnce.vbs</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">cscript .\RunOnce.vbs</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Run Once x64 Clean Up" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run:ABC0029F cscript .\RunOnce64.vbs</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">cscript .\RunOnce64.vbs</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC0029F</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Delete Shadow Copies" description="" continueOnError="true" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: vssadmin delete shadows /for=%OSDisk% /all</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">vssadmin delete shadows /for=%OSDisk% /all</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Run Disk Cleanup" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: CleanMgr.exe /sagerun:0333</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">CleanMgr.exe /sagerun:0333</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="DISM Cleanup Windows" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: DISM.exe /online /Cleanup-Image /StartComponentCleanup</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">DISM.exe /online /Cleanup-Image /StartComponentCleanup</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="DISM Cleanup Windows" description="" timeout="900" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: DISM.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">DISM.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_InstallSoftwareAction" name="Prep Image for Capture" description="" runIn="FullOS" successCodeList="0" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /pkg:ABC00155 /install /basevar: /continueOnError:</action>
+                <defaultVarList>
+                    <variable name="PackageID" property="PackageID" hidden="true">ABC00155</variable>
+                    <variable name="_SMSSWDProgramName" property="ProgramName">PrepImageForCapture</variable>
+                </defaultVarList>
+            </step>
+            <step type="SMS_TaskSequence_RunCommandLineAction" name="Rebuild System Center Client" description="Fixes issue with System Center Client hanging and waiting for a service to start" timeout="3600" runIn="WinPEandFullOS" successCodeList="0 3010" retryCount="0" runFromNet="false">
+                <action>smsswd.exe /run: %OSDisk%\Windows\CCM\ccmrepair.exe</action>
+                <defaultVarList>
+                    <variable name="CommandLine" property="CommandLine" hidden="true">%OSDisk%\Windows\CCM\ccmrepair.exe</variable>
+                    <variable name="SMSTSDisableWow64Redirection" property="DisableWow64Redirection">false</variable>
+                    <variable name="_SMSTSRunCommandLineAsUser" property="RunAsUser">false</variable>
+                    <variable name="SuccessCodes" property="SuccessCodes" hidden="true">0 3010</variable>
+                </defaultVarList>
+            </step>
+        </group>
+    </group>
+    <group name="Capture the Reference Machine" description="Actions to prepare and capture the reference machine">
+        <step type="SMS_TaskSequence_PrepareSMSClientAction" name="Prepare Configuration Manager Client" description="" runIn="FullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>osdpreparesmsclient.exe</action>
+            <defaultVarList/>
+        </step>
+        <step type="SMS_TaskSequence_PrepareOSAction" name="Prepare OS" description="" runIn="FullOS" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>osdprepareos.exe /activate:%OSDKeepActivation% /bmsd:%OSDBuildStorageDriverList%</action>
+            <defaultVarList>
+                <variable name="OSDBuildStorageDriverList" property="BuildStorageDriverList">false</variable>
+                <variable name="OSDKeepActivation" property="KeepActivation">false</variable>
+            </defaultVarList>
+        </step>
+        <step type="SMS_TaskSequence_CaptureSystemImageAction" name="Capture the Reference Machine" description="" runIn="WinPE" successCodeList="0" retryCount="0" runFromNet="false">
+            <action>osdcapturesystemimage.exe</action>
+            <defaultVarList>
+                <variable name="OSDCaptureDestination" property="CaptureDestination">\\SERVER\Source$\OSD\WIMCapture\WIMCapture.wim</variable>
+                <variable name="OSDCaptureAccountPassword" property="CapturePassword">
+                </variable>
+                <variable name="OSDCaptureAccount" property="CaptureUsername">DOMAIN\User</variable>
+                <variable name="OSDImageCreator" property="ImageCreator">CREATOR</variable>
+                <variable name="OSDImageDescription" property="ImageDescription">Build and Capture Windows 10 - Core</variable>
+                <variable name="OSDImageVersion" property="ImageVersion">
+                </variable>
+            </defaultVarList>
+        </step>
+    </group>
+</sequence>
