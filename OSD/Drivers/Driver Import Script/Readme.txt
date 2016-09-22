@@ -18,6 +18,8 @@ Pre-Flight steps:
 		+WinPE drivers go under the manufacturer in a WinPE folder.  The WinPE version and architecture goes under this (for the third tier).
 		+Oddball and one-off drivers go under the "Other" folder. Because of this, they are only two layers deep ("Other" counts for the first tier).
 		+EXAMPLE: \Other\Dell\DockDriver\
+		+If it's something that's versioned and changes, you can add a layer for versioning.
+		+EXAMPLE: \DisplayLink\10.0.0.1\Win10x64\
 *If a driver package needs to be re-run for any reason, manually delete the *.hash file found in the driver package folder.
 
 Running the script:
