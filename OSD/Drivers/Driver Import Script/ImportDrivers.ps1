@@ -3,6 +3,7 @@ Param(
 	,[string]$CMSite = "P01"
 	,[string]$driverStore = "\\SERVER.fqdn.com\Source$\OSD\Drivers"
 	,[string]$CMPackageSource = "\\SERVER.fqdn.com\Source$\OSD\Driver Packages"
+    	,[string]$CMCmdletLibrary = "ConfigurationManager.psd1"
 	,[bool]$VerboseLogging = $false
 )
 
@@ -14,8 +15,28 @@ $Global:ScriptStatus = 'Success'
 $LogItModule = $PSScriptRoot + "\Module_LogIt"
 
 #Import modules
-Import-Module -Name "ConfigurationManager.psd1"
 Import-Module FileSystem::$LogItModule
+if (Test-Path -Path "FileSystem::$CMCmdletLibrary")
+{
+    Import-Module -Name $CMCmdletLibrary
+}
+else
+{
+    LogIt -message ("Cannot find SCCM Cmdlet Library: " + $CMCmdletLibrary) -component "init()" -type "Error" -LogFile $LogFile
+    Return
+}
+
+# Test to make sure folders exist
+if (!Test-Path -Path "FileSystem::$driverStore")
+{
+    LogIt -message ("Cannot find folder: " + $CMPackageSource) -component "init()" -type "Error" -LogFile $LogFile
+    Return
+}
+if (!Test-Path -Path "FileSystem::$driverStore")
+{
+    LogIt -message ("Cannot find folder: " + $CMPackageSource) -component "init()" -type "Error" -LogFile $LogFile
+    Return
+}
 
 Function New-SCCMConnection {
 	[CmdletBinding()]
