@@ -1,0 +1,10 @@
+All Status Messages for Task Sequence Components
+
+select stat.*, ins.*, att1.*, stat.Time 
+from  SMS_StatusMessage as stat 
+left join SMS_StatMsgInsStrings as ins on ins.RecordID = stat.RecordID 
+left join SMS_StatMsgAttributes as att1 on att1.RecordID = stat.RecordID 
+where (stat.Component = "Task Sequence Engine" or stat.Component = "Task Sequence Manager") and 
+stat.SiteCode = ##PRM:SMS_StatusMessage.SiteCode## and 
+stat.Time >= ##PRM:SMS_StatusMessage.Time## 
+order by stat.Time DESC
