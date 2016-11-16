@@ -1,3 +1,8 @@
+Prereqs:
+*Requires that the site be configured for MDT.  If running remotely, the console will need the MDT extensions installed.
+ If you recieve an error along the lines of: "Failed to load the class properties and qualifiers for class BDD_UsePackage in task sequence"
+ (where BDD_UsePackage can be replaced by anything starting with BDD_) then you are missing the MDT extensions.
+
 To download and import:
 
 *Go back to the main repository screen (click "SystemCenterConfigMgr")
