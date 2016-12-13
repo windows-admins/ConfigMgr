@@ -1,0 +1,17 @@
+To download and import:
+
+*Go back to the main repository screen (click "SystemCenterConfigMgr")
+*Download as a zip (green button)
+*Extract
+*Import Build&Capture.zip (remember to use a UNC path)
+*In the import wizard, select to ignore the missing packages
+*You'll need to create packages from the various reg files, scripts, etc, if you want to use them, but they'll all be in the downloaded zip
+
+
+Things to be aware of:
+
+*This isn't a complete ready to run Task Sequence, it's about 80% done.
+*As mentioned above, you will need to set up a package to reference the files you want to execute.
+*Lots of the steps are examples of how to do things. Some things may or may not work depending on the particular version of Windows you're executing against.
+*An example of this is the certificate imports, you don't _need_ to import certs, but if you _want_ to that shows you how to import them against different cert stores.
+*You should use a vanilla Windows WIM.  You can extract this out of the ISO you download from Microsoft, just grab the install.wim out of the Sources folder, import into SCCM (make sure to name it so you know it's a vanilla image), and drop it into the B&C task sequence.
