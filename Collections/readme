@@ -1,11 +1,4 @@
 To add the collections, either download the whole repository or just the MOF file.  (If you try to copy and paste you might screw up the formatting, but you can try.)
 
-To configure:
-1) Import the MOF file
-2) Put them  all into a folder. (Neat and tidy, now)
-3) Modify any collection queries that say they need updated (some may require things like a site code to function properly).
-4) Create a new collection, name it something like: Client Health: All Unhealthy Workstations
-5) Include all of the imported collections in the freshly created collections.  You now know how many clients are unhealthy.  (If you need a few minutes to wipe the tears away, take a short break here.)
-6) Create a new collection, name it something like: Client Health: All Healthy Workstations
-7) Exclude (not include) the collection you created in step 4.  This should now show you all your clients, except the ones that register as unhealthy.
-8) Go get a beer.  And then  get back to work, you have a lot to clean up!
+To import:
+https://technet.microsoft.com/en-us/library/cc181056.aspx#EBAA
