@@ -1,6 +1,6 @@
 *.MOF diff
 *.mof diff
-*.reg diff
+*.reg diff=astextplain
 
 #common settings that generally should always be used with your language specific settings
 
@@ -31,6 +31,10 @@
 *.tab text
 *.tsv text
 *.sql text
+
+# Don't diff image files
+*.iso binary
+*.wim binary
 
 # Graphics
 *.png binary
