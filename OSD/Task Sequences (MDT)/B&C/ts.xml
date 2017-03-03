@@ -1,0 +1,481 @@
+<?xml version="1.0"?>
+<sequence version="3.00" name="Standard Client Task Sequence" description="A complete task sequence for deploying a client operating system">
+  <globalVarList>
+    <variable name="OSGUID" property="OSGUID">{56b95f3f-cbd1-4d67-9c69-56d84ce30ad2}</variable>
+    <variable name="DestinationDisk" property="DestinationDisk">0</variable>
+    <variable name="DestinationPartition" property="DestinationPartition">1</variable>
+    <variable name="DestinationOSVariable" property="DestinationOSVariable">OSDisk</variable>
+    <variable name="DestinationOSRefresh" property="DestinationOSRefresh"></variable>
+    <variable name="DestinationOSDriveLetter" property="DestinationOSDriveLetter"></variable>
+    <variable name="DestinationOSInstallType" property="DestinationOSInstallType">ByVariable</variable>
+    <variable name="OSGUID" property="OSGUID">{56b95f3f-cbd1-4d67-9c69-56d84ce30ad2}</variable>
+  </globalVarList>
+  <group expand="true" name="WinPE" description="In the WinPE environment" disable="false" continueOnError="false">
+    <action />
+    <group name="Validation" disable="false" continueOnError="false" description="Test" expand="true">
+      <step type="BDD_Gather" name="Gather local only" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <defaultVarList>
+          <variable name="GatherLocalOnly" property="GatherLocalOnly">true</variable>
+          <variable name="RulesFile" property="RulesFile"></variable>
+        </defaultVarList>
+        <action>cscript.exe "%SCRIPTROOT%\ZTIGather.wsf"</action>
+      </step>
+      <condition>
+        <operator type="or">
+          <expression type="SMS_TaskSequence_VariableConditionExpression">
+            <variable name="Variable">PHASE</variable>
+            <variable name="Operator">equals</variable>
+            <variable name="Value">VALIDATION</variable>
+          </expression>
+        </operator>
+      </condition>
+      <step type="BDD_Validate" name="Validate" successCodeList="0 3010" description="" startIn="" disable="false" continueOnError="false">
+        <defaultVarList>
+          <variable name="ImageSize" property="ImageSize">0</variable>
+          <variable name="ImageProcessorSpeed" property="ImageProcessorSpeed">0</variable>
+          <variable name="ImageMemory" property="ImageMemory">0</variable>
+          <variable name="VerifyOS" property="VerifyOS"></variable>
+        </defaultVarList>
+        <action>cscript.exe "%SCRIPTROOT%\ZTIValidate.wsf"</action>
+      </step>
+      <step name="Check BIOS" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\ZTIBIOSCheck.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+      <step name="Next Phase" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\ZTINextPhase.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+    </group>
+    <group name="Format and Partition" disable="false" continueOnError="false" description="" expand="true">
+      <condition></condition>
+      <step type="SMS_TaskSequence_PartitionDiskAction" name="Format and Partition Disk (BIOS)" description="Only use a single partition to make for a cleaner capture" disable="false" continueOnError="false" runIn="WinPEandFullOS" successCodeList="0 3010">
+        <condition>
+          <expression type="SMS_TaskSequence_VariableConditionExpression">
+            <variable name="Operator">notEquals</variable>
+            <variable name="Value">True</variable>
+            <variable name="Variable">IsUEFI</variable>
+          </expression>
+        </condition>
+        <defaultVarList>
+          <variable name="OSDDiskIndex" property="DiskIndex">0</variable>
+          <variable name="OSDDiskPartitions1Type" property="OSDDiskPartitions1Type">Recovery</variable>
+          <variable name="DONotCreateExtraPartition" property="DONotCreateExtraPartition"></variable>
+          <variable name="OSDPartitions0Type" property="Partitions0Type">Primary</variable>
+          <variable name="OSDPartitions0FileSystem" property="Partitions0FileSystem">NTFS</variable>
+          <variable name="OSDPartitions0Bootable" property="Partitions0Bootable">False</variable>
+          <variable name="OSDPartitions0QuickFormat" property="Partitions0QuickFormat">True</variable>
+          <variable name="OSDPartitions0VolumeName" property="Partitions0VolumeName">Windows</variable>
+          <variable name="OSDPartitions0Size" property="Partitions0Size">100</variable>
+          <variable name="OSDPartitions0SizeUnits" property="Partitions0SizeUnits">%</variable>
+          <variable name="OSDPartitions0VolumeLetterVariable" property="Partitions0VolumeLetterVariable">OSDisk</variable>
+          <variable name="OSDPartitions" property="Partitions">1</variable>
+          <variable name="OSDPartitionStyle" property="PartitionStyle">MBR</variable>
+        </defaultVarList>
+        <action>cscript.exe "%SCRIPTROOT%\ZTIDiskpart.wsf"</action>
+      </step>
+    </group>
+    <group name="Preinstall" disable="false" continueOnError="false" description="" expand="true">
+      <step name="Copy scripts" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\LTICopyScripts.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+      <condition>
+        <expression type="SMS_TaskSequence_VariableConditionExpression">
+          <variable name="Variable">PHASE</variable>
+          <variable name="Operator">equals</variable>
+          <variable name="Value">PREINSTALL</variable>
+        </expression>
+      </condition>
+      <step name="Configure" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\ZTIConfigure.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+      <step type="BDD_InstallUpdatesOffline" name="Apply Patches" disable="true" continueOnError="false" successCodeList="0 3010" description="Enable this if you want to apply updates &quot;offline&quot; (from update files rather than a WSUS server)" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\ZTIPatches.wsf"</action>
+        <defaultVarList>
+          <variable name="PackageSelectionProfile" property="PackageSelectionProfile">All Packages</variable>
+        </defaultVarList>
+      </step>
+      <step name="Next Phase" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\ZTINextPhase.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+    </group>
+    <group name="Install" disable="false" continueOnError="false" description="" expand="true">
+      <condition>
+        <expression type="SMS_TaskSequence_VariableConditionExpression">
+          <variable name="Variable">PHASE</variable>
+          <variable name="Operator">equals</variable>
+          <variable name="Value">INSTALL</variable>
+        </expression>
+      </condition>
+      <step type="BDD_InstallOS" name="Install Operating System" description="" disable="false" continueOnError="false" runIn="WinPEandFullOS" successCodeList="0 3010">
+        <defaultVarList>
+          <variable name="OSGUID" property="OSGUID">{56b95f3f-cbd1-4d67-9c69-56d84ce30ad2}</variable>
+          <variable name="DestinationDisk" property="DestinationDisk">0</variable>
+          <variable name="DestinationPartition" property="DestinationPartition">1</variable>
+          <variable name="DestinationOSDriveLetter" property="DestinationOSDriveLetter"></variable>
+          <variable name="DestinationOSVariable" property="DestinationOSVariable">OSDisk</variable>
+          <variable name="DestinationOSRefresh" property="DestinationOSRefresh"></variable>
+          <variable name="DestinationOSInstallType" property="DestinationOSInstallType">ByVariable</variable>
+        </defaultVarList>
+        <action>cscript.exe "%SCRIPTROOT%\LTIApply.wsf"</action>
+      </step>
+      <step name="Next Phase" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\ZTINextPhase.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+    </group>
+  </group>
+  <group expand="true" name="Windows" description="In the Windows environment" disable="false" continueOnError="false">
+    <action />
+    <group name="Postinstall" disable="false" continueOnError="false" description="" expand="true">
+      <condition>
+        <expression type="SMS_TaskSequence_VariableConditionExpression">
+          <variable name="Variable">PHASE</variable>
+          <variable name="Operator">equals</variable>
+          <variable name="Value">POSTINSTALL</variable>
+        </expression>
+      </condition>
+      <step name="Copy Scripts" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\LTICopyScripts.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+      <step name="Configure" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\ZTIConfigure.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="Add Windows Recovery (WinRE)" description="Enable if customizing WinRE" disable="true" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <action>cscript.exe "%SCRIPTROOT%\ZTIWinRE.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+      <step name="Next Phase" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+        <action>cscript.exe "%SCRIPTROOT%\ZTINextPhase.wsf"</action>
+        <defaultVarList>
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+      </step>
+      <step type="SMS_TaskSequence_RebootAction" name="Restart computer" description="" disable="false" continueOnError="false" runIn="WinPEandFullOS" successCodeList="0 3010">
+        <defaultVarList>
+          <variable name="Message" property="Message"></variable>
+          <variable name="MessageTimeout" property="MessageTimeout">60</variable>
+          <variable name="Target" property="Target"></variable>
+        </defaultVarList>
+        <action>smsboot.exe /target:WinPE</action>
+      </step>
+    </group>
+    <step type="BDD_Gather" name="Gather local only" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+      <defaultVarList>
+        <variable name="GatherLocalOnly" property="GatherLocalOnly">true</variable>
+        <variable name="RulesFile" property="RulesFile"></variable>
+      </defaultVarList>
+      <action>cscript.exe "%SCRIPTROOT%\ZTIGather.wsf"</action>
+    </step>
+    <step name="Post-Apply Cleanup" disable="false" continueOnError="false" successCodeList="0 3010" description="" startIn="">
+      <action>cscript.exe "%SCRIPTROOT%\LTIApply.wsf" /post</action>
+      <defaultVarList>
+        <variable name="RunAsUser" property="RunAsUser">false</variable>
+        <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+        <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+        <variable name="LoadProfile" property="LoadProfile">false</variable>
+      </defaultVarList>
+    </step>
+    <step name="Tattoo" disable="false" continueOnError="true" successCodeList="0 3010" description="" startIn="">
+      <action>cscript.exe "%SCRIPTROOT%\ZTITatoo.wsf"</action>
+      <defaultVarList>
+        <variable name="RunAsUser" property="RunAsUser">false</variable>
+        <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+        <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+        <variable name="LoadProfile" property="LoadProfile">false</variable>
+      </defaultVarList>
+    </step>
+    <group expand="true" name="Windows Configuration" description="" disable="false" continueOnError="false">
+      <action />
+      <step type="BDD_InstallApplication" name="Copy Windows Config Files Locally" description="Copies our various customizations and scripts locally, so we can execute them" disable="false" continueOnError="false" runIn="WinPEandFullOS" successCodeList="0 3010">
+        <defaultVarList>
+          <variable name="ApplicationGUID" property="ApplicationGUID">{b5347cda-c7e3-43d1-9c1a-73f528b0f39e}</variable>
+          <variable name="ApplicationSuccessCodes" property="ApplicationSuccessCodes">0 3010</variable>
+        </defaultVarList>
+        <action>cscript.exe "%SCRIPTROOT%\ZTIApplications.wsf"</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableAdvertisingID.reg" description="Disables the advertising ID" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableAdvertisingID.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableFirstLogonAnimation.reg" description="Changes back into the spinning circle on first logon" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableFirstLogonAnimation.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableIEFirstRun.reg" description="Prevents IE first run welcome box" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableIEFirstRun.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableMasterBrowser.reg" description="Prevents a machine from becoming a master browser" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableMasterBrowser.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableOneDrive.reg" description="" disable="true" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableOneDrive.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableStoreCloudContent.reg" description="Disables the advertising and automatic download from the Windows Store" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableStoreCloudContent.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableSystemRestore.reg" description="" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableSystemRestore.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableTelemetry.reg" description="" disable="true" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableTelemetry.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableTypingTelemetry" description="Prevents telemetry being sent to Microsoft from the start menu box" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableTypingTelemetry.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableUserGeneratedFeedback.reg" description="Prevents popups asking for user feedback" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableUserGeneratedFeedback.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableWebSearch.reg" description="Disables the automatic Bing search from the Windows start menu" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableWebSearch.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableWiFiSense.reg" description="Prevents trying to automatically connect to open WiFi hotspots. No long exists in1607+" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableWiFiSense.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="DisableWindowsAutomaticUpdates.reg" description="" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\DisableWindowsAutomaticUpdates.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="LockScreenImage.reg" description="" disable="true" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\LockScreenImage.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="SetAppPrivacy.reg" description="Restricts what apps can access" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\SetAppPrivacy.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="ShowOldDesktopIcons.reg" description="" disable="true" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\ShowOldDesktopIcons.reg</action>
+      </step>
+      <step type="SMS_TaskSequence_RunCommandLineAction" name="WMIServiceConfiguration.reg" description="Sets windows to run standalone and with a higher priority" disable="false" continueOnError="false" startIn="" successCodeList="0 3010" runIn="WinPEandFullOS">
+        <defaultVarList>
+          <variable name="PackageID" property="PackageID" />
+          <variable name="RunAsUser" property="RunAsUser">false</variable>
+          <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+          <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+          <variable name="LoadProfile" property="LoadProfile">false</variable>
+        </defaultVarList>
+        <action>reg import %TEMP%\Registry_Windows10\WMIServiceConfiguration.reg</action>
+      </step>
+    </group>
+    <step name="Windows Update (Pre-Application Installation)" disable="false" continueOnError="true" successCodeList="0 3010" description="Run Windows update multiple times to ensure all updates are caught" startIn="">
+      <action>cscript.exe "%SCRIPTROOT%\ZTIWindowsUpdate.wsf"</action>
+      <defaultVarList>
+        <variable name="RunAsUser" property="RunAsUser">false</variable>
+        <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+        <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+        <variable name="LoadProfile" property="LoadProfile">false</variable>
+      </defaultVarList>
+    </step>
+    <group expand="true" name="Customization" description="" disable="false" continueOnError="false">
+      <action />
+      <step type="BDD_InstallRoles" name="Install .NET 3.5.1" description="" disable="false" continueOnError="true" runIn="WinPEandFullOS" successCodeList="0 3010">
+        <defaultVarList>
+          <variable name="OSRoleIndex" property="OSRoleIndex">13</variable>
+          <variable name="OSRoles" property="OSRoles"></variable>
+          <variable name="OSRoleServices" property="OSRoleServices"></variable>
+          <variable name="OSFeatures" property="OSFeatures">NetFx3,WCF-NonHTTP-Activation</variable>
+        </defaultVarList>
+        <action>cscript.exe "%SCRIPTROOT%\ZTIOSRole.wsf"</action>
+      </step>
+    </group>
+    <step name="Opt In to CEIP and WER" disable="true" continueOnError="true" successCodeList="0 3010" description="" startIn="">
+      <action>cscript.exe "%SCRIPTROOT%\ZTIOptIn.wsf" /CEIP:YES /WER:YES</action>
+      <defaultVarList>
+        <variable name="RunAsUser" property="RunAsUser">false</variable>
+        <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+        <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+        <variable name="LoadProfile" property="LoadProfile">false</variable>
+      </defaultVarList>
+    </step>
+    <step type="SMS_TaskSequence_RebootAction" name="Restart computer" description="" disable="false" continueOnError="false" runIn="WinPEandFullOS" successCodeList="0 3010">
+      <defaultVarList>
+        <variable name="SMSRebootMessage" property="Message"></variable>
+        <variable name="SMSRebootTimeout" property="MessageTimeout">60</variable>
+        <variable name="SMSRebootTarget" property="Target"></variable>
+      </defaultVarList>
+      <action>smsboot.exe /target:WinPE</action>
+    </step>
+    <group expand="true" name="Customizations" description="Install apps and other requirements" disable="false" continueOnError="false">
+      <action />
+    </group>
+    <step name="Windows Update (Post-Application Installation)" disable="false" continueOnError="true" successCodeList="0 3010" description="Run Windows update multiple times to ensure all updates are caught" startIn="">
+      <action>cscript.exe "%SCRIPTROOT%\ZTIWindowsUpdate.wsf"</action>
+      <defaultVarList>
+        <variable name="RunAsUser" property="RunAsUser">false</variable>
+        <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+        <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+        <variable name="LoadProfile" property="LoadProfile">false</variable>
+      </defaultVarList>
+    </step>
+    <step name="Windows Update (Post-Application Installation)" disable="false" continueOnError="true" successCodeList="0 3010" description="Run Windows update multiple times to ensure all updates are caught" startIn="">
+      <action>cscript.exe "%SCRIPTROOT%\ZTIWindowsUpdate.wsf"</action>
+      <defaultVarList>
+        <variable name="RunAsUser" property="RunAsUser">false</variable>
+        <variable name="SMSTSRunCommandLineUserName" property="SMSTSRunCommandLineUserName"></variable>
+        <variable name="SMSTSRunCommandLineUserPassword" property="SMSTSRunCommandLineUserPassword"></variable>
+        <variable name="LoadProfile" property="LoadProfile">false</variable>
+      </defaultVarList>
+    </step>
+  </group>
+</sequence>
