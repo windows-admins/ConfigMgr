@@ -3,7 +3,7 @@ Param(
 	,[string]$CMSite = "P01"
 	,[string]$driverStore = "\\SERVER.fqdn.com\Source$\OSD\Drivers"
 	,[string]$CMPackageSource = "\\SERVER.fqdn.com\Source$\OSD\Driver Packages"
-    	,[string]$CMCmdletLibrary = "ConfigurationManager.psd1"
+    ,[string]$CMCmdletLibrary = "ConfigurationManager.psd1"
 	,[bool]$VerboseLogging = $false
 )
 
@@ -27,14 +27,23 @@ else
 }
 
 # Test to make sure folders exist
-if (!Test-Path -Path "FileSystem::$driverStore")
+if (Test-Path -Path "FileSystem::$driverStore")
 {
-    LogIt -message ("Cannot find folder: " + $CMPackageSource) -component "init()" -type "Error" -LogFile $LogFile
+    LogIt -message ("Driver store exists: " + $driverStore) -component "init()" -type "Verbose" -LogFile $LogFile
+}
+else
+{
+    LogIt -message ("Cannot find driver store: " + $CMPackageSource) -component "init()" -type "Error" -LogFile $LogFile
     Return
 }
-if (!Test-Path -Path "FileSystem::$driverStore")
+
+if (Test-Path -Path "FileSystem::$CMPackageSource")
 {
-    LogIt -message ("Cannot find folder: " + $CMPackageSource) -component "init()" -type "Error" -LogFile $LogFile
+    LogIt -message ("Driver package source exists: " + $CMPackageSource) -component "init()" -type "Verbose" -LogFile $LogFile
+}
+else
+{
+    LogIt -message ("Cannot find driver package source: " + $CMPackageSource) -component "init()" -type "Error" -LogFile $LogFile
     Return
 }
 
@@ -61,19 +70,16 @@ Function New-SCCMConnection {
 
 
 	# Make sure we can get a connection
-
-	if (Test-Connection -quiet -computer $sccmServer)
-	{
-		Set-Location -Path $sccmSiteCode
-		LogIt -message ("Successfully connected to: " + $sccmServer) -component "New-SCCMConnection()" -type "Info" -LogFile $LogFile
-		#Write-Host "Successfully connected to: " $sccmServer
-	}
-	else
-	{
-		LogIt -message ("Failed to connect to: " + $sccmServer) -component "New-SCCMConnection()" -type "Error" -LogFile $LogFile
-		#Write-Host "Failed to connect to: " $serverName
-		Exit
-	}
+    try
+    {
+        Set-Location -Path $sccmSiteCode
+        LogIt -message ("Successfully connected to: " + $sccmServer) -component "New-SCCMConnection()" -type "Info" -LogFile $LogFile
+    }
+    catch
+    {
+        LogIt -message ("Failed to connect to: " + $sccmServer) -component "New-SCCMConnection()" -type "Error" -LogFile $LogFile
+        Exit
+    }
 
 }
 
@@ -147,6 +153,8 @@ Function SDS-ProcessPackage
 
 	$PackageName = $package.FullName.Substring($DriverStore.Length+1, $package.FullName.Length-($DriverStore.Length+1))
 	$PackageName = $PackageName.Replace("\","_")
+    # Uncomment if you want to add a string to start/end of package
+    #$PackageName = "D " + $PackageName + " P"
 	
 	LogIt -message ("Processing Driver Package: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
 	Write-Progress -Activity "Importing Drivers" -Status "Driver Package: $PackageName"
@@ -211,9 +219,17 @@ Function SDS-ProcessPackage
 				#Write-Host "Created driver package folder"
 			}
 		
-			$CMPackage = New-CMDriverPackage -Name $PackageName -Path $CMPackageSource #-PackageSourceType StorageDirect
-			LogIt -message ("Created new driver package: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
-			#Write-Host "Created new driver package $($PackageName)"
+            try
+            {
+			    $CMPackage = New-CMDriverPackage -Name $PackageName -Path $CMPackageSource #-PackageSourceType StorageDirect
+			    LogIt -message ("Created new driver package: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
+			    #Write-Host "Created new driver package $($PackageName)"
+            }
+            catch
+            {
+                LogIt -message ("Failed to create driver package. Exiting. Error: " + $($_.ToString())) -component "SDS-ProcessPackage()" -type "Error" -LogFile $LogFile
+                Exit
+            }
 		}
 		else
 		{
