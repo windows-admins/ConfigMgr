@@ -51,5 +51,5 @@
 *.eps binary
 
 # Git Large File Storage (LFS).
-*.wim filter=lfs diff=lfs merge=lfs -text
-*.iso filter=lfs diff=lfs merge=lfs -text
+#*.wim filter=lfs diff=lfs merge=lfs -text
+#*.iso filter=lfs diff=lfs merge=lfs -text
