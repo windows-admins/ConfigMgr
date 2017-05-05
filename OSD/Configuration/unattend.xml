@@ -9,7 +9,9 @@
                 <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
                 <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
                 <NetworkLocation>Work</NetworkLocation>
-                <ProtectYourPC>1</ProtectYourPC>
+                <ProtectYourPC>3</ProtectYourPC>
+                <SkipMachineOOBE>true</SkipMachineOOBE>
+                <SkipUserOOBE>true</SkipUserOOBE>
             </OOBE>
         </component>
     </settings>
