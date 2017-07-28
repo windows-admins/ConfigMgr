@@ -1,0 +1,1 @@
+DISM /Image=%OSDisk% /Add-ProvisioningPackage /PackagePath:ProvisioningPack.ppkg
