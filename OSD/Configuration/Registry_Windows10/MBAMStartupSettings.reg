@@ -1,0 +1,11 @@
+Windows Registry Editor Version 5.00
+
+; Removes the startup delay from MBAM (speeds up first check in and drive encryption)
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\MBAM]
+“NoStartupDelay”=dword:00000001
+
+
+;These settings are *NOT* recommended outside of testing.  This will cause the client to constantly check in with the server.
+;[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\FVE\MDOPBitLockerManagement]
+;“ClientWakeupFrequency”=dword:00000001
+;“StatusReportingFrequency”=dword:00000001
