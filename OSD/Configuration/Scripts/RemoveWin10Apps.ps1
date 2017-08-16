@@ -7,12 +7,18 @@
 
 $appxpackages = ('Messaging', 'OneNote', 'OneConnect', 'SkypeApp', 'XboxApp')
  
-Foreach($package in $appxpackages){
+ForEach($package in $appxpackages)
+{
     try{
-	    $packagename=(Get-AppxProvisionedPackage -online | ?{$_.DisplayName -like '*' + $package + '*'}).PackageName
-	    DISM /online /remove-provisionedappxpackage /packagename:$packagename
+	    $packagenames=(Get-AppxProvisionedPackage -online | ?{$_.DisplayName -like '*' + $package + '*'}).PackageName
+	    
+	    ForEach ($packagename in $packagenames)
+	    {
+		    DISM /online /remove-provisionedappxpackage /packagename:$packagename
+	    }
     }
-    catch{
+    catch
+    {
 	    # Do nothing
 	    Write-Host "Critical error removing package: "
 	    Write-Host $package
