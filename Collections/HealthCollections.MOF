@@ -903,7 +903,7 @@ instance of SMS_Collection
 	CollectionRules = {
 instance of SMS_CollectionRuleQuery
 {
-	QueryExpression = "select SYS.ResourceID,SYS.ResourceType,SYS.Name,SYS.SMSUniqueIdentifier,SYS.ResourceDomainORWorkgroup,SYS.Client from sms_r_system as SYS join SMS_StatusMessage as stat on stat.machinename  IN (SYS.name, SYS.NetbiosName) where stat.ModuleName = \"SMS Client\" and stat.MessageID = 11416 and DateDiff(dd,stat.Time, GetDate()) <7";
+	QueryExpression = "select SYS.ResourceID,SYS.ResourceType,SYS.Name,SYS.SMSUniqueIdentifier,SYS.ResourceDomainORWorkgroup,SYS.Client from sms_r_system as SYS join SMS_StatusMessage as stat on stat.machinename = SYS.name OR stat.machinename = SYS.NetbiosName where stat.ModuleName = \"SMS Client\" and stat.MessageID = 11416 and DateDiff(dd,stat.Time, GetDate()) <7";
 	QueryID = 1;
 	RuleName = "WUA Agent Error";
 }};
