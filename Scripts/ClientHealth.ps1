@@ -67,9 +67,7 @@ Function Repair_SCCM
           Write-Host "[INFO] Trigger the SCCM Repair on $strComputer." 
           # The actual repair is put in a variable, to trap unwanted output. 
           $repair = $SMSCli.RepairClient() 
-          Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair on $strComputer." 
-          ########## END - PROCESS / PROGRESS CHECK AND RUN 
- 
+          Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair" 
         } 
     } 
     Catch 
