@@ -14,7 +14,6 @@ $appxpackages = (
 	'ConnectivityStore',
 	'GetHelp',
 	'Getstarted',
-	'Getstarted',
 	'HaloCamera',
 	'HaloItemPlayerApp',
 	'HaloShell',
