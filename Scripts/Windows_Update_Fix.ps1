@@ -103,6 +103,10 @@ ForEach ($dll in $dllList) {
     }
 }
 
+# Reset WinSock and WinHTTP Proxy
+netsh winsock reset
+netsh winhttp reset proxy
+
 # Restart BITS, WU, and Cryptographic services
 ForEach ($svc in $svcList) {
     $rSvc = Get-Service -Name $svc
