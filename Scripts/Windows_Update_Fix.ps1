@@ -54,7 +54,7 @@ $swdFolder = "$env:WINDIR\SoftwareDistribution"
 $cr2Folder = "$env:WINDIR\system32\catroot2"
 
 # Stop BITS, WU, and Cryptographic services
-Get-Service -Name $services | Set-Service -StartupType Automatic -Status Stopped
+Get-Service -Name $svcList | Set-Service -StartupType Automatic -Status Stopped
 
 # Delete qmgr*.dat files under %ALLUSERSPROFILE%
 If (Test-path $userDL) {
@@ -100,4 +100,4 @@ netsh winsock reset
 netsh winhttp reset proxy
 
 # Restart BITS, WU, and Cryptographic services
-Get-Service -Name $services | Set-Service -StartupType Automatic -Status Running
+Get-Service -Name $svcList | Set-Service -StartupType Automatic -Status Running
