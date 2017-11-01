@@ -1,38 +1,103 @@
 ###################################
 #
 #Automated Windows Update Fix
-#https://support.microsoft.com/en-us/help/971058/how-do-i-reset-windows-update-components
+#Gleaned from https://support.microsoft.com/en-us/help/971058/how-do-i-reset-windows-update-components
 #
 ###################################
 
-#Set services we'll be stopping and starting
-$services = "bits","wuauserv","appidsvc","cryptsvc"
+# Services, DLL lists, and locations
+$svcList = @(
+    "bits", # Background Intelligent Transfer Service
+    "wuauserv", #Windows Update Agent Service
+    "appidsvc", #Application Identity Service
+    "cryptsvc" # Crytographic Service
+)
+$dllList = @(
+    "urlmon.dll", # OLE functions
+    "mshtml.dll", # HTML related fucntions
+    "shdocvw.dll", # Add basic file and networking ops
+    "browseui.dll", # Functions and resources for browser UI mgmt
+    "jscript.dll", # Extra functionality to MS JavaScript
+    "vbscript.dll", # API functions for VBScript
+    "scrrun.dll", # Libraries for reading/writing scripts/text
+    "msxml.dll", # IE 4.0+; Parse XML docs
+    "msxml3.dll", # Microsoft MSXML 3.0 SP 7
+    "msxml6.dll", # Microsoft MSXML 6.0
+    "actxprxy.dll", # Functions for marshalling ActiveX COM interfaces
+    "softpub.dll", # Functions that support encryption
+    "wintrust.dll", # API functions to verify trust in files, catalogs, mem-blobs, sigs, and certs by third parties
+    "dssenh.dll", # Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider
+    "rsaenh.dll", # Implements MS enhanced CSP; 128-bit encryption
+    "gpkcsp.dll", # Gemplus CSP
+    "sccbase.dll", # Infineon SICRYPT® Base Smart Card CSP
+    "slbcsp.dll", # Schlumberger CSP
+    "cryptdlg.dll", # Microsoft Common Certificate Dialogs
+    "oleaut32.dll", # Core OLE functions
+    "ole32.dll",  # Core OLE functions
+    "shell32.dll", # Windows Shell API functions
+    "initpki.dll", # Microsoft Trust Installation and Setup
+    "wuapi.dll", # Windows Update Client API
+    "wuaueng.dll", # Microsoft Windows Update
+    "wuaueng1.dll", # Windows Update AutoUpdate Engine
+    "wucltui.dll", # Windows Update Client UI Plugin
+    "wups.dll", # Windows Update client proxy stub
+    "wups2.dll", # Windows Update client proxy stub
+    "wuweb.dll", # Windows Update Web Control
+    "qmgr.dll", # Background Intelligent Transfer Service
+    "qmgrprxy.dll", # Background Intelligent Transfer Service
+    "wucltux.dll", # Windows Update Client User Experience 
+    "muweb.dll", # Microsoft Update Web Control
+    "wuwebv.dll" # Windows Update Vista Web Control  
+)
+$userDL = "$env:ALLUSERSPORFILE\Microsoft\Network\Downloader"
+$swdFolder = "$env:WINDIR\SoftwareDistribution"
+$cr2Folder = "$env:WINDIR\system32\catroot2"
 
-#Stop services
-foreach ($service in $services) {Stop-Service $service}
+# Stop BITS, WU, and Cryptographic services
+Get-Service -Name $svcList | Set-Service -StartupType Automatic -Status Stopped
 
-#Remove all Downloader qmgr*.dat files
-if (test-path "$env:ALLUSERSPROFILE\Microsoft\Network\Downloader\") {get-childitem "$env:ALLUSERSPROFILE\Microsoft\Network\Downloader\" -recurse -force -include qmgr*.dat | remove-item -force}
+# Delete qmgr*.dat files under %ALLUSERSPROFILE%
+If (Test-path $userDL) {
+    Get-ChildItem $userDL -Recurse -Force -Include qmgr*.dat | Remove-Item -Force
+    Write-Host "Deleting qmgr*.dat from the All Users Profile."
+}
 
-#Agressive - Microsoft recommends skipping this on first attempt at fix.
-#Have we run the fix previously?
-if (test-path $env:WINDIR\SoftwareDistribution.bak) {Remove-Item $env:WINDIR\SoftwareDistribution.bak -Recurse}
-if (test-path $env:WINDIR\System32\catroot2.bak) {Remove-Item $env:WINDIR\System32\catroot2.bak -Recurse}
-#Otherwise, rename folders
-if (test-path $env:WINDIR\SoftwareDistribution) {Rename-Item -path $env:WINDIR\SoftwareDistribution -newname SoftwareDistribution.bak}
-if (test-path $env:WINDIR\System32\catroot2) {Rename-Item -path $env:WINDIR\System32\catroot2 -newname catroot2.bak}
-#Set BITS and WU Service Security Descriptors
-cmd /c "sc.exe sdset bits D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)"
-cmd /c "sc.exe sdset wuauserv D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)"
-#End Agressive
+# Aggressive approach: Rename the Software Distribution & catroot2 folder's backup copies   
+    # First, check to see if its been done already; remove .bak if so, then rename current folder
+    If (Test-Path ($swdFolder + ".bak")) {
+        Remove-Item ($swdFolder + ".bak") -Recurse
+        Write-Host "$swdFolder.bak deleted; renaming current folder."
+        Rename-Item $swdFolder "SoftwareDistribution.bak"
+    } Else {
+        Write-Host "$swdFolder.bak does not exist; renaming current folder"
+        Rename-Item $swdFolder "SoftwareDistribution.bak"
+    }
+    If (Test-Path ($cr2Folder + ".bak")) {
+        Remove-Item ($cr2Folder + ".bak")
+        Write-Host "$cr2Folder.bak deleted; renaming current folder."
+        Rename-Item $cr2Folder "catroot2.bak"
+    } Else {
+        Write-Host "$cr2Folder.bak does not exist; renaming current folder."
+        Rename-Item $cr2Folder "catroot2.bak"
+    }
+    # Reset BITS and WU service to the default descriptor
+    cmd /c "sc.exe sdset bits D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)"
+    cmd /c "sc.exe sdset wuauserv D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)"
 
-#Re-register DLLs
-$dll_list = "atl.dll","urlmon.dll","mshtml.dll","shdocvw.dll","browseui.dll","jscript.dll","vbscript.dll","scrrun.dll","msxml.dll","msxml3.dll","msxml6.dll","actxprxy.dll","softpub.dll","wintrust.dll","dssenh.dll","rsaenh.dll","gpkcsp.dll","sccbase.dll","slbcsp.dll","cryptdlg.dll","oleaut32.dll","ole32.dll","shell32.dll","initpki.dll","wuapi.dll","wuaueng.dll","wuaueng1.dll","wucltui.dll","wups.dll","wups2.dll","wuweb.dll","qmgr.dll","qmgrprxy.dll","wucltux.dll","muweb.dll","wuwebv.dll"
-foreach ($dll in $dll_list) {regsvr32.exe /s $env:WINDIR\system32\$dll}
+#Re-register BITS and WU DLLs
+ForEach ($dll in $dllList) {
 
-#Reset winsock and proxy
+    If (Test-Path $env:WINDIR\system32\$dll) {
+        regsvr32.exe /s $env:WINDIR\system32\$dll
+        Write-Host "Registering $dll."
+    } Else {
+        Write-Host "$dll does not exist on your system."
+    }
+}
+
+# Reset WinSock and WinHTTP Proxy
 netsh winsock reset
 netsh winhttp reset proxy
 
-#Start services
-foreach ($service in $services) {Start-Service $service}
+# Restart BITS, WU, and Cryptographic services
+Get-Service -Name $svcList | Set-Service -StartupType Automatic -Status Running
