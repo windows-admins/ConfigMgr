@@ -1,6 +1,7 @@
 *.MOF diff
 *.mof diff
 *.reg diff=astextplain
+*.MOFTEST binary eol=crlf diff=astextplain
 
 #common settings that generally should always be used with your language specific settings
 
