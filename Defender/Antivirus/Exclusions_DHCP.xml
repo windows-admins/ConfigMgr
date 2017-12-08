@@ -1,0 +1,13 @@
+<SecurityPolicy Name="Exclusions: DHCP" Description="" CreatedBy="CORP\LabAdmin" LastModifiedBy="CORP\LabAdmin" xmlns="http://forefront.microsoft.com/FEP/2010/01/PolicyData">
+  <PolicySection Name="FEP.AmPolicy" Disabled="false">
+    <LocalGroupPolicySettings>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Paths" Disabled="false">
+        <AddValue Name="%systemroot%\System32\DHCP\*.mdb" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%systemroot%\System32\DHCP\*.pat" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%systemroot%\System32\DHCP\*.log" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%systemroot%\System32\DHCP\*.chk" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%systemroot%\System32\DHCP\*.edb" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+    </LocalGroupPolicySettings>
+  </PolicySection>
+</SecurityPolicy>

@@ -1,0 +1,22 @@
+<SecurityPolicy Name="Exclusions: SCCM Client" Description="" CreatedBy="CORP\LabAdmin" LastModifiedBy="CORP\LabAdmin" xmlns="http://forefront.microsoft.com/FEP/2010/01/PolicyData">
+  <PolicySection Name="FEP.AmPolicy" Disabled="false">
+    <LocalGroupPolicySettings>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Paths" Disabled="false">
+        <AddValue Name="%SystemRoot%\system32\CCM\Cache" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\_SMSTaskSequence" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Extensions" Disabled="false">
+        <AddValue Name=".lo_" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".log" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".mof" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".xml" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Processes" Disabled="false">
+        <AddValue Name="Ccmexec.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Ccmrepair.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Ccmsetup.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Ccmdump.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+    </LocalGroupPolicySettings>
+  </PolicySection>
+</SecurityPolicy>

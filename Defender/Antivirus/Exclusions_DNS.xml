@@ -1,0 +1,10 @@
+<SecurityPolicy Name="Exclusions: DNS" Description="" CreatedBy="CORP\LabAdmin" LastModifiedBy="CORP\LabAdmin" xmlns="http://forefront.microsoft.com/FEP/2010/01/PolicyData">
+  <PolicySection Name="FEP.AmPolicy" Disabled="false">
+    <LocalGroupPolicySettings>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Paths" Disabled="false">
+        <AddValue Name="%systemroot%\System32\Dns\*.dns" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%systemroot%\System32\Dns\*.log" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+    </LocalGroupPolicySettings>
+  </PolicySection>
+</SecurityPolicy>

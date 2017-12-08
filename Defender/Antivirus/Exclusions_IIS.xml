@@ -1,0 +1,14 @@
+<SecurityPolicy Name="Exclusions: IIS" Description="" CreatedBy="CORP\LabAdmin" LastModifiedBy="CORP\LabAdmin" xmlns="http://forefront.microsoft.com/FEP/2010/01/PolicyData">
+  <PolicySection Name="FEP.AmPolicy" Disabled="false">
+    <LocalGroupPolicySettings>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Paths" Disabled="false">
+        <AddValue Name="%systemroot%\IIS Temporary Compressed Files" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\inetpub\temp\IIS Temporary Compressed Files" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Processes" Disabled="false">
+        <AddValue Name="%systemroot%\system32\inetsrv\w3wp.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%systemroot%\SysWOW64\inetsrv\w3wp.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+    </LocalGroupPolicySettings>
+  </PolicySection>
+</SecurityPolicy>
