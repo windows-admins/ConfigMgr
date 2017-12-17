@@ -114,9 +114,10 @@ Function Repair_WMI
 #---------------------------------------------------------- 
 Function Repair_SCCM 
 { 
-	Write-Host 
+	Write-Host "Repairing CCM Client"
 	Try 
 	{ 
+        Thro
 		$getProcess = Get-Process -Name ccmrepair* 
 		If ($getProcess) 
 		{ 
@@ -125,20 +126,34 @@ Function Repair_SCCM
 		} 
 		Else 
 		{ 
-		  Write-Host "[INFO] Connect to the WMI Namespace on $strComputer." 
-		  $SMSCli = [wmiclass] "\root\ccm:sms_client" 
-		  Write-Host "[INFO] Trigger the SCCM Repair on $strComputer." 
-		  # The actual repair is put in a variable, to trap unwanted output. 
-		  $repair = $SMSCli.RepairClient() 
-		  Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair" 
+            Write-Host "[INFO] Connect to the WMI Namespace on $strComputer." 
+            $SMSCli = [wmiclass] "\root\ccm:sms_client" 
+            Write-Host "[INFO] Trigger the SCCM Repair on $strComputer." 
+            # The actual repair is put in a variable, to trap unwanted output. 
+            $repair = $SMSCli.RepairClient() 
+            Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair" 
 		} 
 	} 
 	Catch 
-	{ 
+    { 
 		# The soft repair trigger failed, so lets fall back to some more hands on methods.
 		
+        Stop-Service -Name "CcmExec"
+
 		$CCMPath = (Get-ItemProperty("HKLM:\SOFTWARE\Microsoft\SMS\Client\Configuration\Client Properties")).$("Local SMS Path")
-		get-childitem "$($CCMPath)ServiceData\Messaging\EndpointQueues" -include *.msg,*.que -recurse | foreach ($_) {remove-item $_.fullname -force}
+		$files = get-childitem "$($CCMPath)ServiceData\Messaging\EndpointQueues" -include *.msg,*.que -recurse 
+        foreach ($file in $files)
+        {
+            Try
+            {
+                Write-Host "Removing $file.FullName"
+                remove-item $file.FullName -Force
+            }
+            Catch
+            {
+                Write-Host "Failed to remove $file.FullName"
+            }
+        }
 
 		$ccmrepair = "$($CCMPath)ccmrepair.exe"
 		$CCMRepairFailed = $False
