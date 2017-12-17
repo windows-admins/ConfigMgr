@@ -136,8 +136,11 @@ Function Repair_SCCM
 	Catch 
 	{ 
 		# The soft repair trigger failed, so lets fall back to some more hands on methods.
+		
+		$CCMPath = (Get-ItemProperty("HKLM:\SOFTWARE\Microsoft\SMS\Client\Configuration\Client Properties")).$("Local SMS Path")
+		get-childitem "$($CCMPath)ServiceData\Messaging\EndpointQueues" -include *.msg,*.que -recurse | foreach ($_) {remove-item $_.fullname -force}
 
-		$ccmrepair = "$env:SystemRoot\CCM\ccmrepair.exe"
+		$ccmrepair = "$($CCMPath)ccmrepair.exe"
 		$CCMRepairFailed = $False
 
 		# See if CCMRepair exists
@@ -170,7 +173,7 @@ Function Repair_SCCM
 			# CCMRepair failed or doesn't exist, try and fall back to CCMSetup
 			
 			$ccmsetup = "$env:SystemRoot\ccmsetup\ccmsetup.exe"
-			$ccmsetupargs = "/remediate:client  /log:""$env:SystemRoot\\CCM\logs\repair-msi-scripted.log"""
+			$ccmsetupargs = "/remediate:client  /log:""$($CCMPath)logs\repair-msi-scripted.log"""
 			$CCMSetupFailed = $False
 
 			# See if CCMSetup exists
