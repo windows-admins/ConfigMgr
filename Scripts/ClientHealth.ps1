@@ -117,43 +117,43 @@ Function Repair_SCCM
 	Write-Host "Repairing CCM Client"
 	Try 
 	{ 
-        Thro
 		$getProcess = Get-Process -Name ccmrepair* 
 		If ($getProcess) 
 		{ 
-		  Write-Host "[WARNING] SCCM Repair is already running. Script will end." 
-		  Exit 1 
+			Write-Host "[WARNING] SCCM Repair is already running. Script will end." 
+			Exit 1 
 		} 
 		Else 
 		{ 
-            Write-Host "[INFO] Connect to the WMI Namespace on $strComputer." 
-            $SMSCli = [wmiclass] "\root\ccm:sms_client" 
-            Write-Host "[INFO] Trigger the SCCM Repair on $strComputer." 
-            # The actual repair is put in a variable, to trap unwanted output. 
-            $repair = $SMSCli.RepairClient() 
-            Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair" 
+			Write-Host "[INFO] Connect to the WMI Namespace on $strComputer." 
+			$SMSCli = [wmiclass] "\root\ccm:sms_client" 
+			Write-Host "[INFO] Trigger the SCCM Repair on $strComputer." 
+			# The actual repair is put in a variable, to trap unwanted output. 
+			$repair = $SMSCli.RepairClient() 
+			Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair" 
 		} 
 	} 
 	Catch 
-    { 
+    	{ 
 		# The soft repair trigger failed, so lets fall back to some more hands on methods.
 		
-        Stop-Service -Name "CcmExec"
+        	Stop-Service -Name "CcmExec"
 
 		$CCMPath = (Get-ItemProperty("HKLM:\SOFTWARE\Microsoft\SMS\Client\Configuration\Client Properties")).$("Local SMS Path")
 		$files = get-childitem "$($CCMPath)ServiceData\Messaging\EndpointQueues" -include *.msg,*.que -recurse 
-        foreach ($file in $files)
-        {
-            Try
-            {
-                Write-Host "Removing $file.FullName"
-                remove-item $file.FullName -Force
-            }
-            Catch
-            {
-                Write-Host "Failed to remove $file.FullName"
-            }
-        }
+		
+		foreach ($file in $files)
+		{
+		    Try
+		    {
+			Write-Host "Removing $file.FullName"
+			remove-item $file.FullName -Force
+		    }
+		    Catch
+		    {
+			Write-Host "Failed to remove $file.FullName"
+		    }
+		}
 
 		$ccmrepair = "$($CCMPath)ccmrepair.exe"
 		$CCMRepairFailed = $False
@@ -186,7 +186,7 @@ Function Repair_SCCM
 		if ($CCMRepairFailed)
 		{
 			# CCMRepair failed or doesn't exist, try and fall back to CCMSetup
-			
+
 			$ccmsetup = "$env:SystemRoot\ccmsetup\ccmsetup.exe"
 			$ccmsetupargs = "/remediate:client  /log:""$($CCMPath)logs\repair-msi-scripted.log"""
 			$CCMSetupFailed = $False
