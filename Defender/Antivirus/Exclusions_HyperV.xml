@@ -1,0 +1,25 @@
+<SecurityPolicy Name="Exclusions: Hyper-V" Description="" CreatedBy="CORP\LabAdmin" LastModifiedBy="CORP\LabAdmin" xmlns="http://forefront.microsoft.com/FEP/2010/01/PolicyData">
+  <PolicySection Name="FEP.AmPolicy" Disabled="false">
+    <LocalGroupPolicySettings>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Paths" Disabled="false">
+        <AddValue Name="%ALLUSERSPROFILE%\Microsoft\Windows\Hyper-V" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%ALLUSERSPROFILE%\Microsoft\Windows\Hyper-V\Snapshots" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%PUBLIC%\Documents\Hyper-V\Virtual Hard Disks" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\ClusterStorage" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Extensions" Disabled="false">
+        <AddValue Name=".VHD" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".VHDX" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".AVHD" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".AVHDX" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".VSV" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ISO" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Processes" Disabled="false">
+        <AddValue Name="Vmms.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Vmwp.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Vmsp.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+    </LocalGroupPolicySettings>
+  </PolicySection>
+</SecurityPolicy>

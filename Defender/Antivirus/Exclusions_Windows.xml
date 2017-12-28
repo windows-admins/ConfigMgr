@@ -1,0 +1,35 @@
+<SecurityPolicy Name="Exclusions: Windows" Description="" CreatedBy="CORP\LabAdmin" LastModifiedBy="CORP\LabAdmin" xmlns="http://forefront.microsoft.com/FEP/2010/01/PolicyData">
+  <PolicySection Name="FEP.AmPolicy" Disabled="false">
+    <LocalGroupPolicySettings>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Paths" Disabled="false">
+        <AddValue Name="%windir%\SoftwareDistribution\Datastore\Datastore.edb" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\SoftwareDistribution\Datastore\Logs\Res*.log" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\SoftwareDistribution\Datastore\Logs\Res*.jrs" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\SoftwareDistribution\Datastore\Logs\Edb.chk" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\SoftwareDistribution\Datastore\Logs\Tmp.edb" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Security\Database\*.edb" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Security\Database\*.sdb" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Security\Database\*.log" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Security\Database\*.chk" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Security\Database\*.jrs" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%ALLUSERSPROFILE%\NTuser.pol" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemRoot%\System32\GroupPolicy\Machine\registry.pol" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemRoot%\System32\GroupPolicy\User\registry.pol" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Security\Database\*.xml" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Security\Database\*.csv" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Security\Database\*.cmtx" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntds\Ntds.dit" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntds\Ntds.pat" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntds\EDB*.log" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntds\Res*.log" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntds\Edb*.jrs" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntds\Temp.edb" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntds\Edb.chk" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntfrs\jet\sys\edb.chk" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntfrs\jet\Ntfrs.jdb" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntfrs\jet\log\*.log" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\Ntfrs\Edb*.log" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+    </LocalGroupPolicySettings>
+  </PolicySection>
+</SecurityPolicy>

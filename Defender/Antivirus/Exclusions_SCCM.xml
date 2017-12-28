@@ -1,0 +1,134 @@
+<SecurityPolicy Name="Exclusions: SCCM" Description="" CreatedBy="CORP\LabAdmin" LastModifiedBy="CORP\LabAdmin" xmlns="http://forefront.microsoft.com/FEP/2010/01/PolicyData">
+  <PolicySection Name="FEP.AmPolicy" Disabled="false">
+    <LocalGroupPolicySettings>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Paths" Disabled="false">
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\adsrv.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\AIKbMgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\amtproxymgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\auth.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\ccr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\certmgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\clifiles.src" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\colfile.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\coll_out.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\COLLEVAL.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\CompSumm.Box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\dataldr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\ddm.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\ddmnotif.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\despoolr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\distmgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\epmgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\hman.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\inventry.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\invproc.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\mmctrl.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\notictrl.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\objmgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\offermgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\OfferSum.Box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\pkginfo.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\PkgTransferMgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\policypv.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\polreq.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\rcm.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\replmgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\RuleEngine.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\schedule.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\sinv.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\sitecomp.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\sitectrl.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\SiteStat.Box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\smsbkup.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\statmgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\swmproc.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\WSUSMgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\Inboxes\wsyncmgr.box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\ConfigMgr_OfflineImageServicing" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\OSD\boot\" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\SMS_CCM\ServiceData" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\cd.latest" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\EasySetupPayload" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\AdminUIContentPayload" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\AdminUIContentStaging" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\CMUStaging" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\CMUClient" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\PilotingUpgrade" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\RLAStaging" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%programfiles%\Microsoft Configuration Manager\CMProviderLog" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemRoot%\TEMP\BootImages" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SMS_DP$" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SMSPKG" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SMSPKGSIG" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SMSSIG$" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SCCMContentLib" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SCCMBackup" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SMSPKGC$" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SMSPKGD$" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\SMSPKGE$" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Extensions" Disabled="false">
+        <AddValue Name=".cab" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".map" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".adc" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".box" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ccr" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".cfg" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".cmn" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ct0" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ct1" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ct2" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".dat" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".dc" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ddr" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ins" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ist" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".job" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".lkp" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".lo_" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".log" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".mif" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".mof" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".nal" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ncf" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".nhm" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ofn" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ofr" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".pcf" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".pck" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".pdf" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".pkg" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".pkn" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".rpl" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".rpt" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".sca" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".scd" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".scu" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".sha" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".sic" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".sid" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".srq" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".srs" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ssu" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".svf" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".tmp" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".udc" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".mdf" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ndf" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".ldf" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".msg" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".que" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".xml" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".sdf" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+      <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Processes" Disabled="false">
+        <AddValue Name="Smsexec.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="CmRcService.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Sitecomp.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Smswriter.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Smssqlbkup.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="Cmupdate.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+      </AddKey>
+    </LocalGroupPolicySettings>
+  </PolicySection>
+</SecurityPolicy>

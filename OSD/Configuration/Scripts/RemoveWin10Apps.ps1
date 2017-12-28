@@ -5,7 +5,36 @@
 # To find app names use: 
 # Get-AppxProvisionedPackage -online  | Select DisplayName, PackageName
 
-$appxpackages = ('Messaging', 'OneNote', 'OneConnect', 'SkypeApp', 'XboxApp')
+
+$appxpackages = (
+	'3DBuilder',
+	'BingFinance',
+	'BingSports',
+	'CommsPhone',
+	'ConnectivityStore',
+	'GetHelp',
+	'Getstarted',
+	'HaloCamera',
+	'HaloItemPlayerApp',
+	'HaloShell',
+	'Messaging',
+	'Microsoft3DViewer',
+	'MicrosoftOfficeHub',
+	'MicrosoftSolitaireCollection',
+	'Office.Sway',
+	'OneConnect', 
+	'OneNote', 
+	'People',
+	'Print3D',
+	'SkypeApp', 
+	'WindowsFeedbackHub',
+	'WindowsPhone',
+	'Xbox.TCUI',
+	'XboxApp',
+	'ZuneMusic',
+	'ZuneVideo',
+	'windowscommunicationsapps'
+)
  
 ForEach($package in $appxpackages)
 {
