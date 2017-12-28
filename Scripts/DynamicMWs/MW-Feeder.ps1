@@ -15,8 +15,8 @@ $Windows = Import-Csv "$PSScriptRoot\Window_Source.csv" #If you use a different 
 
 #Loop through the Collections listed in the CSV, and create a MW based on the specifications on each of the Collections
 ForEach($Line in $Windows) {
-    $SiteCode = "EVG" #Sitecode
-    $SiteServer = "sccm" #Server name (doesn't need to be FQDN
+    $SiteCode = "CON" #Sitecode
+    $SiteServer = "configmgr" #Server name (doesn't need to be FQDN
     $CollectionID = $line.CollectionID.Trim() #The Unique collection ID
     $HourDuration = $line.HourDuration.Trim() #Number of hours to open the window.  24 limitation imposed by SCCM
     $MinuteDuration = $line.MinuteDuration.Trim() #Limited to 59 minutes. Anything over will add one hour and all else will be ignored. Ex: 61 = 1 hour, no minutes
