@@ -3,8 +3,8 @@
 #Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
 # Site configuration
-$SiteCode = "EVG" # Site code 
-$ProviderMachineName = "sccm.evergreenhealthcare.org" # SMS Provider machine name
+$SiteCode = "CON" # Site code 
+$ProviderMachineName = "configmgr.contoso.com" # SMS Provider machine name
 
 # Customizations
 $initParams = @{}
