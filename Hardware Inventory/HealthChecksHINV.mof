@@ -808,3 +808,29 @@ class Win32_WindowsUpdateAgentVersion : SMS_Class_Template
         String         Version;
 };
 
+[ SMS_Report (TRUE),
+  SMS_Group_Name ("Device Guard"),
+  SMS_Class_ID ("MICROSOFT|DEVICE_GUARD|1.0"),
+  Namespace ("root\\\\Microsoft\\\\Windows\\\\DeviceGuard") ]
+class Win32_DeviceGuard : SMS_Class_Template
+{
+    [ SMS_Report (TRUE), key ]
+    String     InstanceIdentifier;
+    [ SMS_Report (TRUE) ]
+    UInt32     AvailableSecurityProperties[];
+    [ SMS_Report (TRUE) ]
+    UInt32     CodeIntegrityPolicyEnforcementStatus;
+    [ SMS_Report (TRUE) ]
+    UInt32     RequiredSecurityProperties[];
+    [ SMS_Report (TRUE) ]
+    UInt32     SecurityServicesConfigured[];
+    [ SMS_Report (TRUE) ]
+    UInt32     SecurityServicesRunning[];
+    [ SMS_Report (TRUE) ]
+    UInt32     UsermodeCodeIntegrityPolicyEnforcementStatus;
+    [ SMS_Report (TRUE) ]
+    String     Version;
+    [ SMS_Report (TRUE) ]
+    UInt32     VirtualizationBasedSecurityStatus;
+};
+
