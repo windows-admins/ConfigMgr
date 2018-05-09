@@ -27,7 +27,7 @@ ForEach ($STIG in $STIGs)
     if (Test-Path -Path $pathGPO)
     {
         $GPOBackup = dir -Filter {*} $pathGPO
-        $name = "STIG" + $version + " " + $STIG.Name
+        $name = "STIG " + $version + " " + $STIG.Name
         Write-Host "Creating STIG: " $name
         Import-GPO -BackupId $GPOBackup.Name -Path $pathGPO -TargetName $name -CreateIfNeeded
     }
@@ -38,7 +38,7 @@ ForEach ($STIG in $STIGs)
         
         ForEach ($GPOBackup in $GPOBackups)
         {
-            $name = "STIG" + $version + " " + $STIG.Name + " [" + $count + "]"
+            $name = "STIG " + $version + " " + $STIG.Name + " [" + $count + "]"
             Write-Host $name
             Import-GPO -BackupId $GPOBackup.Name -Path $pathGPOs -TargetName $name -CreateIfNeeded
             $count++
