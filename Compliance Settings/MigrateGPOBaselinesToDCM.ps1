@@ -1,4 +1,8 @@
+# REQUIRES Convert-GPOtoCI.ps1
+#
+# Fetch off WinAdmins Github or:
 # https://blogs.technet.microsoft.com/samroberts/2017/06/19/create-configmgr-configuration-items-from-group-policy-object/
+#
 
 
 #
@@ -6,6 +10,13 @@
 # module for Windows PowerShell and will connect to the site.
 #
 # This script was auto-generated at '4/18/2018 7:16:37 PM'.
+
+
+param(
+    [parameter(Mandatory=$true)]
+    [String]
+    $GPOName
+    )
 
 # Uncomment the line below if running in an environment where script signing is 
 # required.
@@ -35,19 +46,18 @@ if((Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue
 # Set the current location to be the site code.
 Set-Location "$($SiteCode):\" @initParams
 
-$GPOs = @(
-"MSFT Internet Explorer 11 - Computer",
-"MSFT Internet Explorer 11 - User",
-"MSFT Windows 10 and Server 2016 - Credential Guard",
-"MSFT Windows 10 and Server 2016 - Defender Antivirus",
-"MSFT Windows 10 and Server 2016 - Domain Security",
-"MSFT Windows 10 RS3 - BitLocker",
-"MSFT Windows 10 RS3 - Computer",
-"MSFT Windows 10 RS3 - User"
-)
 
+$GPOs = Get-GPO -All
 
 ForEach ($GPO in $GPOs)
 {
-    C:\Temp\Convert-GPOtoCI.ps1 -GpoTarget $GPO -DomainTarget corp.contoso.com -SiteCode CHQ -Remediate -Severity Critical
+    if ($GPO.DisplayName -like '*'+$GPOName+'*')
+    {
+        Write-Host "Converting: " $GPO.DisplayName
+        C:\Temp\Convert-GPOtoCI.ps1 -GpoTarget $GPO.DisplayName -DomainTarget corp.contoso.com -SiteCode CHQ -Remediate -Severity Critical
+    }
+    else
+    {
+        Write-Host "Skipping: " $GPO.DisplayName
+    }
 }
