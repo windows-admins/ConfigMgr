@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule xmlns="http://schemas.microsoft.com/SystemsCenterConfigurationManager/2009/06/14/Rules" id="" Severity="" NonCompliantWhenSettingIsNotFound="true">
+  <Annotation>
+    <DisplayName Text=""/>
+    <Description Text=""/>
+  </Annotation>
+  <Expression>
+    <Operator></Operator>
+    <Operands>
+      <SettingReference AuthoringScopeId="" LogicalName="" Version="1" SettingLogicalName="" SettingSourceType="" DataType="" Method="" Changeable=""/>
+      <ConstantValue DataType="" Value=""/>
+    </Operands>
+  </Expression>
+</Rule>
+

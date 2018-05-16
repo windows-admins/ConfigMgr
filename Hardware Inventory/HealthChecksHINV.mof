@@ -27,7 +27,7 @@ class SMS_Class_Template
 //                          Default is the WBEM class name as it
 //                          appears in this MOF.
 //          SMS_Class_ID:   REQUIRED -- The SMS class identifier
-//                          string associated with the property group.
+//                              String     associated with the property group.
 //          SMS_Namespace:  OPTIONAL -- Boolean value (TRUE, FALSE)
 //                          indicating whether the provider for this class
 //                          is located in the SMS namespace. This is TRUE
@@ -47,7 +47,7 @@ class SMS_Class_Template
 //                          Default is FALSE. For key properties,
 //                          this qualifier is ignored; keys will
 //                          always be reported.
-//          SMS_Units:      OPTIONAL -- This string informs the
+//          SMS_Units:      OPTIONAL -- This     String     informs the
 //                          Inventory Agent to perform a conversion
 //                          between data provided by WMI into a form
 //                          SMS can handle. Example: SMS can't handle
@@ -61,7 +61,7 @@ class SMS_Class_Template
 //                          Another example is using the DateString
 //                          qualifier for WMI date-time intervals
 //                          (aka: ddddddddHHMMSS.mmmmmm:000).  SMS
-//                          requires the DateString qualifier to
+//                          requires the Date    String     qualifier to
 //                          convert / use WMI time-intervals.
 //
 //                          Values:
@@ -69,13 +69,13 @@ class SMS_Class_Template
 //                           Megabytes, divides int value by (1024 * 1024)
 //                           GigaBytes, divides int value by (1024 * 1024 * 1024)
 //                           HexString, converts int value to hex characters,
-//                             (ie:  hex value 0A1 converted to string "0xA1")
+//                             (ie:  hex value 0A1 converted to     String     "0xA1")
 //                           DecimalString, converts int value to decimal string
-//                             (ie:  value 123 converted to string "123")
+//                             (ie:  value 123 converted to     String     "123")
 //                           Seconds, divides int value by 1000
 //                           DateString, converts value to interval string
 //                             (ie: DateTime value "00000008061924.000000:000"
-//                              turns into string "8 Days 08:15:55 Hours")
+//                              turns into     String     "8 Days 08:15:55 Hours")
 //
 
 [ SMS_Report (TRUE),
@@ -85,13 +85,13 @@ class SMS_Class_Template
 class Win32_EncryptableVolume : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     DeviceID;
+        String         DeviceID;
     [ SMS_Report (TRUE) ]
-    String     DriveLetter;
+        String         DriveLetter;
     [ SMS_Report (TRUE) ]
-    String     PersistentVolumeID;
+        String         PersistentVolumeID;
     [ SMS_Report (TRUE) ]
-    UInt32     ProtectionStatus;
+        uint32         ProtectionStatus;
 };
 
 [ SMS_Report (TRUE),
@@ -101,105 +101,105 @@ class Win32_EncryptableVolume : SMS_Class_Template
 class Win32_ComputerSystem : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     Name;
+        String         Name;
     [ SMS_Report (TRUE) ]
-    UInt16     AdminPasswordStatus;
+        UInt16     AdminPasswordStatus;
     [ SMS_Report (TRUE) ]
-    Boolean     AutomaticResetBootOption;
+        Boolean     AutomaticResetBootOption;
     [ SMS_Report (TRUE) ]
-    Boolean     AutomaticResetCapability;
+        Boolean     AutomaticResetCapability;
     [ SMS_Report (TRUE) ]
-    UInt16     BootOptionOnLimit;
+        UInt16     BootOptionOnLimit;
     [ SMS_Report (TRUE) ]
-    UInt16     BootOptionOnWatchDog;
+        UInt16     BootOptionOnWatchDog;
     [ SMS_Report (TRUE) ]
-    Boolean     BootROMSupported;
+        Boolean     BootROMSupported;
     [ SMS_Report (TRUE) ]
-    String     BootupState;
+        String         BootupState;
     [ SMS_Report (TRUE) ]
-    String     Caption;
+        String         Caption;
     [ SMS_Report (TRUE) ]
-    UInt16     ChassisBootupState;
+        UInt16     ChassisBootupState;
     [ SMS_Report (TRUE) ]
     SInt16     CurrentTimeZone;
     [ SMS_Report (TRUE) ]
-    Boolean     DaylightInEffect;
+        Boolean     DaylightInEffect;
     [ SMS_Report (TRUE) ]
-    String     Description;
+        String         Description;
     [ SMS_Report (TRUE) ]
-    String     Domain;
+        String         Domain;
     [ SMS_Report (TRUE) ]
-    UInt16     DomainRole;
+        UInt16     DomainRole;
     [ SMS_Report (TRUE) ]
-    UInt16     FrontPanelResetStatus;
+        UInt16     FrontPanelResetStatus;
     [ SMS_Report (TRUE) ]
-    Boolean     InfraredSupported;
+        Boolean     InfraredSupported;
     [ SMS_Report (TRUE) ]
-    String     InitialLoadInfo[];
+        String         InitialLoadInfo[];
     [ SMS_Report (TRUE) ]
     DateTime     InstallDate;
     [ SMS_Report (TRUE) ]
-    UInt16     KeyboardPasswordStatus;
+        UInt16     KeyboardPasswordStatus;
     [ SMS_Report (TRUE) ]
-    String     LastLoadInfo;
+        String         LastLoadInfo;
     [ SMS_Report (TRUE) ]
-    String     Manufacturer;
+        String         Manufacturer;
     [ SMS_Report (TRUE) ]
-    String     Model;
+        String         Model;
     [ SMS_Report (TRUE) ]
-    String     NameFormat;
+        String         NameFormat;
     [ SMS_Report (TRUE) ]
-    Boolean     NetworkServerModeEnabled;
+        Boolean     NetworkServerModeEnabled;
     [ SMS_Report (TRUE) ]
-    UInt32     NumberOfProcessors;
+        uint32         NumberOfProcessors;
     [ SMS_Report (TRUE) ]
-    String     OEMLogoBitmap;
+        String         OEMLogoBitmap;
     [ SMS_Report (TRUE) ]
-    String     OEMStringArray[];
+        String         OEMStringArray[];
     [ SMS_Report (TRUE), SMS_Units ("DecimalString") ]
     SInt64     PauseAfterReset;
     [ SMS_Report (TRUE) ]
-    UInt16     PowerManagementCapabilities[];
+        UInt16     PowerManagementCapabilities[];
     [ SMS_Report (TRUE) ]
-    Boolean     PowerManagementSupported;
+        Boolean     PowerManagementSupported;
     [ SMS_Report (TRUE) ]
-    UInt16     PowerOnPasswordStatus;
+        UInt16     PowerOnPasswordStatus;
     [ SMS_Report (TRUE) ]
-    UInt16     PowerState;
+        UInt16     PowerState;
     [ SMS_Report (TRUE) ]
-    UInt16     PowerSupplyState;
+        UInt16     PowerSupplyState;
     [ SMS_Report (TRUE) ]
-    String     PrimaryOwnerContact;
+        String         PrimaryOwnerContact;
     [ SMS_Report (TRUE) ]
-    String     PrimaryOwnerName;
+        String         PrimaryOwnerName;
     [ SMS_Report (TRUE) ]
-    UInt16     ResetCapability;
+        UInt16     ResetCapability;
     [ SMS_Report (TRUE) ]
     SInt16     ResetCount;
     [ SMS_Report (TRUE) ]
     SInt16     ResetLimit;
     [ SMS_Report (TRUE) ]
-    String     Roles[];
+        String         Roles[];
     [ SMS_Report (TRUE) ]
-    String     Status;
+        String         Status;
     [ SMS_Report (TRUE) ]
-    String     SupportContactDescription[];
+        String         SupportContactDescription[];
     [ SMS_Report (TRUE) ]
-    UInt16     SystemStartupDelay;
+        UInt16     SystemStartupDelay;
     [ SMS_Report (TRUE) ]
-    String     SystemStartupOptions[];
+        String         SystemStartupOptions[];
     [ SMS_Report (TRUE) ]
     UInt8     SystemStartupSetting;
     [ SMS_Report (TRUE) ]
-    String     SystemType;
+        String         SystemType;
     [ SMS_Report (TRUE) ]
-    UInt16     ThermalState;
+        UInt16     ThermalState;
     [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
-    UInt64     TotalPhysicalMemory;
+        UInt64     TotalPhysicalMemory;
     [ SMS_Report (TRUE) ]
-    String     UserName;
+        String         UserName;
     [ SMS_Report (TRUE) ]
-    UInt16     WakeUpType;
+        UInt16     WakeUpType;
 };
 
 [ SMS_Report (TRUE),
@@ -209,97 +209,97 @@ class Win32_ComputerSystem : SMS_Class_Template
 class Win32_DiskDrive : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     DeviceID;
+        String         DeviceID;
     [ SMS_Report (TRUE) ]
-    UInt16     Availability;
+        UInt16     Availability;
     [ SMS_Report (TRUE) ]
-    UInt32     BytesPerSector;
+        uint32         BytesPerSector;
     [ SMS_Report (TRUE) ]
-    UInt16     Capabilities[];
+        UInt16     Capabilities[];
     [ SMS_Report (TRUE) ]
-    String     CapabilityDescriptions[];
+        String         CapabilityDescriptions[];
     [ SMS_Report (TRUE) ]
-    String     Caption;
+        String         Caption;
     [ SMS_Report (TRUE) ]
-    String     CompressionMethod;
+        String         CompressionMethod;
     [ SMS_Report (TRUE) ]
-    UInt32     ConfigManagerErrorCode;
+        uint32         ConfigManagerErrorCode;
     [ SMS_Report (TRUE) ]
-    Boolean     ConfigManagerUserConfig;
+        Boolean     ConfigManagerUserConfig;
     [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
-    UInt64     DefaultBlockSize;
+        UInt64     DefaultBlockSize;
     [ SMS_Report (TRUE) ]
-    String     Description;
+        String         Description;
     [ SMS_Report (TRUE) ]
-    Boolean     ErrorCleared;
+        Boolean     ErrorCleared;
     [ SMS_Report (TRUE) ]
-    String     ErrorDescription;
+        String         ErrorDescription;
     [ SMS_Report (TRUE) ]
-    String     ErrorMethodology;
+        String         ErrorMethodology;
     [ SMS_Report (TRUE) ]
-    UInt32     Index;
+        uint32         Index;
     [ SMS_Report (TRUE) ]
     DateTime     InstallDate;
     [ SMS_Report (TRUE) ]
-    String     InterfaceType;
+        String         InterfaceType;
     [ SMS_Report (TRUE) ]
-    UInt32     LastErrorCode;
+        uint32         LastErrorCode;
     [ SMS_Report (TRUE) ]
-    String     Manufacturer;
+        String         Manufacturer;
     [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
-    UInt64     MaxBlockSize;
+        UInt64     MaxBlockSize;
     [ SMS_Report (TRUE), SMS_Units ("MegaBytes") ]
-    UInt64     MaxMediaSize;
+        UInt64     MaxMediaSize;
     [ SMS_Report (TRUE) ]
-    Boolean     MediaLoaded;
+        Boolean     MediaLoaded;
     [ SMS_Report (TRUE) ]
-    String     MediaType;
+        String         MediaType;
     [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
-    UInt64     MinBlockSize;
+        UInt64     MinBlockSize;
     [ SMS_Report (TRUE) ]
-    String     Model;
+        String         Model;
     [ SMS_Report (TRUE) ]
-    String     Name;
+        String         Name;
     [ SMS_Report (TRUE) ]
-    Boolean     NeedsCleaning;
+        Boolean     NeedsCleaning;
     [ SMS_Report (TRUE) ]
-    UInt32     NumberOfMediaSupported;
+        uint32         NumberOfMediaSupported;
     [ SMS_Report (TRUE) ]
-    UInt32     Partitions;
+        uint32         Partitions;
     [ SMS_Report (TRUE) ]
-    String     PNPDeviceID;
+        String         PNPDeviceID;
     [ SMS_Report (TRUE) ]
-    UInt16     PowerManagementCapabilities[];
+        UInt16     PowerManagementCapabilities[];
     [ SMS_Report (TRUE) ]
-    Boolean     PowerManagementSupported;
+        Boolean     PowerManagementSupported;
     [ SMS_Report (TRUE) ]
-    UInt32     SCSIBus;
+        uint32         SCSIBus;
     [ SMS_Report (TRUE) ]
-    UInt16     SCSILogicalUnit;
+        UInt16     SCSILogicalUnit;
     [ SMS_Report (TRUE) ]
-    UInt16     SCSIPort;
+        UInt16     SCSIPort;
     [ SMS_Report (TRUE) ]
-    UInt16     SCSITargetId;
+        UInt16     SCSITargetId;
     [ SMS_Report (TRUE) ]
-    UInt32     SectorsPerTrack;
+        uint32         SectorsPerTrack;
     [ SMS_Report (TRUE), SMS_Units ("Megabytes") ]
-    UInt64     Size;
+        UInt64     Size;
     [ SMS_Report (TRUE) ]
-    String     Status;
+        String         Status;
     [ SMS_Report (TRUE) ]
-    UInt16     StatusInfo;
+        UInt16     StatusInfo;
     [ SMS_Report (TRUE) ]
-    String     SystemName;
+        String         SystemName;
     [ SMS_Report (TRUE), SMS_Units ("DecimalString") ]
-    UInt64     TotalCylinders;
+        UInt64     TotalCylinders;
     [ SMS_Report (TRUE) ]
-    UInt32     TotalHeads;
+        uint32         TotalHeads;
     [ SMS_Report (TRUE), SMS_Units ("DecimalString") ]
-    UInt64     TotalSectors;
+        UInt64     TotalSectors;
     [ SMS_Report (TRUE), SMS_Units ("DecimalString") ]
-    UInt64     TotalTracks;
+        UInt64     TotalTracks;
     [ SMS_Report (TRUE) ]
-    UInt32     TracksPerCylinder;
+        uint32         TracksPerCylinder;
 };
 
 [ SMS_Report (TRUE),
@@ -309,69 +309,69 @@ class Win32_DiskDrive : SMS_Class_Template
 class Win32_DiskPartition : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     DeviceID;
+        String         DeviceID;
     [ SMS_Report (TRUE) ]
-    UInt16     Access;
+        UInt16     Access;
     [ SMS_Report (TRUE) ]
-    UInt16     Availability;
+        UInt16     Availability;
     [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
-    UInt64     BlockSize;
+        UInt64     BlockSize;
     [ SMS_Report (TRUE) ]
-    Boolean     Bootable;
+        Boolean     Bootable;
     [ SMS_Report (TRUE) ]
-    Boolean     BootPartition;
+        Boolean     BootPartition;
     [ SMS_Report (TRUE) ]
-    String     Caption;
+        String         Caption;
     [ SMS_Report (TRUE) ]
-    UInt32     ConfigManagerErrorCode;
+        uint32         ConfigManagerErrorCode;
     [ SMS_Report (TRUE) ]
-    Boolean     ConfigManagerUserConfig;
+        Boolean     ConfigManagerUserConfig;
     [ SMS_Report (TRUE) ]
-    String     Description;
+        String         Description;
     [ SMS_Report (TRUE) ]
-    UInt32     DiskIndex;
+        uint32         DiskIndex;
     [ SMS_Report (TRUE) ]
-    Boolean     ErrorCleared;
+        Boolean     ErrorCleared;
     [ SMS_Report (TRUE) ]
-    String     ErrorDescription;
+        String         ErrorDescription;
     [ SMS_Report (TRUE) ]
-    String     ErrorMethodology;
+        String         ErrorMethodology;
     [ SMS_Report (TRUE) ]
-    UInt32     HiddenSectors;
+        uint32         HiddenSectors;
     [ SMS_Report (TRUE) ]
-    UInt32     Index;
+        uint32         Index;
     [ SMS_Report (TRUE) ]
     DateTime     InstallDate;
     [ SMS_Report (TRUE) ]
-    UInt32     LastErrorCode;
+        uint32         LastErrorCode;
     [ SMS_Report (TRUE) ]
-    String     Name;
+        String         Name;
     [ SMS_Report (TRUE), SMS_Units ("DecimalString") ]
-    UInt64     NumberOfBlocks;
+        UInt64     NumberOfBlocks;
     [ SMS_Report (TRUE) ]
-    String     PNPDeviceID;
+        String         PNPDeviceID;
     [ SMS_Report (TRUE) ]
-    UInt16     PowerManagementCapabilities[];
+        UInt16     PowerManagementCapabilities[];
     [ SMS_Report (TRUE) ]
-    Boolean     PowerManagementSupported;
+        Boolean     PowerManagementSupported;
     [ SMS_Report (TRUE) ]
-    Boolean     PrimaryPartition;
+        Boolean     PrimaryPartition;
     [ SMS_Report (TRUE) ]
-    String     Purpose;
+        String         Purpose;
     [ SMS_Report (TRUE) ]
-    Boolean     RewritePartition;
+        Boolean     RewritePartition;
     [ SMS_Report (TRUE), SMS_Units ("Megabytes") ]
-    UInt64     Size;
+        UInt64     Size;
     [ SMS_Report (TRUE), SMS_Units ("Megabytes") ]
-    UInt64     StartingOffset;
+        UInt64     StartingOffset;
     [ SMS_Report (TRUE) ]
-    String     Status;
+        String         Status;
     [ SMS_Report (TRUE) ]
-    UInt16     StatusInfo;
+        UInt16     StatusInfo;
     [ SMS_Report (TRUE) ]
-    String     SystemName;
+        String         SystemName;
     [ SMS_Report (TRUE) ]
-    String     Type;
+        String         Type;
 };
 
 [ SMS_Report (TRUE),
@@ -381,9 +381,9 @@ class Win32_DiskPartition : SMS_Class_Template
 class SMS_Firmware : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    Boolean     UEFI;
+        Boolean     UEFI;
     [ SMS_Report (TRUE) ]
-    Boolean     SecureBoot;
+        Boolean     SecureBoot;
 };
 
 [ SMS_Report (TRUE),
@@ -393,71 +393,71 @@ class SMS_Firmware : SMS_Class_Template
 class SMS_LogicalDisk : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     DeviceID;
+        String         DeviceID;
     [ SMS_Report (TRUE) ]
-    UInt16     Access;
+        UInt16     Access;
     [ SMS_Report (TRUE) ]
-    UInt16     Availability;
+        UInt16     Availability;
     [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
-    UInt64     BlockSize;
+        UInt64     BlockSize;
     [ SMS_Report (TRUE) ]
-    String     Caption;
+        String         Caption;
     [ SMS_Report (TRUE) ]
-    Boolean     Compressed;
+        Boolean     Compressed;
     [ SMS_Report (TRUE) ]
-    UInt32     ConfigManagerErrorCode;
+        uint32         ConfigManagerErrorCode;
     [ SMS_Report (TRUE) ]
-    Boolean     ConfigManagerUserConfig;
+        Boolean     ConfigManagerUserConfig;
     [ SMS_Report (TRUE) ]
-    String     Description;
+        String         Description;
     [ SMS_Report (TRUE) ]
-    UInt32     DriveType;
+        uint32         DriveType;
     [ SMS_Report (TRUE) ]
-    Boolean     ErrorCleared;
+        Boolean     ErrorCleared;
     [ SMS_Report (TRUE) ]
-    String     ErrorDescription;
+        String         ErrorDescription;
     [ SMS_Report (TRUE) ]
-    String     ErrorMethodology;
+        String         ErrorMethodology;
     [ SMS_Report (TRUE) ]
-    String     FileSystem;
+        String         FileSystem;
     [ SMS_Report (TRUE), SMS_Units ("Gigabytes") ]
-    UInt64     FreeSpace;
+        UInt64     FreeSpace;
     [ SMS_Report (TRUE) ]
     DateTime     InstallDate;
     [ SMS_Report (TRUE) ]
-    UInt32     LastErrorCode;
+        uint32         LastErrorCode;
     [ SMS_Report (TRUE) ]
-    UInt32     MaximumComponentLength;
+        uint32         MaximumComponentLength;
     [ SMS_Report (TRUE) ]
-    UInt32     MediaType;
+        uint32         MediaType;
     [ SMS_Report (TRUE) ]
-    String     Name;
+        String         Name;
     [ SMS_Report (TRUE), SMS_Units ("DecimalString") ]
-    UInt64     NumberOfBlocks;
+        UInt64     NumberOfBlocks;
     [ SMS_Report (TRUE) ]
-    String     PNPDeviceID;
+        String         PNPDeviceID;
     [ SMS_Report (TRUE) ]
-    UInt16     PowerManagementCapabilities[];
+        UInt16     PowerManagementCapabilities[];
     [ SMS_Report (TRUE) ]
-    Boolean     PowerManagementSupported;
+        Boolean     PowerManagementSupported;
     [ SMS_Report (TRUE) ]
-    String     ProviderName;
+        String         ProviderName;
     [ SMS_Report (TRUE) ]
-    String     Purpose;
+        String         Purpose;
     [ SMS_Report (TRUE), SMS_Units ("Gigabytes") ]
-    UInt64     Size;
+        UInt64     Size;
     [ SMS_Report (TRUE) ]
-    String     Status;
+        String         Status;
     [ SMS_Report (TRUE) ]
-    UInt16     StatusInfo;
+        UInt16     StatusInfo;
     [ SMS_Report (TRUE) ]
-    Boolean     SupportsFileBasedCompression;
+        Boolean     SupportsFileBasedCompression;
     [ SMS_Report (TRUE) ]
-    String     SystemName;
+        String         SystemName;
     [ SMS_Report (TRUE) ]
-    String     VolumeName;
+        String         VolumeName;
     [ SMS_Report (TRUE) ]
-    String     VolumeSerialNumber;
+        String         VolumeSerialNumber;
 };
 
 [ SMS_Report (TRUE),
@@ -467,11 +467,11 @@ class SMS_LogicalDisk : SMS_Class_Template
 class CCM_ProtectedVolumeInfo : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     Name;
+        String         Name;
     [ SMS_Report (TRUE) ]
-    String     DriveLetter;
+        String         DriveLetter;
     [ SMS_Report (TRUE) ]
-    UInt32     ProtectionType;
+        uint32         ProtectionType;
 };
 
 [ SMS_Report (TRUE),
@@ -481,51 +481,177 @@ class CCM_ProtectedVolumeInfo : SMS_Class_Template
 class Win32_Service : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     Name;
+        String         Name;
     [ SMS_Report (TRUE) ]
-    Boolean     AcceptPause;
+        Boolean     AcceptPause;
     [ SMS_Report (TRUE) ]
-    Boolean     AcceptStop;
+        Boolean     AcceptStop;
     [ SMS_Report (TRUE) ]
-    String     Caption;
+        String         Caption;
     [ SMS_Report (TRUE) ]
-    UInt32     CheckPoint;
+        uint32         CheckPoint;
     [ SMS_Report (TRUE) ]
-    String     Description;
+        String         Description;
     [ SMS_Report (TRUE) ]
-    Boolean     DesktopInteract;
+        Boolean     DesktopInteract;
     [ SMS_Report (TRUE) ]
-    String     DisplayName;
+        String         DisplayName;
     [ SMS_Report (TRUE) ]
-    String     ErrorControl;
+        String         ErrorControl;
     [ SMS_Report (TRUE) ]
-    UInt32     ExitCode;
+        uint32         ExitCode;
     [ SMS_Report (TRUE) ]
     DateTime     InstallDate;
     [ SMS_Report (TRUE) ]
-    String     PathName;
+        String         PathName;
     [ SMS_Report (TRUE) ]
-    UInt32     ProcessId;
+        uint32         ProcessId;
     [ SMS_Report (TRUE) ]
-    UInt32     ServiceSpecificExitCode;
+        uint32         ServiceSpecificExitCode;
     [ SMS_Report (TRUE) ]
-    String     ServiceType;
+        String         ServiceType;
     [ SMS_Report (TRUE) ]
-    Boolean     Started;
+        Boolean     Started;
     [ SMS_Report (TRUE) ]
-    String     StartMode;
+        String         StartMode;
     [ SMS_Report (TRUE) ]
-    String     StartName;
+        String         StartName;
     [ SMS_Report (TRUE) ]
-    String     State;
+        String         State;
     [ SMS_Report (TRUE) ]
-    String     Status;
+        String         Status;
     [ SMS_Report (TRUE) ]
-    String     SystemName;
+        String         SystemName;
     [ SMS_Report (TRUE) ]
-    UInt32     TagId;
+        uint32         TagId;
     [ SMS_Report (TRUE) ]
-    UInt32     WaitHint;
+        uint32         WaitHint;
+};
+
+[ SMS_Report (TRUE),
+  SMS_Group_Name ("SW Licensing Product"),
+  SMS_Class_ID ("MICROSOFT|SOFTWARE_LICENSING_PRODUCT|1.0"),
+  Namespace ("\\\\\\\\.\\\\root\\\\cimv2") ]
+class SoftwareLicensingProduct : SMS_Class_Template
+{
+    [ SMS_Report (TRUE), key ]
+        String         ID;
+    [ SMS_Report (TRUE) ]
+        String         ApplicationID;
+    [ SMS_Report (TRUE) ]
+        String         Description;
+    [ SMS_Report (TRUE) ]
+    DateTime     EvaluationEndDate;
+    [ SMS_Report (TRUE) ]
+        uint32         GracePeriodRemaining;
+    [ SMS_Report (TRUE) ]
+        uint32         LicenseStatus;
+    [ SMS_Report (TRUE) ]
+        String         MachineURL;
+    [ SMS_Report (TRUE) ]
+        String         Name;
+    [ SMS_Report (TRUE) ]
+        String         OfflineInstallationId;
+    [ SMS_Report (TRUE) ]
+        String         PartialProductKey;
+    [ SMS_Report (TRUE) ]
+        String         ProcessorURL;
+    [ SMS_Report (TRUE) ]
+        String         ProductKeyID;
+    [ SMS_Report (TRUE) ]
+        String         ProductKeyURL;
+    [ SMS_Report (TRUE) ]
+        String         UseLicenseURL;
+    [ SMS_Report (TRUE) ]
+        String         ValidationURL;
+    [ SMS_Report (TRUE) ]
+    uint32     LicenseStatusReason;
+    [ SMS_Report (TRUE) ]
+        String         ProductKeyID2;
+    [ SMS_Report (TRUE) ]
+        String         ProductKeyChannel;
+    [ SMS_Report (TRUE) ]
+        String         LicenseFamily;
+    [ SMS_Report (TRUE) ]
+        String         LicenseDependsOn;
+    [ SMS_Report (TRUE) ]
+        boolean         LicenseIsAddon;
+    [ SMS_Report (TRUE) ]
+    uint32     VLActivationInterval;
+    [ SMS_Report (TRUE) ]
+    uint32     VLRenewalInterval;
+    [ SMS_Report (TRUE) ]
+        String         KeyManagementServiceProductKeyID;
+    [ SMS_Report (TRUE) ]
+        String         KeyManagementServiceMachine;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServicePort;
+    [ SMS_Report (TRUE) ]
+        String         KeyManagementServiceLookupDomain;
+    [ SMS_Report (TRUE) ]
+        String         DiscoveredKeyManagementServiceMachineName;
+    [ SMS_Report (TRUE) ]
+        uint32     IsKeyManagementServiceMachine;
+    [ SMS_Report (TRUE) ]
+        uint32     KeyManagementServiceCurrentCount;
+    [ SMS_Report (TRUE) ]
+    uint32     RequiredClientCount;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServiceUnlicensedRequests;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServiceLicensedRequests;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServiceOOBGraceRequests;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServiceOOTGraceRequests;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServiceNonGenuineGraceRequests;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServiceTotalRequests;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServiceFailedRequests;
+    [ SMS_Report (TRUE) ]
+    uint32     KeyManagementServiceNotificationRequests;
+    [ SMS_Report (TRUE) ]
+    uint32     GenuineStatus;
+    [ SMS_Report (TRUE) ]
+    uint32     ExtendedGrace;
+    [ SMS_Report (TRUE) ]
+    String     TokenActivationILID;
+    [ SMS_Report (TRUE) ]
+    uint32     TokenActivationILVID;
+    [ SMS_Report (TRUE) ]
+    uint32     TokenActivationGrantNumber;
+    [ SMS_Report (TRUE) ]
+    String     TokenActivationCertificateThumbprint;
+    [ SMS_Report (TRUE) ]
+    String     TokenActivationAdditionalInfo;
+    [ SMS_Report (TRUE) ]
+    datetime   TrustedTime;
+    [ SMS_Report (TRUE) ]
+    uint32     VLActivationType;
+    [ SMS_Report (TRUE) ]
+    uint32     VLActivationTypeEnabled;
+    [ SMS_Report (TRUE) ]
+    String     ADActivationObjectName;
+    [ SMS_Report (TRUE) ]
+    String     ADActivationObjectDN;
+    [ SMS_Report (TRUE) ]
+    String     ADActivationCsvlkPid;
+    [ SMS_Report (TRUE) ]
+    String     ADActivationCsvlkSkuId;
+    [ SMS_Report (TRUE) ]
+    uint32     RemainingSkuReArmCount;
+    [ SMS_Report (TRUE) ]
+    uint32     RemainingAppReArmCount;
+    [ SMS_Report (TRUE) ]
+    String     IAID;
+    [ SMS_Report (TRUE) ]
+    String     AutomaticVMActivationHostMachineName;
+    [ SMS_Report (TRUE) ]
+    datetime   AutomaticVMActivationLastActivationTime;
+    [ SMS_Report (TRUE) ]
+    String     AutomaticVMActivationHostDigitalPid2;
 };
 
 [ SMS_Report (TRUE),
@@ -535,21 +661,21 @@ class Win32_Service : SMS_Class_Template
 class Win32_Tpm : SMS_Class_Template
 {
     [ SMS_Report (TRUE) ]
-    Boolean     IsActivated_InitialValue;
+        Boolean     IsActivated_InitialValue;
     [ SMS_Report (TRUE) ]
-    Boolean     IsEnabled_InitialValue;
+        Boolean     IsEnabled_InitialValue;
     [ SMS_Report (TRUE) ]
-    Boolean     IsOwned_InitialValue;
+        Boolean     IsOwned_InitialValue;
     [ SMS_Report (TRUE) ]
-    UInt32     ManufacturerId;
+        uint32         ManufacturerId;
     [ SMS_Report (TRUE) ]
-    String     ManufacturerVersion;
+        String         ManufacturerVersion;
     [ SMS_Report (TRUE) ]
-    String     ManufacturerVersionInfo;
+        String         ManufacturerVersionInfo;
     [ SMS_Report (TRUE) ]
-    String     PhysicalPresenceVersionInfo;
+        String         PhysicalPresenceVersionInfo;
     [ SMS_Report (TRUE) ]
-    String     SpecVersion;
+        String         SpecVersion;
 };
 
 [ SMS_Report (TRUE),
@@ -559,11 +685,11 @@ class Win32_Tpm : SMS_Class_Template
 class SMS_TPM : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    Boolean     IsReady;
+        Boolean     IsReady;
     [ SMS_Report (TRUE) ]
-    UInt32     Information;
+        uint32         Information;
     [ SMS_Report (TRUE) ]
-    Boolean     IsApplicable;
+        Boolean     IsApplicable;
 };
 
 [ SMS_Report (TRUE),
@@ -573,87 +699,87 @@ class SMS_TPM : SMS_Class_Template
 class Win32_Volume : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     DeviceID;
+        String         DeviceID;
     [ SMS_Report (FALSE) ]
-    UInt16     Access;
+        UInt16     Access;
     [ SMS_Report (FALSE) ]
-    Boolean     Automount;
+        Boolean     Automount;
     [ SMS_Report (TRUE) ]
-    UInt16     Availability;
+        UInt16     Availability;
     [ SMS_Report (FALSE), SMS_Units ("Megabytes") ]
-    UInt64     BlockSize;
+        UInt64     BlockSize;
     [ SMS_Report (FALSE), SMS_Units ("Megabytes") ]
-    UInt64     Capacity;
+        UInt64     Capacity;
     [ SMS_Report (FALSE) ]
-    String     Caption;
+        String         Caption;
     [ SMS_Report (FALSE) ]
-    Boolean     Compressed;
+        Boolean     Compressed;
     [ SMS_Report (FALSE) ]
-    UInt32     ConfigManagerErrorCode;
+        uint32         ConfigManagerErrorCode;
     [ SMS_Report (FALSE) ]
-    Boolean     ConfigManagerUserConfig;
+        Boolean     ConfigManagerUserConfig;
     [ SMS_Report (FALSE) ]
-    String     CreationClassName;
+        String         CreationClassName;
     [ SMS_Report (FALSE) ]
-    String     Description;
+        String         Description;
     [ SMS_Report (TRUE) ]
-    Boolean     DirtyBitSet;
+        Boolean     DirtyBitSet;
     [ SMS_Report (FALSE) ]
-    String     DriveLetter;
+        String         DriveLetter;
     [ SMS_Report (FALSE) ]
-    UInt32     DriveType;
+        uint32         DriveType;
     [ SMS_Report (TRUE) ]
-    Boolean     ErrorCleared;
+        Boolean     ErrorCleared;
     [ SMS_Report (TRUE) ]
-    String     ErrorDescription;
+        String         ErrorDescription;
     [ SMS_Report (TRUE) ]
-    String     ErrorMethodology;
+        String         ErrorMethodology;
     [ SMS_Report (FALSE) ]
-    String     FileSystem;
+        String         FileSystem;
     [ SMS_Report (FALSE), SMS_Units ("Megabytes") ]
-    UInt64     FreeSpace;
+        UInt64     FreeSpace;
     [ SMS_Report (FALSE) ]
-    Boolean     IndexingEnabled;
+        Boolean     IndexingEnabled;
     [ SMS_Report (FALSE) ]
-    DateTime     InstallDate;
+        DateTime     InstallDate;
     [ SMS_Report (FALSE) ]
-    String     Label;
+        String         Label;
     [ SMS_Report (TRUE) ]
-    UInt32     LastErrorCode;
+        uint32         LastErrorCode;
     [ SMS_Report (FALSE) ]
-    UInt32     MaximumFileNameLength;
+        uint32         MaximumFileNameLength;
     [ SMS_Report (FALSE) ]
-    String     Name;
+        String         Name;
     [ SMS_Report (FALSE) ]
-    UInt64     NumberOfBlocks;
+        UInt64     NumberOfBlocks;
     [ SMS_Report (FALSE) ]
-    String     PNPDeviceID;
+        String         PNPDeviceID;
     [ SMS_Report (FALSE) ]
-    UInt16     PowerManagementCapabilities[];
+        UInt16     PowerManagementCapabilities[];
     [ SMS_Report (FALSE) ]
-    Boolean     PowerManagementSupported;
+        Boolean     PowerManagementSupported;
     [ SMS_Report (FALSE) ]
-    String     Purpose;
+        String         Purpose;
     [ SMS_Report (FALSE) ]
-    Boolean     QuotasEnabled;
+        Boolean     QuotasEnabled;
     [ SMS_Report (FALSE) ]
-    Boolean     QuotasIncomplete;
+        Boolean     QuotasIncomplete;
     [ SMS_Report (FALSE) ]
-    Boolean     QuotasRebuilding;
+        Boolean     QuotasRebuilding;
     [ SMS_Report (FALSE) ]
-    UInt32     SerialNumber;
+        uint32         SerialNumber;
     [ SMS_Report (TRUE) ]
-    String     Status;
+        String         Status;
     [ SMS_Report (TRUE) ]
-    UInt16     StatusInfo;
+        UInt16     StatusInfo;
     [ SMS_Report (FALSE) ]
-    Boolean     SupportsDiskQuotas;
+        Boolean     SupportsDiskQuotas;
     [ SMS_Report (FALSE) ]
-    Boolean     SupportsFileBasedCompression;
+        Boolean     SupportsFileBasedCompression;
     [ SMS_Report (FALSE) ]
-    String     SystemCreationClassName;
+        String         SystemCreationClassName;
     [ SMS_Report (FALSE) ]
-    String     SystemName;
+        String         SystemName;
 };
 
 [ SMS_Report (TRUE),
@@ -663,13 +789,13 @@ class Win32_Volume : SMS_Class_Template
 class Win32Reg_SMSWindowsUpdate : SMS_Class_Template
 {
     [ SMS_Report (TRUE), key ]
-    String     InstanceKey;
+        String         InstanceKey;
     [ SMS_Report (TRUE) ]
-    UInt32     AUOptions;
+        uint32         AUOptions;
     [ SMS_Report (TRUE) ]
-    UInt32     NoAutoUpdate;
+        uint32         NoAutoUpdate;
     [ SMS_Report (TRUE) ]
-    UInt32     UseWUServer;
+        uint32         UseWUServer;
 };
 
 [ SMS_Report (TRUE),
@@ -679,6 +805,32 @@ class Win32Reg_SMSWindowsUpdate : SMS_Class_Template
 class Win32_WindowsUpdateAgentVersion : SMS_Class_Template
 {
     [ SMS_Report (TRUE) ]
+        String         Version;
+};
+
+[ SMS_Report (TRUE),
+  SMS_Group_Name ("Device Guard"),
+  SMS_Class_ID ("MICROSOFT|DEVICE_GUARD|1.0"),
+  Namespace ("root\\\\Microsoft\\\\Windows\\\\DeviceGuard") ]
+class Win32_DeviceGuard : SMS_Class_Template
+{
+    [ SMS_Report (TRUE), key ]
+    String     InstanceIdentifier;
+    [ SMS_Report (TRUE) ]
+    UInt32     AvailableSecurityProperties[];
+    [ SMS_Report (TRUE) ]
+    UInt32     CodeIntegrityPolicyEnforcementStatus;
+    [ SMS_Report (TRUE) ]
+    UInt32     RequiredSecurityProperties[];
+    [ SMS_Report (TRUE) ]
+    UInt32     SecurityServicesConfigured[];
+    [ SMS_Report (TRUE) ]
+    UInt32     SecurityServicesRunning[];
+    [ SMS_Report (TRUE) ]
+    UInt32     UsermodeCodeIntegrityPolicyEnforcementStatus;
+    [ SMS_Report (TRUE) ]
     String     Version;
+    [ SMS_Report (TRUE) ]
+    UInt32     VirtualizationBasedSecurityStatus;
 };
 

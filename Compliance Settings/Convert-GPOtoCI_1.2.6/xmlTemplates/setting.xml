@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SimpleSetting LogicalName="" DataType="">
+  <Annotation xmlns="http://schemas.microsoft.com/SystemsCenterConfigurationManager/2009/06/14/Rules">
+    <DisplayName Text=""/>
+    <Description Text=""/>
+  </Annotation>
+  <RegistryDiscoverySource Hive="" Is64Bit="">
+    <Key></Key>
+    <ValueName></ValueName>
+  </RegistryDiscoverySource>
+</SimpleSetting>
+
