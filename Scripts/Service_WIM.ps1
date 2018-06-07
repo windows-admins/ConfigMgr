@@ -11,51 +11,100 @@ param(
 [Parameter(Mandatory=$True,ParameterSetName = "FullOptions")]
 [String]$MountDir,
 [Parameter(Mandatory=$True,ParameterSetName = "FullOptions")]
-[String]$DestinationImage,
-[Parameter(Mandatory=$False,ParameterSetName = "FullOptions")]
-[String]$UpdatePath
+[String]$DestinationImage
 )
 
+#Create an empty directory to mount the .wim file to.
+    #C:\WIM
+
+#Place all update files (.cab or .msu) you'd like serviced into the .wim file in the same directory as the .wim. Ex:
+    #C:\WIM-Servicing\
+    #C:\WIM-Serviving\install.wim
+    #C:\Wim-Servicing\windows10.0-kb4100347-x64.msu
+    #C:\Wim-Servicing\windows10.0-kb4100403-x64.msu
+#The script will add them to the .wim automatically.
+
 #Command line usage examples:
-# Remove Indexes, add update, optimize .wim
-#      Shrink_WIM.ps1 -SourceImage "c:\install.wim" -MountDir "C:\wim" -DestinationImage "c:\install-new.wim" -WinVersion "Windows 10 Enterprise" -UpdatePath "c:\windows10.0-kb4103721-x64.msu"
+# Export a single Index, add updates, optimize .wim
+#      Service_WIM.ps1 -SourceImage "C:\WIM-Source\install.wim" -MountDir "C:\WIM" -DestinationImage "C:\WIM-Source\install-new.wim" -WinVersion "Windows 10 Enterprise"
 # Remove Indexes only
-#      Shrink_WIM.ps1 -IndexOnly -SourceImage "c:\install.wim" -WinVersion "Windows 10 Enterprise"
+#      Service_WIM.ps1 -IndexOnly -SourceImage "C:\WIM-Source\install.wim" -WinVersion "Windows 10 Enterprise" -DestinationImage "C:\WIM-Source\install-new.wim"
 
 #Index names available as of 1803:
 # Windows 10 Education, Windows 10 Education N, Windows 10 Enterprise, Windows 10 Enterprise N, Windows 10 Pro, Windows 10 Pro N, Windows 10 Pro Education, Windows 10 Pro Education N, Windows 10 Pro for Workstations, Windows 10 Pro N for Workstations
 
-#DISM commands courtesy of @LTBehr.
+#DISM commands courtesy of @LTBehr
+#Export Index method courtesy of @danpadgett
 
-#Get all indexes
-$img_indexes = Get-WindowsImage -ImagePath $SourceImage
+#Check to ensure directory to mount .wim file to is empty. -force to look for hidden files.
+$MountDirInfo = Get-ChildItem $MountDir -Force | Measure-Object
+if ($MountDirInfo -ne 0){
+Write-Host "$MountDir is not empty (including hidden files). Please resolve and try again."
+Exit
+}
 
-#Create loop to remove indexes until we are left with one.
-do {
-    #Loop through each index and remove the index if it is not the designated edition.
-    foreach ($img_index in $img_indexes) {
-        if ($img_index.ImageName -ne $WinVersion) {
-        Remove-WindowsImage -ImagePath $SourceImage -Index $img_index.ImageIndex
-        #Break out of the for loop, as we need to refresh the index list. The indexes re-order once one is removed.
-        break
-        }
-    }
-    #Refresh the index list.
-    $img_indexes = Get-WindowsImage -ImagePath $SourceImage
-    } until ($img_indexes.Count -eq 1)
+#Check for Windows 10 ADK DISM. If it is installed, use that instead of built in version.
+if (Test-Path "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM\dism.exe") {$dism = "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM\dism.exe" } else {$dism = "dism.exe"}
 
-#If -IndexOnly switch was not used, run DISM commands to optimize .wim file.
+#Export specified Index.
+Write-Host "Exporting Single Index..."
+#Check for existence of destination image file for export. If it already exists, dism will not error out and just add another index, so it needs to be removed.
+if ((Test-Path $DestinationImage) -eq $True) {Write-Host "Destination image file, $DestinationImage, already exists. Please remove the file and re-run the script. Otherwise, DISM will reuse the existing file and add another index."
+    Exit}
+#The mount image step had a problem where dism did not return complete using a standard -wait switch and hung the script. Using the WaitForExit method, which fixed this, for all dism commands for consistency.
 
+$dism_wait = Start-Process $dism -PassThru -ArgumentList "/export-image /SourceImageFile:$SourceImage /SourceName:`"$WinVersion`" /DestinationImageFile:$DestinationImage"
+$dism_wait.WaitForExit()
+If ($dism_wait.ExitCode -ne 0) {
+    Write-Host "Error exporting index."
+    Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
+    Exit
+}
+
+#If -IndexOnly switch was not used, run DISM commands to add updates and optimize the .wim file.
 if ($IndexOnly -eq $False)
     {
-    #Mount .wim for dism actions. Do not open this directory in Explorer while the script is running.
-    Mount-WindowsImage -Path $MountDir -ImagePath $SourceImage -Index 1
-    #Add update package to .wim if specified.
-    if ($UpdatePath){Start-Process DISM.exe -Argumentlist "/Image:$MountDir /Add-Package /PackagePath:$UpdatePath" -NoNewWindow -Wait}
+    #Mount .wim for dism actions.
+    Write-Host "Mounting Image..."
+    Write-Host "Do not open $MountDir in Explorer while the script is running."
+    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/mount-image /ImageFile:$DestinationImage /Index:1 /MountDir:$MountDir"
+    $dism_wait.WaitForExit()
+    If ($dism_wait.ExitCode -ne 0) {
+        Write-Host "Error Mounting .wim file."
+        Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
+        Exit
+        }
+    #Add update package(s) to mounted WIM.
+    $UpdateFiles = Get-ChildItem -Path (Get-Item $DestinationImage).Directory.FullName -Recurse -Include *.msu,*.cab
+    foreach ($UpdateFile in $UpdateFiles) {
+        Write-Host "Adding Update: $UpdateFile"
+        $dism_wait = Start-Process $dism -PassThru -Argumentlist "/Image:$MountDir /Add-Package /PackagePath:$UpdateFile"
+        $dism_wait.WaitForExit()
+        If ($dism_wait.ExitCode -ne 0) {
+            Write-Host "Error adding $UpdateFile. Discarding changes to .wim file."
+            Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
+            $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:$MountDir /discard"
+            $dism_wait.WaitForExit()  
+            Exit
+            }
+        }
     #Cleanup .wim
-    Start-Process DISM.exe -Argumentlist "/Image:$MountDir /Cleanup-Image /StartComponentCleanup /ResetBase" -NoNewWindow -Wait
+    Write-Host "Cleaning Up WIM..."
+    $dism_wait = Start-Process $dism -PassThru -Argumentlist "/Image:$MountDir /Cleanup-Image /StartComponentCleanup /ResetBase"
+    $dism_wait.WaitForExit()
+    If ($dism_wait.ExitCode -ne 0) {
+        Write-Host "Error running DISM Image Cleanup. Discarding changes to .wim file."
+        Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
+        $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:$MountDir /discard"
+        $dism_wait.WaitForExit()  
+        Exit
+        }
     #Unmount .wim and save changes.
-    Dismount-WindowsImage -Path $MountDir -Save
-    #Export .wim to optimize size.
-    Export-WindowsImage -SourceImagePath $SourceImage -SourceIndex 1 -DestinationImagePath $DestinationImage -CompressionType max
+    Write-Host "Unmounting WIM..."
+    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image BLAHBLAHBLAH /MountDir:$MountDir /Commit"
+    $dism_wait.WaitForExit()    
+    If ($dism_wait.ExitCode -ne 0) {
+        Write-Host "Error saving changes to the WIM file. WIM is likely still mounted to $MountDir and may require manual attention." -Foregroundcolor Red
+        Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
+    }
     }
