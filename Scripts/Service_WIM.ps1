@@ -38,7 +38,7 @@ param(
 
 #Check to ensure directory to mount .wim file to is empty. -force to look for hidden files.
 $MountDirInfo = Get-ChildItem $MountDir -Force | Measure-Object
-if ($MountDirInfo -ne 0){
+if ($MountDirInfo.Count -ne 0){
 Write-Host "$MountDir is not empty (including hidden files). Please resolve and try again."
 Exit
 }
@@ -101,7 +101,7 @@ if ($IndexOnly -eq $False)
         }
     #Unmount .wim and save changes.
     Write-Host "Unmounting WIM..."
-    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image BLAHBLAHBLAH /MountDir:$MountDir /Commit"
+    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:$MountDir /Commit"
     $dism_wait.WaitForExit()    
     If ($dism_wait.ExitCode -ne 0) {
         Write-Host "Error saving changes to the WIM file. WIM is likely still mounted to $MountDir and may require manual attention." -Foregroundcolor Red
