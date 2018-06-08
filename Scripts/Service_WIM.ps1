@@ -36,8 +36,11 @@ param(
 #DISM commands courtesy of @LTBehr
 #Export Index method courtesy of @danpadgett
 
+#Set Directory of Source Image for later use.
+$SourceDirectory = (Get-Item $SourceImage).Directory.FullName
+
 #Check to ensure directory to mount .wim file to is empty. -force to look for hidden files.
-$MountDirInfo = Get-ChildItem $MountDir -Force | Measure-Object
+$MountDirInfo = Get-ChildItem $MountDir | Measure-Object
 if ($MountDirInfo.Count -ne 0){
 Write-Host "$MountDir is not empty (including hidden files). Please resolve and try again."
 Exit
@@ -52,8 +55,7 @@ Write-Host "Exporting Single Index..."
 if ((Test-Path $DestinationImage) -eq $True) {Write-Host "Destination image file, $DestinationImage, already exists. Please remove the file and re-run the script. Otherwise, DISM will reuse the existing file and add another index."
     Exit}
 #The mount image step had a problem where dism did not return complete using a standard -wait switch and hung the script. Using the WaitForExit method, which fixed this, for all dism commands for consistency.
-
-$dism_wait = Start-Process $dism -PassThru -ArgumentList "/export-image /SourceImageFile:$SourceImage /SourceName:`"$WinVersion`" /DestinationImageFile:$DestinationImage"
+$dism_wait = Start-Process $dism -PassThru -ArgumentList "/export-image /SourceImageFile:`"$SourceImage`" /SourceName:`"$WinVersion`" /DestinationImageFile:`"$SourceDirectory\install-temp.wim`""
 $dism_wait.WaitForExit()
 If ($dism_wait.ExitCode -ne 0) {
     Write-Host "Error exporting index."
@@ -67,7 +69,7 @@ if ($IndexOnly -eq $False)
     #Mount .wim for dism actions.
     Write-Host "Mounting Image..."
     Write-Host "Do not open $MountDir in Explorer while the script is running."
-    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/mount-image /ImageFile:$DestinationImage /Index:1 /MountDir:$MountDir"
+    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/mount-image /ImageFile:`"$SourceDirectory\install-temp.wim`" /Index:1 /MountDir:`"$MountDir`""
     $dism_wait.WaitForExit()
     If ($dism_wait.ExitCode -ne 0) {
         Write-Host "Error Mounting .wim file."
@@ -75,36 +77,48 @@ if ($IndexOnly -eq $False)
         Exit
         }
     #Add update package(s) to mounted WIM.
-    $UpdateFiles = Get-ChildItem -Path (Get-Item $DestinationImage).Directory.FullName -Recurse -Include *.msu,*.cab
+    $UpdateFiles = Get-ChildItem -Path "$SourceDirectory" -Recurse -Include *.msu,*.cab
     foreach ($UpdateFile in $UpdateFiles) {
         Write-Host "Adding Update: $UpdateFile"
-        $dism_wait = Start-Process $dism -PassThru -Argumentlist "/Image:$MountDir /Add-Package /PackagePath:$UpdateFile"
+        $dism_wait = Start-Process $dism -PassThru -Argumentlist "/Image:`"$MountDir`" /Add-Package /PackagePath:`"$UpdateFile`""
         $dism_wait.WaitForExit()
         If ($dism_wait.ExitCode -ne 0) {
             Write-Host "Error adding $UpdateFile. Discarding changes to .wim file."
             Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
-            $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:$MountDir /discard"
+            $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:`"$MountDir`" /discard"
             $dism_wait.WaitForExit()  
             Exit
             }
         }
     #Cleanup .wim
     Write-Host "Cleaning Up WIM..."
-    $dism_wait = Start-Process $dism -PassThru -Argumentlist "/Image:$MountDir /Cleanup-Image /StartComponentCleanup /ResetBase"
+    $dism_wait = Start-Process $dism -PassThru -Argumentlist "/Image:`"$MountDir`" /Cleanup-Image /StartComponentCleanup /ResetBase"
     $dism_wait.WaitForExit()
     If ($dism_wait.ExitCode -ne 0) {
         Write-Host "Error running DISM Image Cleanup. Discarding changes to .wim file."
         Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
-        $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:$MountDir /discard"
+        $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:`"$MountDir`" /discard"
         $dism_wait.WaitForExit()  
         Exit
         }
     #Unmount .wim and save changes.
     Write-Host "Unmounting WIM..."
-    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:$MountDir /Commit"
+    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:`"$MountDir`" /Commit"
     $dism_wait.WaitForExit()    
     If ($dism_wait.ExitCode -ne 0) {
-        Write-Host "Error saving changes to the WIM file. WIM is likely still mounted to $MountDir and may require manual attention." -Foregroundcolor Red
+        Write-Host "Error saving changes to the WIM file. WIM is likely still mounted to `"$MountDir`" and may require manual attention." -Foregroundcolor Red
         Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
     }
+    #Final Export to Optimize Size
+    Write-Host "Exporting WIM for additional space savings..."
+    $dism_wait = Start-Process $dism -PassThru -ArgumentList "/export-image /SourceImageFile:`"$SourceDirectory\install-temp.wim`" /SourceIndex:1 /DestinationImageFile:`"$DestinationImage`" /Compress:max"
+    $dism_wait.WaitForExit()
+    If ($dism_wait.ExitCode -ne 0) {
+        Write-Host "Error exporting index."
+        Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
+        Exit
     }
+   #Delete Temporary WIM File.
+   Write-Host "Deleting Temporary WIM..."
+   Remove-Item -Path "$SourceDirectory\install-temp.wim" -Force
+   }
