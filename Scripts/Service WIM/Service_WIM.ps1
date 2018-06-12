@@ -34,7 +34,7 @@ param(
 # Windows 10 Education, Windows 10 Education N, Windows 10 Enterprise, Windows 10 Enterprise N, Windows 10 Pro, Windows 10 Pro N, Windows 10 Pro Education, Windows 10 Pro Education N, Windows 10 Pro for Workstations, Windows 10 Pro N for Workstations
 
 #DISM commands courtesy of @LTBehr
-#Export Index method courtesy of @danpadgett
+#Export Index method courtesy of @danpadgett. His detailed writeup of these optimization methods: https://execmgr.net/2018/06/07/windows-10-image-maintenance/
 
 #Set Directory of Source Image for later use.
 $SourceDirectory = (Get-Item $SourceImage).Directory.FullName
