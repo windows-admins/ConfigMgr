@@ -9,3 +9,5 @@ This is the naming convention CIS uses. I'm sorry.
 * Windows7v3.1.0
 * Windows8.1v2.3.0
 * Windows10v1.3.0
+
+These baselines include both level 1 and level 2.  You will need to modify them to only apply the levels that you desire.
