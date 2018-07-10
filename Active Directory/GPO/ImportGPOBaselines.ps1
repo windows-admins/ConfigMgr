@@ -23,6 +23,6 @@ dir -Recurse -Include backup.xml $rootdir | %{
     $dn = $x.GroupPolicyBackupScheme.GroupPolicyObject.GroupPolicyCoreSettings.DisplayName.InnerText
     # $dn + "`t" + $guid
     $results.Add($dn, $guid)
-    Import-GPO -BackupId $guid -Path $rootdir -TargetName $dn -CreateIfNeeded
+    Import-GPO -BackupId $guid -Path (Get-Item (get-item $_.PSParentPath).PSParentPath).FullName -TargetName $dn -CreateIfNeeded
 }
 $results | ft Name, Value -AutoSize
