@@ -3,9 +3,6 @@
 # Fetch off WinAdmins Github or:
 # https://blogs.technet.microsoft.com/samroberts/2017/06/19/create-configmgr-configuration-items-from-group-policy-object/
 #
-
-
-#
 # Press 'F5' to run this script. Running this script will load the ConfigurationManager
 # module for Windows PowerShell and will connect to the site.
 #
@@ -15,21 +12,25 @@
 param(
     [parameter(Mandatory=$true)]
     [String]
-    $GPOName
+    $GPOName,
+    [parameter(Mandatory=$true)]
+    [String]
+    $TargetDomain,
+    [parameter(Mandatory=$true)]
+    [ValidateLength(3,3)]
+    [String]
+    $SCCMSiteCode,
+    [parameter(Mandatory=$true)]
+    [String]
+    $SCCMSiteServerFQDN
     )
 
 # Uncomment the line below if running in an environment where script signing is 
 # required.
 #Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
-# Site configuration
-$SiteCode = "CHQ" # Site code 
-$ProviderMachineName = "cm1.corp.contoso.com" # SMS Provider machine name
-
 # Customizations
 $initParams = @{}
-#$initParams.Add("Verbose", $true) # Uncomment this line to enable verbose logging
-#$initParams.Add("ErrorAction", "Stop") # Uncomment this line to stop the script on any errors
 
 # Do not change anything below this line
 
@@ -39,12 +40,12 @@ if((Get-Module ConfigurationManager) -eq $null) {
 }
 
 # Connect to the site's drive if it is not already present
-if((Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue) -eq $null) {
-    New-PSDrive -Name $SiteCode -PSProvider CMSite -Root $ProviderMachineName @initParams
+if((Get-PSDrive -Name $SCCMSiteCode -PSProvider CMSite -ErrorAction SilentlyContinue) -eq $null) {
+    New-PSDrive -Name $SCCMSiteCode -PSProvider CMSite -Root $SCCMSiteServerFQDN @initParams
 }
 
 # Set the current location to be the site code.
-Set-Location "$($SiteCode):\" @initParams
+Set-Location "$($SCCMSiteCode):\" @initParams
 
 
 $GPOs = Get-GPO -All
@@ -54,7 +55,7 @@ ForEach ($GPO in $GPOs)
     if ($GPO.DisplayName -like '*'+$GPOName+'*')
     {
         Write-Host "Converting: " $GPO.DisplayName
-        C:\Temp\Convert-GPOtoCI.ps1 -GpoTarget $GPO.DisplayName -DomainTarget corp.contoso.com -SiteCode CHQ -Remediate -Severity Critical
+        & $PSScriptRoot\Convert-GPOtoCI_1.2.6\Convert-GPOtoCI.ps1 -GpoTarget $GPO.DisplayName -DomainTarget $TargetDomain -SiteCode $SCCMSiteCode -Remediate -Severity Critical
     }
     else
     {
