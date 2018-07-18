@@ -17,12 +17,19 @@ param(
 #Create an empty directory to mount the .wim file to.
     #C:\WIM
 
-#Place all update files (.cab or .msu) you'd like serviced into the .wim file in the same directory as the .wim. Ex:
+#Place all update files (.cab or .msu) you'd like serviced into the .wim file in the same directory as the .wim.
+#NOTE: If you are adding updates to the .wim, be sure to include the Servicing Stack Update and prefix the name of the update with "1-" so that it is added first.
+#
+#https://support.microsoft.com/en-us/help/4132216/servicing-stack-update-for-windows-10-1607-may-17-2018
+#https://support.microsoft.com/en-us/help/4132650/servicing-stack-update-for-windows-10-version-1709-may-21-2018
+#https://support.microsoft.com/en-us/help/4338853/servicing-stack-update-for-windows-10-version-1803-june-26-2018
+#Ex:
     #C:\WIM-Servicing\
+    #C:\Wim-Servicing\1-windows10.0-kb4338853-x64.msu
     #C:\WIM-Serviving\install.wim
     #C:\Wim-Servicing\windows10.0-kb4100347-x64.msu
     #C:\Wim-Servicing\windows10.0-kb4100403-x64.msu
-#The script will add them to the .wim automatically.
+#The script will add the updates to the .wim automatically.
 
 #Command line usage examples:
 # Export a single Index, add updates, optimize .wim
