@@ -23,7 +23,6 @@ $appxpackages = (
 	'MicrosoftSolitaireCollection',
 	'Office.Sway',
 	'OneConnect', 
-	'OneNote', 
 	'People',
 	'Print3D',
 	'SkypeApp', 
