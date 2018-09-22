@@ -14,9 +14,6 @@ param(
 [String]$DestinationImage
 )
 
-#Create an empty directory to mount the .wim file to.
-    #C:\WIM
-
 #Place all update files (.cab or .msu) you'd like serviced into the .wim file in the same directory as the .wim.
 #NOTE: If you are adding updates to the .wim, be sure to include the Servicing Stack Update and prefix the name of the update with "1-" so that it is added first.
 #
@@ -49,10 +46,16 @@ $SourceDirectory = (Get-Item $SourceImage).Directory.FullName
 #DISM doesn't like trailing slashes on directory names
 $MountDir = $MountDir.Trim('\')
 
-#Check to ensure directory to mount .wim file to is empty. -force to look for hidden files.
-if (Get-ChildItem -Force $MountDir) {
-    Write-Host "$MountDir is not empty (including hidden files). Please resolve and try again."
-    Exit
+#Check $MountDir exists.
+if (Test-Path -PathType Container $MountDir) {
+    #Check to ensure directory to mount .wim file to is empty. -force to look for hidden files.
+    if (Get-ChildItem -Force $MountDir) {
+        Write-Host "$MountDir is not empty (including hidden files). Please resolve and try again."
+        Exit
+    }
+} else {
+    #Create if it doesn't.
+    New-Item -Type Directory -Path $MountDir
 }
 
 if (!($WinVersion -in (Get-WindowsImage -ImagePath $SourceImage).ImageName)) {
