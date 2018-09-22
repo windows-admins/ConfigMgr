@@ -64,7 +64,8 @@ if (!($WinVersion -in (Get-WindowsImage -ImagePath $SourceImage).ImageName)) {
 }
 
 #Check for Windows 10 ADK DISM. If it is installed, use that instead of built in version.
-if (Test-Path "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM\dism.exe") {$dism = "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM\dism.exe" } else {$dism = "dism.exe"}
+$AdkDism = 'C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM\dism.exe'
+if (Test-Path -PathType Leaf -Path $AdkDism) {$dism = $AdkDism} else {$dism = "dism.exe"}
 
 #Export specified Index.
 Write-Host "Exporting Single Index..."
