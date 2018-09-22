@@ -46,6 +46,9 @@ param(
 #Set Directory of Source Image for later use.
 $SourceDirectory = (Get-Item $SourceImage).Directory.FullName
 
+#DISM doesn't like trailing slashes on directory names
+$MountDir = $MountDir.Trim('\')
+
 #Check to ensure directory to mount .wim file to is empty. -force to look for hidden files.
 $MountDirInfo = Get-ChildItem $MountDir | Measure-Object
 if ($MountDirInfo.Count -ne 0){
