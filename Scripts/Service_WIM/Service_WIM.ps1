@@ -53,6 +53,11 @@ Write-Host "$MountDir is not empty (including hidden files). Please resolve and 
 Exit
 }
 
+if (!($WinVersion -in (Get-WindowsImage -ImagePath $SourceImage).ImageName)) {
+    Write-Host "No such image $WinVersion found in $SourceImage"
+    Exit
+}
+
 #Check for Windows 10 ADK DISM. If it is installed, use that instead of built in version.
 if (Test-Path "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM\dism.exe") {$dism = "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM\dism.exe" } else {$dism = "dism.exe"}
 
@@ -93,7 +98,7 @@ if ($IndexOnly -eq $False)
             Write-Host "Error adding $UpdateFile. Discarding changes to .wim file."
             Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
             $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:`"$MountDir`" /discard"
-            $dism_wait.WaitForExit()  
+            $dism_wait.WaitForExit()
             Exit
             }
         }
@@ -105,13 +110,13 @@ if ($IndexOnly -eq $False)
         Write-Host "Error running DISM Image Cleanup. Discarding changes to .wim file."
         Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
         $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:`"$MountDir`" /discard"
-        $dism_wait.WaitForExit()  
+        $dism_wait.WaitForExit()
         Exit
         }
     #Unmount .wim and save changes.
     Write-Host "Unmounting WIM..."
     $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:`"$MountDir`" /Commit"
-    $dism_wait.WaitForExit()    
+    $dism_wait.WaitForExit()
     If ($dism_wait.ExitCode -ne 0) {
         Write-Host "Error saving changes to the WIM file. WIM is likely still mounted to `"$MountDir`" and may require manual attention." -Foregroundcolor Red
         Write-Host "You can check C:\Windows\Logs\DISM\dism.log for errors."
