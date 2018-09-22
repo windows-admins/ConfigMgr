@@ -20,6 +20,8 @@ param(
 #https://support.microsoft.com/en-us/help/4132216/servicing-stack-update-for-windows-10-1607-may-17-2018
 #https://support.microsoft.com/en-us/help/4132650/servicing-stack-update-for-windows-10-version-1709-may-21-2018
 #https://support.microsoft.com/en-us/help/4338853/servicing-stack-update-for-windows-10-version-1803-june-26-2018
+#https://support.microsoft.com/en-gb/help/4456655/servicing-stack-update-for-windows-10-version-1803-september-11-2018
+
 #Ex:
     #C:\WIM-Servicing\
     #C:\Wim-Servicing\1-windows10.0-kb4338853-x64.msu
