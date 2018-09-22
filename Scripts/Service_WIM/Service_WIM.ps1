@@ -50,10 +50,9 @@ $SourceDirectory = (Get-Item $SourceImage).Directory.FullName
 $MountDir = $MountDir.Trim('\')
 
 #Check to ensure directory to mount .wim file to is empty. -force to look for hidden files.
-$MountDirInfo = Get-ChildItem $MountDir | Measure-Object
-if ($MountDirInfo.Count -ne 0){
-Write-Host "$MountDir is not empty (including hidden files). Please resolve and try again."
-Exit
+if (Get-ChildItem -Force $MountDir) {
+    Write-Host "$MountDir is not empty (including hidden files). Please resolve and try again."
+    Exit
 }
 
 if (!($WinVersion -in (Get-WindowsImage -ImagePath $SourceImage).ImageName)) {
