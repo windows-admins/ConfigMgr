@@ -19,12 +19,12 @@ Try{
 Start-Process "$($Volume_Letter):\Img\Setup.exe" -ArgumentList "/qb /I $($Volume_Letter):\Img\Maya2018_Silent.ini /Trial /language en-us" -Wait
 }Catch{
 #Unmount the VHD if we fail.
-Dismount-DiskImage $vhdpath
+Dismount-DiskImage $vhd
 }
 
 Try{
 #Unount the VHD when we are done.
-Dismount-DiskImage $vhdpath
+Dismount-DiskImage $vhd
 }Catch{
 Exit 1
 }
