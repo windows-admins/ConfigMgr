@@ -1,0 +1,758 @@
+//=========================================================================
+//
+// OMCI_SMS_DEF.mof - Sample MOF that maps SMS inventory set to that
+//      provided by the Dell Command | Monitor Provider 
+//      for Dell Command | Monitor version 10.0.0
+//
+//  2008 - 2018 Dell Inc. or its subsidiaries  All Rights Reserved.
+//  THIS SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT IS
+//  PROVIDED "AS IS" WITHOUT ANY WARRANTY, EXPRESS, IMPLIED OR OTHERWISE,
+//  INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTY OF MERCHANTABILITY OR
+//  FITNESS FOR A PARTICULAR PURPOSE OR ANY WARRANTY REGARDING TITLE OR
+//  AGAINST INFRINGEMENT.  IN NO EVENT SHALL DELL BE LIABLE FOR ANY DIRECT,
+//  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTUTUTE GOODS OR
+//  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+//  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+//  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+//  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//  POSSIBILITY OF SUCH DAMAGE.
+//
+//  This sample MOF is provided as an example only. Dell provides no
+//  technical support with regard to content herein. For more information
+//  on MOF files, refer to applicable documentation.
+//
+// Guidelines for updating the MOF are as follows:
+// 1. All the key and mandatory attributes of a class are set to TRUE for 
+//    reporting.
+// 2. All the attributes of a class which are not populated or not applicable
+//    are not added under the class in the MOF file.
+// 3. Optional attribute will have an MOF entry however it will be set to 
+//    FALSE for reporting.
+// 4. If a platform generation has an specific attribute populated then 
+//    the attributes are set to TRUE for reporting.
+//=========================================================================
+
+//===================================================================
+// Define Dell classes for inventory reporting
+//===================================================================
+
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Alert Indication Setting Data"), SMS_Class_ID("DELL|DCIM_ALERTINDICATIONSETTINGDATA|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_AlertIndicationSettingData : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	AlertCategory;
+[SMS_Report (TRUE)]	uint16	AlertType;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	boolean	LocalOnly;
+[SMS_Report (TRUE)]	sint32	MaxDisplayNotifications;
+[SMS_Report (TRUE)]	sint32	MaxNTEventLogNotifications;
+[SMS_Report (TRUE)]	string	Name;
+[SMS_Report (FALSE)]	string	OtherAlertType;
+[SMS_Report (TRUE)]	boolean	PollEnabled;
+[SMS_Report (TRUE)]	uint32	PollingInterval;
+[SMS_Report (TRUE)]	uint16	ProbableCause;
+[SMS_Report (TRUE)]	uint32	StartDelay;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM AMTSettings"), SMS_Class_ID("DELL|DCIM_AMTSETTINGS|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_AMTSettings : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	boolean	AMTSupported;
+[SMS_Report (TRUE)]	string	Description;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	boolean	IDEREnabled;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	boolean	SOLEnabled;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM ASFSettings"), SMS_Class_ID("DELL|DCIM_ASFSETTINGS|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_ASFSettings : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	boolean	ASFEnabled;
+[SMS_Report (TRUE)]	string	Description;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	uint8	StructureVersion;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Battery"), SMS_Class_ID("DELL|DCIM_BATTERY|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Battery : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	string	IdentifyingDescriptions[];
+[SMS_Report (TRUE)]	string	Name;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	string	OtherIdentifyingInfo[];
+[SMS_Report (TRUE)]	uint16	PrimaryStatus;
+[SMS_Report (TRUE)]	uint16	RequestedState;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (TRUE)]	uint16	BatteryStatus;
+[SMS_Report (TRUE)]	uint16	ChargingStatus;
+[SMS_Report (TRUE)]	uint16	Chemistry;
+[SMS_Report (TRUE)]	uint32	DesignCapacity;
+[SMS_Report (TRUE)]	uint64	DesignVoltage;
+[SMS_Report (TRUE)]	uint16	EstimatedChargeRemaining;
+[SMS_Report (TRUE)]	uint32	EstimatedRunTime;
+[SMS_Report (TRUE)]	uint8	RemainingCapacityMaxError;
+[SMS_Report (TRUE)]	string	SmartBatteryVersion;
+[SMS_Report (TRUE)]	string	Status;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Button"), SMS_Class_ID("DELL|DCIM_BUTTON|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Button : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint16	ButtonPurpose;
+[SMS_Report (TRUE)]	uint16	ButtonType;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	uint16	RequestedState;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM BIOSElement"), SMS_Class_ID("DELL|DCIM_BIOSELEMENT|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_BIOSElement : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	Manufacturer;
+[SMS_Report (TRUE), Key]	string	Name;
+[SMS_Report (TRUE)]	datetime	ReleaseDate;
+[SMS_Report (TRUE), Key]	string	SoftwareElementID;
+[SMS_Report (TRUE), Key]	uint16	SoftwareElementState;
+[SMS_Report (TRUE), Key]	uint16	TargetOperatingSystem;
+[SMS_Report (TRUE), Key]	string	Version;
+};
+
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM BIOS Enumeration"), SMS_Class_ID("DELL|DCIM_BIOSENUMERATION|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_BIOSEnumeration : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	AttributeName;
+[SMS_Report (TRUE)]	string	CurrentValue[];
+[SMS_Report (TRUE)]	boolean	IsReadOnly;
+[SMS_Report (TRUE)]	string	PossibleValues[];
+[SMS_Report (TRUE)]	string	PossibleValuesDescription[];
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Thin Client Info"), SMS_Class_ID("DELL|DCIM_THINCLIENTINFO|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_ThinClientInfo : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	AttributeName;
+[SMS_Report (TRUE)]	string	CurrentValue[];
+[SMS_Report (TRUE)]	boolean	IsReadOnly;
+[SMS_Report (TRUE)]	string	PossibleValues[];
+[SMS_Report (TRUE)]	string	PossibleValuesDescription[];
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM BIOSPassword"), SMS_Class_ID("DELL|DCIM_BIOSPASSWORD|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_BIOSPassword : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	AttributeName;
+[SMS_Report (TRUE)]	uint64	MaxLength;
+[SMS_Report (TRUE)]	uint64	MinLength;
+[SMS_Report (TRUE)]	boolean	IsSet;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM BIOSService"), SMS_Class_ID("DELL|DCIM_BIOSSERVICE|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_BIOSService : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	Name;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM BIOSString"), SMS_Class_ID("DELL|DCIM_BIOSSTRING|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_BIOSString : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	AttributeName;
+[SMS_Report (FALSE)]	string	CurrentValue[];
+[SMS_Report (TRUE)]	uint32	StringType;
+[SMS_Report (TRUE)]	uint64	MaxLength;
+
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Boot Config Setting"), SMS_Class_ID("DELL|DCIM_BOOTCONFIGSETTING|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_BootConfigSetting : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Boot Service"), SMS_Class_ID("DELL|DCIM_BOOTSERVICE|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_BootService : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	Name;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (TRUE)] string	ElementName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Boot Source Setting"), SMS_Class_ID("DELL|DCIM_BOOTSOURCESETTING|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_BootSourceSetting : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	BIOSBootString;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	FailThroughSupported;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	StructuredBootString;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Card"), SMS_Class_ID("DELL|DCIM_CARD|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Card : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	boolean	CanBeFRUed;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	boolean	HostingBoard;
+[SMS_Report (TRUE)]	datetime	ManufactureDate;
+[SMS_Report (TRUE)]	string	Manufacturer;
+[SMS_Report (TRUE)]	string	Model;
+[SMS_Report (TRUE)]	uint16	PackageType;
+[SMS_Report (TRUE)]	string	PartNumber;
+[SMS_Report (TRUE)]	string	SerialNumber;
+[SMS_Report (TRUE)]	string	SKU;
+[SMS_Report (TRUE), Key]	string	Tag;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Chassis and Docking"), SMS_Class_ID("DELL|DCIM_Chassis|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Chassis : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	BreachDescription;
+[SMS_Report (TRUE)]	boolean	CanBeFRUed;
+[SMS_Report (TRUE)]	uint16	ChassisPackageType;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	datetime FirstPowerOnDate;
+[SMS_Report (TRUE)]	boolean	LockPresent;
+[SMS_Report (TRUE)]	string	Manufacturer;
+[SMS_Report (TRUE)]	datetime ManufactureDate;
+[SMS_Report (TRUE)]	string	Model;
+[SMS_Report (TRUE)]	string	Name;
+[SMS_Report (TRUE)]	uint16	PackageType;
+[SMS_Report (TRUE)]	string	PartNumber;
+[SMS_Report (TRUE)]	string	SerialNumber;
+[SMS_Report (TRUE)]	string	SKU;
+[SMS_Report (TRUE), Key]	string	Tag;
+[SMS_Report (TRUE)]	string	PropertyOwnershipTag;
+[SMS_Report (TRUE)]	uint16	SecurityBreach;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Chip"), SMS_Class_ID("DELL|DCIM_CHIP|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Chip : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	boolean	CanBeFRUed;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (FALSE)]	uint16	IRQ;
+[SMS_Report (TRUE)]	string	Manufacturer;
+[SMS_Report (TRUE)]	string	Model;
+[SMS_Report (FALSE)]	string	SerialNumber;
+[SMS_Report (FALSE)]	string	SKU;
+[SMS_Report (TRUE), Key]	string	Tag;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Concrete Job"), SMS_Class_ID("DELL|DCIM_CONCRETEJOB|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_ConcreteJob : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	boolean	DeleteOnCompletion;
+[SMS_Report (TRUE)]	uint16	ErrorCode;
+[SMS_Report (TRUE)]	string	ErrorDescription;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	JobStatus;
+[SMS_Report (TRUE)]	string	Name;
+[SMS_Report (TRUE)]	uint32	Priority;
+[SMS_Report (TRUE)]	datetime	TimeBeforeRemoval;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Computer System"), SMS_Class_ID("DELL|DCIM_COMPUTERSYSTEM|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_ComputerSystem : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	uint16	Dedicated[];
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	string	IdentifyingDescriptions[];
+[SMS_Report (TRUE), Key]	string	Name;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	string	OtherIdentifyingInfo[];
+[SMS_Report (TRUE)]	uint16	PrimaryStatus;
+[SMS_Report (TRUE)]	uint16	RequestedState;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Desktop Monitor"), SMS_Class_ID("DELL|DCIM_DESKTOPMONITOR|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_DesktopMonitor : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint32	Brightness;
+[SMS_Report (TRUE)]	string	Caption;
+[SMS_Report (TRUE)]	string	ColorCodeFormatSupported;
+[SMS_Report (TRUE)]	uint16	ColorModePreset;
+[SMS_Report (TRUE)]	sint16	ColorDepthBits;
+[SMS_Report (TRUE)]	boolean	CompositSyncSignalOnGreenVideoSupported;
+[SMS_Report (TRUE)]	boolean	CompositSyncSignalOnHorizontalSupported;
+[SMS_Report (TRUE)]	boolean	ContinuousFrequency;
+[SMS_Report (TRUE)]	uint32	Contrast;
+[SMS_Report (TRUE), Key] string	CreationClassName;
+[SMS_Report (TRUE)]	uint16	CurrentResolutionH;
+[SMS_Report (TRUE)]	uint16	CurrentResolutionV;
+[SMS_Report (TRUE)]	string	Description;
+[SMS_Report (TRUE), Key] string	DeviceID;
+[SMS_Report (TRUE)]	uint16	DisplayMode;
+[SMS_Report (TRUE)]    string	EDIDGamma;
+[SMS_Report (TRUE)]	string	EDIDVersionNumber;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint32	FrequencyH;
+[SMS_Report (TRUE)]	uint32	FrequencyV;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	boolean	InputAnalog;
+[SMS_Report (TRUE)]	boolean	InputDigital;
+[SMS_Report (TRUE)]	boolean	InputDisplayPort;
+[SMS_Report (TRUE)]	boolean	InputDVI;
+[SMS_Report (TRUE)]	boolean	InputHDMI;
+[SMS_Report (TRUE)]	uint16	InputSource;
+[SMS_Report (TRUE)]	string	ManufactureDate;
+[SMS_Report (TRUE)]	uint32	MaxBrightness;
+[SMS_Report (TRUE)]	uint32	MaxContrast;
+[SMS_Report (TRUE)]	string	MCCSVersionNumber;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	uint16	PhysicalSizeH;
+[SMS_Report (TRUE)]	uint16	PhysicalSizeV;
+[SMS_Report (TRUE)]	uint16	PrimaryStatus;
+[SMS_Report (TRUE)]	string	ProductCode;
+[SMS_Report (TRUE)]	string	SerialNumber;
+[SMS_Report (TRUE)]	boolean	SeparateSyncHVSupported;
+[SMS_Report (TRUE)]	boolean	sRGBStandardDefaultColorSpace;
+[SMS_Report (TRUE)]	uint16	ScalerManufacturer;
+[SMS_Report (TRUE)]	uint16	StandbyModeSupported;
+[SMS_Report (TRUE)]	uint16	SuspendModeSupported;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (TRUE)]	uint16	VeryLowPowerSupported;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Device Bay"), SMS_Class_ID("DELL|DCIM_DEVICEBAY|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_DeviceBay : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	uint16	DeviceBayType;
+[SMS_Report (TRUE)]	string	DeviceBayLocation;
+[SMS_Report (TRUE)]	string	DeviceCurrentlyAttached;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	DeviceSupported;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	EnabledDefault;
+[SMS_Report (TRUE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	string	IdentifyingDescriptions[];
+[SMS_Report (TRUE)]	uint16	LogicalModuleType;
+[SMS_Report (TRUE)]	uint16	ModuleNumber;
+[SMS_Report (TRUE)]	string	OtherIdentifyingInfo[];
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Display Controller"), SMS_Class_ID("DELL|DCIM_DISPLAYCONTROLLER|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_DisplayController : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	Caption;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	Description;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	string	Name;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Ethernet Port"), SMS_Class_ID("DELL|DCIM_ETHERNETPORT|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_EthernetPort : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (FALSE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	uint16	LinkTechnology;
+[SMS_Report (TRUE)]	string	Name;
+[SMS_Report (TRUE)]	string	PermanentAddress;
+[SMS_Report (FALSE)]	uint16	RequestedState;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (FALSE)]	uint16	TOEEnabledState;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Fan"), SMS_Class_ID("DELL|DCIM_FAN|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Fan : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	boolean	ActiveCooling;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	uint16	PrimaryStatus;
+[SMS_Report (TRUE)]	uint16	RequestedState;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (TRUE)]	boolean	VariableSpeed;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Flat Panel"), SMS_Class_ID("DELL|DCIM_FLATPANEL|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_FlatPanel : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	Brightness;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	uint16	DisplayType;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	uint32	HorizontalResolution;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	uint16	PrimaryStatus;
+[SMS_Report (TRUE)]	uint16	ScanMode;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (TRUE)]	uint32	VerticalResolution;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Memory"), SMS_Class_ID("DELL|DCIM_MEMORY|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Memory : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint16	Access;
+[SMS_Report (TRUE)]	uint64	BlockSize;
+[SMS_Report (TRUE)]	uint64	ConsumableBlocks;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	string	ErrorMethodology;
+[SMS_Report (TRUE)]	uint16	FailOverState;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	uint64	NumberOfBlocks;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	string	OtherIdentifyingInfo[];
+[SMS_Report (TRUE)]	uint16	PrimaryStatus;
+[SMS_Report (TRUE)]	string	Purpose;
+[SMS_Report (TRUE)]	uint16	RedundancyConfiguration;
+[SMS_Report (TRUE)]	uint16	RequestedState;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (TRUE)]	boolean	volatile;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Numeric Sensor"), SMS_Class_ID("DELL|DCIM_NUMERICSENSOR|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_NumericSensor : SMS_Class_Template
+{
+[SMS_Report (FALSE)]	sint32	Accuracy;
+[SMS_Report (TRUE)]	uint16	BaseUnits;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (FALSE)]	sint32	CurrentReading;
+[SMS_Report (TRUE)]	string	CurrentState;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	sint32	LowerThresholdNonCritical;
+[SMS_Report (TRUE)]	sint32	LowerThresholdFatal;
+[SMS_Report (TRUE)]	sint32	LowerThresholdCritical;
+[SMS_Report (FALSE)]	sint32	NominalReading;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	string	PossibleStates[];
+[SMS_Report (TRUE)]	uint16	RateUnits;
+[SMS_Report (FALSE)]	uint16	RequestedState;
+[SMS_Report (FALSE)]	uint32	Resolution;
+[SMS_Report (TRUE)]	uint16	SensorType;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (FALSE)]	sint32	Tolerance;
+[SMS_Report (FALSE)]	sint32	UnitModifier;
+[SMS_Report (TRUE)]	sint32	UpperThresholdNonCritical;
+[SMS_Report (TRUE)]	sint32	UpperThresholdCritical;
+[SMS_Report (TRUE)]	sint32	UpperThresholdFatal;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Operating System"), SMS_Class_ID("DELL|DCIM_OPERATINGSYSTEM|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_OperatingSystem : SMS_Class_Template
+{
+[SMS_Report (FALSE), Key]	string	CreationClassName;
+[SMS_Report (FALSE), Key]	string	CSCreationClassName;
+[SMS_Report (TRUE), Key]	string	CSName;
+[SMS_Report (FALSE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	datetime	LastBootUpTime;
+[SMS_Report (TRUE)]	datetime	LocalDateTime;
+[SMS_Report (TRUE), Key]	string	Name;
+[SMS_Report (TRUE)]	uint16	OSType;
+[SMS_Report (TRUE)]	uint16	RequestedState;
+[SMS_Report (TRUE)]	string	Version;
+};
+
+[ SMS_Report(FALSE), SMS_Group_Name("DCIM Ordered MemberOfCollection"), SMS_Class_ID("DELL|DCIM_OrderedMemberOfCollection |1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_OrderedMemberOfCollection  : SMS_Class_Template
+{
+[SMS_Report (FALSE)]	string Collection;
+[SMS_Report (FALSE)]	string Member;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Parallel Port"), SMS_Class_ID("DELL|DCIM_PARALLELPORT|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_ParallelPort : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint64	BaseIOAddress;
+[SMS_Report (TRUE)]	uint16	ConnectorType;
+[SMS_Report (TRUE)]	uint32	IRQLevel;
+[SMS_Report (TRUE)]	uint32	Pinout;
+[SMS_Report (TRUE)]	uint16	Security;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM PCIDevice"), SMS_Class_ID("DELL|DCIM_PCIDEVICE|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_PCIDevice : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint8	BusNumber;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	Description;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	uint8	DeviceNumber;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (FALSE)]	uint16	EnabledState;
+[SMS_Report (FALSE)]	uint8	FunctionNumber;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	uint16	PrimaryStatus;
+[SMS_Report (FALSE)]	uint16	RequestedState;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Processor"), SMS_Class_ID("DELL|DCIM_PROCESSOR|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Processor : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (FALSE)]	string	Caption;
+[SMS_Report (TRUE)]	uint16	CPUStatus;
+[SMS_Report (TRUE)]	string	Description;
+[SMS_Report (TRUE)]	uint32	CurrentClockSpeed;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	uint32	ExternalBusClockSpeed;
+[SMS_Report (TRUE)]	uint16	Family;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	uint32	MaxClockSpeed;
+[SMS_Report (TRUE)]	uint16	NumberOfEnabledCores;
+[SMS_Report (FALSE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	uint16	PrimaryStatus;
+[SMS_Report (TRUE)]	uint16	RequestedState;
+[SMS_Report (TRUE)]	string	Stepping;
+[SMS_Report (TRUE)]	string	UniqueID;
+[SMS_Report (TRUE)]	uint16	UpgradeMethod;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Physical Memory"), SMS_Class_ID("DELL|DCIM_PHYSICALMEMORY|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_PhysicalMemory : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	BankLabel;
+[SMS_Report (TRUE)]	boolean	CanBeFRUed;
+[SMS_Report (TRUE)]	uint64	Capacity;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	boolean	IsSpeedInMhz;
+[SMS_Report (TRUE)]	uint16	FormFactor;
+[SMS_Report (TRUE)]	datetime	ManufactureDate;
+[SMS_Report (TRUE)]	string	Manufacturer;
+[SMS_Report (TRUE)]	uint16	MemoryType;
+[SMS_Report (TRUE)]	string	Model;
+[SMS_Report (TRUE)]	string	PartNumber;
+[SMS_Report (TRUE)]	string	SerialNumber;
+[SMS_Report (TRUE)]	string	SKU;
+[SMS_Report (TRUE)]	uint32	Speed;
+[SMS_Report (TRUE), Key]	string	Tag;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Physical Package"), SMS_Class_ID("DELL|DCIM_PHYSICALPACKAGE|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_PhysicalPackage : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	boolean	CanBeFRUed;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	datetime	ManufactureDate;
+[SMS_Report (TRUE)]	string	Manufacturer;
+[SMS_Report (TRUE)]	string	Model;
+[SMS_Report (TRUE)]	uint16	PackageType;
+[SMS_Report (TRUE)]	string	PartNumber;
+[SMS_Report (TRUE)]	string	SerialNumber;
+[SMS_Report (TRUE)]	string	SKU;
+[SMS_Report (TRUE), Key]	string	Tag;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Sensor"), SMS_Class_ID("DELL|DCIM_SENSOR|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Sensor : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	CurrentState;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (FALSE)]	uint16	EnabledState;
+[SMS_Report (TRUE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	string	PossibleStates[];
+[SMS_Report (FALSE)]	uint16	RequestedState;
+[SMS_Report (TRUE)]	uint16	SensorType;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Serial Port"), SMS_Class_ID("DELL|DCIM_SERIALPORT|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_SerialPort : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint64	BaseIOAddress;
+[SMS_Report (TRUE)]	uint16	ConnectorType;
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (FALSE)]	uint16	EnabledState;
+[SMS_Report (FALSE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	uint32	IRQLevel;
+[SMS_Report (TRUE)]	uint64	MaxSpeed;
+[SMS_Report (FALSE)]	uint16	OperationalStatus[];
+[SMS_Report (TRUE)]	uint16	PortType;
+[SMS_Report (FALSE)]	uint16	PrimaryStatus;
+[SMS_Report (TRUE)]	uint16	Security;
+[SMS_Report (TRUE)]	sint32  SerialPortCapabilities;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (FALSE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Slot"), SMS_Class_ID("DELL|DCIM_SLOT|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_Slot : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint16	ConnectorLayout;
+[SMS_Report (TRUE)]	uint16	ConnectorType[];
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	Number;
+[SMS_Report (TRUE)]	boolean	SupportsHotPlug;
+[SMS_Report (TRUE), Key]	string	Tag;
+[SMS_Report (TRUE)]	uint16	VccMixedVoltageSupport[];
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Software Identity"), SMS_Class_ID("DELL|DCIM_SOFTWAREIDENTITY|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_SoftwareIdentity : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	ClassificationDescriptions[];
+[SMS_Report (TRUE)]	uint16	Classifications[];
+[SMS_Report (FALSE)]	string	Description;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	string	IdentityInfoType[];
+[SMS_Report (TRUE)]	string	IdentityInfoValue[];
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	boolean	IsEntity;
+[SMS_Report (TRUE)]	string	Manufacturer;
+[SMS_Report (TRUE)]	string	Name;
+[SMS_Report (TRUE)]	datetime	ReleaseDate;
+[SMS_Report (TRUE)]	string	TargetTypes[];
+[SMS_Report (TRUE)]	string	VersionString;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM USBPort"), SMS_Class_ID("DELL|DCIM_USBPORT|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_USBPort : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (FALSE)]	uint16	HealthState;
+[SMS_Report (TRUE)]	uint16	OperationalStatus[];
+[SMS_Report (FALSE)]	uint16	PrimaryStatus;
+[SMS_Report (FALSE)]	uint16	RequestedState;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Video Head"), SMS_Class_ID("DELL|DCIM_VIDEOHEAD|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_VideoHead : SMS_Class_Template
+{
+[SMS_Report (TRUE), Key]	string	CreationClassName;
+[SMS_Report (TRUE), Key]	string	DeviceID;
+[SMS_Report (TRUE), Key]	string	SystemCreationClassName;
+[SMS_Report (TRUE), Key]	string	SystemName;
+[SMS_Report (TRUE)]	string	Caption;
+[SMS_Report (FALSE)]	uint32	CurrentBitsPerPixel;
+[SMS_Report (TRUE)]	uint32	CurrentHorizontalResolution;
+[SMS_Report (FALSE)]	uint32	CurrentNumberOfColumns;
+[SMS_Report (FALSE)]	uint32	CurrentNumberOfRows;
+[SMS_Report (FALSE)]	uint32	CurrentRefreshRate;
+[SMS_Report (FALSE)]	uint16	CurrentScanMode;
+[SMS_Report (TRUE)]	uint32	CurrentVerticalResolution;
+[SMS_Report (FALSE)]	string	Description;
+[SMS_Report (FALSE)]	string	ElementName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM VPro Settings"), SMS_Class_ID("DELL|DCIM_VPROSETTINGS|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_VProSettings : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string	BIOSSupportedMaximumVAVersion;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	Description;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint16	LTTXTEnabledState;
+[SMS_Report (TRUE)]	uint16	SMXState;
+[SMS_Report (TRUE)]	uint16	SPIFlashhasPlatformDataRegionReserved;
+[SMS_Report (TRUE)]	uint16	SupportedBIOSsetup[];
+[SMS_Report (TRUE)]	uint16	VMXState;
+[SMS_Report (TRUE)]	uint16	VProCharacteristics[];
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Controller View"), SMS_Class_ID("DELL|DCIM_CONTROLLERVIEW|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_ControllerView : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint8	BusType;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	ControllerFirmwareVersion;
+[SMS_Report (TRUE)]	string	DriverVersion;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint8	PCISlot;
+[SMS_Report (TRUE)]	uint32	PrimaryStatus;
+[SMS_Report (TRUE)]	string	ProductName;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Physical Disk View"), SMS_Class_ID("DELL|DCIM_PDVIEW|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_PhysicalDiskView : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint32	DriveAFStatus;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	uint32	DriveUsage;
+[SMS_Report (TRUE)]	string	Model;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	string	SerialNumber;
+[SMS_Report (TRUE)]	uint32	PrimaryStatus;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("DCIM Virtual Disk View"), SMS_Class_ID("DELL|DCIM_VDVIEW|1.0"), SMS_Namespace(FALSE), Namespace("\\\\\\\\.\\\\root\\\\dcim\\\\sysman") ]
+class DCIM_VirtualDiskView : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint32	RAIDStatus;
+[SMS_Report (TRUE), Key]	string	InstanceID;
+[SMS_Report (TRUE)]	string	PhysicalDiskIDs[];
+[SMS_Report (TRUE)]	uint32	RAIDTypes;
+[SMS_Report (TRUE)]	string	ElementName;
+[SMS_Report (TRUE)]	uint32	SizeInMegabytes;
+[SMS_Report (TRUE)]	uint32	StripeSize;
+[SMS_Report (TRUE)]	uint32	PrimaryStatus;
+};
