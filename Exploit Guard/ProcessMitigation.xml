@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MitigationPolicy>
+  <AppConfig Executable="iexplore.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="true" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="mshtml.dll;flash*.ocx;jscript*.dll;vbscript.dll;vgx.dll;" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="true" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="wordpad.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="OUTLOOK.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="WINWORD.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="EXCEL.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="POWERPNT.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="MSACCESS.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="MSPUB.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="INFOPATH.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="VISIO.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="VPREVIEW.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="LYNC.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="PPTVIEW.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="OIS.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="AcroRd32.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="true" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="AcroRd32.dll;Acrofx32.dll;AcroForm.api;" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="true" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="Acrobat.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="true" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="AcroRd32.dll;Acrofx32.dll;AcroForm.api;" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="true" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="java.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="javaw.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+  <AppConfig Executable="javaws.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="false" RequireInfo="false" BottomUp="true" HighEntropy="true" />
+    <StrictHandle Enable="false" />
+    <SystemCalls DisableWin32kSystemCalls="false" Audit="false" />
+    <ExtensionPoints DisableExtensionPoints="false" />
+    <DynamicCode BlockDynamicCode="false" AllowThreadsToOptOut="false" Audit="false" />
+    <ControlFlowGuard Enable="false" SuppressExports="false" StrictControlFlowGuard="false" />
+    <SignedBinaries MicrosoftSignedOnly="false" AllowStoreSignedBinaries="false" EnforceModuleDependencySigning="false" Audit="false" AuditStoreSigned="false" AuditEnforceModuleDependencySigning="false" />
+    <Fonts DisableNonSystemFonts="false" Audit="false" />
+    <ImageLoad BlockRemoteImageLoads="true" BlockLowLabelImageLoads="false" PreferSystem32="false" AuditRemoteImageLoads="false" AuditLowLabelImageLoads="false" AuditPreferSystem32="false" />
+    <Payload EAFModules="" EnableExportAddressFilter="true" AuditEnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" AuditEnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" AuditEnableImportAddressFilter="false" EnableRopStackPivot="true" AuditEnableRopStackPivot="false" EnableRopCallerCheck="true" AuditEnableRopCallerCheck="false" EnableRopSimExec="true" AuditEnableRopSimExec="false" />
+    <SEHOP Enable="true" TelemetryOnly="false" Audit="false" />
+    <Heap TerminateOnError="true" />
+    <ChildProcess DisallowChildProcessCreation="false" Audit="false" />
+  </AppConfig>
+</MitigationPolicy>
