@@ -1,4 +1,5 @@
+WARNING: If you do not first import the hardware inventory MOF (HealthChecksHINV.mof) first, these collections may not import.  Import the HINV settings first *THEN* import the collections.
+
 To add the collections, either download the whole repository or just the MOF file.  (If you try to copy and paste you might screw up the formatting, but you can try.)
 
-To import:
-https://technet.microsoft.com/en-us/library/cc181056.aspx#EBAA
+To import: https://technet.microsoft.com/en-us/library/cc181056.aspx#EBAA

@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MitigationPolicy>
+  <AppConfig Executable="ONEDRIVE.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <ImageLoad BlockRemoteImageLoads="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="firefox.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="true" RequireInfo="false" BottomUp="true" HighEntropy="false" />
+  </AppConfig>
+  <AppConfig Executable="fltldr.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ImageLoad BlockRemoteImageLoads="true" />
+    <ChildProcess DisallowChildProcessCreation="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="GROOVE.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <ImageLoad BlockRemoteImageLoads="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+    <ChildProcess DisallowChildProcessCreation="true" />
+  </AppConfig>
+  <AppConfig Executable="Acrobat.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="true" RequireInfo="false" BottomUp="true" HighEntropy="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="AcroRd32.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="true" RequireInfo="false" BottomUp="true" HighEntropy="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="chrome.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+  </AppConfig>
+  <AppConfig Executable="EXCEL.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="iexplore.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR ForceRelocateImages="true" RequireInfo="false" BottomUp="true" HighEntropy="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="INFOPATH.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="java.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="javaw.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="javaws.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="LYNC.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="MSACCESS.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="MSPUB.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="OIS.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="OUTLOOK.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="plugin-container.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="POWERPNT.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="PPTVIEW.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="VISIO.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="VPREVIEW.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="WINWORD.EXE">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <ASLR Enable="true" ForceRelocateImages="true" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="wmplayer.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <Payload EnableExportAddressFilter="false" EnableExportAddressFilterPlus="false" EnableImportAddressFilter="false" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+  <AppConfig Executable="wordpad.exe">
+    <DEP Enable="true" EmulateAtlThunks="false" />
+    <Payload EnableExportAddressFilter="true" EnableExportAddressFilterPlus="true" EnableImportAddressFilter="true" EnableRopStackPivot="true" EnableRopCallerCheck="true" EnableRopSimExec="true" />
+  </AppConfig>
+</MitigationPolicy>
