@@ -525,6 +525,12 @@ else
     $drivers = Invoke-SqlCommand -ServerName $SCCMServer -Database $SCCMServerDB -Name MP_MatchDrivers -Parameter $xml
 }
 
+if ($drivers[0] -eq 0)
+{
+    Write-Log -Path $basepath -Output "No valid drivers found.  Exiting." -WriteHost $LoggingWriteHost
+    Exit 119
+}
+
 # Write-Log -Path $basepath -Output "Found the following drivers:" -WriteHost $LoggingWriteDebugHost
 # Write-Log -Path $basepath -Output "$drivers.CI_ID" -WriteHost $LoggingWriteDebugHost
 
