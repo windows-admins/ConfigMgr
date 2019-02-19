@@ -327,8 +327,8 @@ function Write-Log
 	process
 	{
         # Examples:
-        # Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteHost -DebugLevel "Error"
-        # Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteHost -DebugLevel "Warning"
+        # Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteInfoHost -DebugLevel "Error"
+        # Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteInfoHost -DebugLevel "Warning"
 
 		try
 		{
@@ -418,11 +418,11 @@ $LoggingWriteDebugHost = $True
 
 $Debug = $False
 
-Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteHost
+Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteInfoHost
 
 
 # Need to get local drivers and build out the XML
-Write-Log -Path $basepath -Output "Generating XML from list of devices on the device" -WriteHost $LoggingWriteHost
+Write-Log -Path $basepath -Output "Generating XML from list of devices on the device" -WriteHost $LoggingWriteInfoHost
 
 $hwidtable = New-Object System.Data.DataTable
 $hwidtable.Columns.Add("FriendlyName","string") | Out-Null
@@ -434,7 +434,7 @@ $CategoryInstance_UniqueIDs = @()
 
 If ($Categories)
 {
-    Write-Log -Path $basepath -Output "Querying driver category information." -WriteHost $LoggingWriteHost
+    Write-Log -Path $basepath -Output "Querying driver category information." -WriteHost $LoggingWriteInfoHost
 
     $xml += "<Categories>"
 
@@ -514,7 +514,7 @@ $xml | Format-Xml | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "Dr
 $hwidtable | Sort-Object | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "PnPDevices.log")
 
 # Run the drivers against the stored procs to find matches
-Write-Log -Path $basepath -Output "Querying MP for list of matching drivers" -WriteHost $LoggingWriteHost
+Write-Log -Path $basepath -Output "Querying MP for list of matching drivers" -WriteHost $LoggingWriteInfoHost
 
 if ($Credential)
 {
@@ -527,7 +527,7 @@ else
 
 if ($drivers[0] -eq 0)
 {
-    Write-Log -Path $basepath -Output "No valid drivers found.  Exiting." -WriteHost $LoggingWriteHost
+    Write-Log -Path $basepath -Output "No valid drivers found.  Exiting." -WriteHost $LoggingWriteInfoHost
     Exit 119
 }
 
@@ -553,7 +553,7 @@ ForEach ($CI_ID in $drivers.CI_ID)
 $CI_ID_list += ")"
 
 
-Write-Log -Path $basepath -Output "Querying additional driver information for matching drivers." -WriteHost $LoggingWriteHost
+Write-Log -Path $basepath -Output "Querying additional driver information for matching drivers." -WriteHost $LoggingWriteInfoHost
 
 $SqlQuery = "SELECT CI_ID, DriverType, DriverINFFile, DriverDate, DriverVersion, DriverClass, DriverProvider, DriverSigned, DriverBootCritical FROM v_CI_DriversCIs WHERE CI_ID IN $CI_ID_list"
 
@@ -623,7 +623,7 @@ $Content_UniqueIDs = $Content_UniqueID | Sort-Object | Get-Unique
 
 If ($DownloadDrivers)
 {
-    Write-Log -Path $basepath -Output "Downloading drivers from distribution point" -WriteHost $LoggingWriteHost
+    Write-Log -Path $basepath -Output "Downloading drivers from distribution point" -WriteHost $LoggingWriteInfoHost
     # Download drivers
     # TODO: Add ability to select DP
     ForEach ($Content_UniqueID in $Content_UniqueIDs)
@@ -637,17 +637,17 @@ If ($DownloadDrivers)
 
 if ($InstallDrivers)
 {
-    Write-Log -Path $basepath -Output "Apply downloaded drivers to online operating system." -WriteHost $LoggingWriteHost
+    Write-Log -Path $basepath -Output "Apply downloaded drivers to online operating system." -WriteHost $LoggingWriteInfoHost
 
     Install-Drivers -driverbasepath $basepath
 }
 else
 {
-    Write-Log -Path $basepath -Output "Skipping installation of drivers" -WriteHost $LoggingWriteHost
+    Write-Log -Path $basepath -Output "Skipping installation of drivers" -WriteHost $LoggingWriteInfoHost
 }
 
-Write-Log -Path $basepath -Output "Script Execution Complete" -WriteHost $LoggingWriteHost
-Write-Log -Path $basepath -Output " " -WriteHost $LoggingWriteHost
-Write-Log -Path $basepath -Output " " -WriteHost $LoggingWriteHost
+Write-Log -Path $basepath -Output "Script Execution Complete" -WriteHost $LoggingWriteInfoHost
+Write-Log -Path $basepath -Output " " -WriteHost $LoggingWriteInfoHost
+Write-Log -Path $basepath -Output " " -WriteHost $LoggingWriteInfoHost
 
 # :beer:
