@@ -217,7 +217,7 @@ function Download-Drivers
 
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
-		[string]$SCCMServer
+		[string]$SCCMDistributionPoint
 	)
 	begin
 	{
@@ -248,14 +248,14 @@ function Download-Drivers
 
             Write-Host "Getting list of drivers from IIS"
 
-            $request = Invoke-WebRequest http://$SCCMServer/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing
+            $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing
             $links = $request.Links.outerHTML
 
             foreach ($link in $links)
             {
                 Write-Host "Downloading: $FileName"
                 $URL = $link.Split("""")[1]
-                $FileName = $URL.Replace("http://$SCCMServer/SMS_DP_SMSPKG$/$DriverGUID/","")
+                $FileName = $URL.Replace("http://$SCCMDistributionPoint/SMS_DP_SMSPKG$/$DriverGUID/","")
                 $outfilepath = Join-Path -Path $driverpath -ChildPath $FileName
 
                 Invoke-Webrequest -uri $URL -outfile $outfilepath
@@ -629,7 +629,7 @@ If ($DownloadDrivers)
     # TODO: Add ability to select DP
     ForEach ($Content_UniqueID in $Content_UniqueIDs)
     {
-        Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMServer $SCCMDistributionPoint
+        Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint
     }
 }
 
