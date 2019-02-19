@@ -333,7 +333,7 @@ function Write-Log
 		try
 		{
             #None of these work.  WHY?!?!?
-            # $Ouput | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
+            $Output | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
             # "$Ouput" | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
             # $Ouput | Out-String | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
             # $Ouput | Write-Output | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
@@ -403,7 +403,8 @@ $basepath = "c:\Temp\Drivers"
 # Uncomment to use a specific set of credentials
 $Credential = Get-Credential
 
-$SCCMServer = "169.254.39.133"
+$SCCMServer = "172.20.2.195"
+$SCCMDistributionPoint = "172.20.2.195"
 $SCCMServerDB = "ConfigMgr_CHQ"
 
 $InstallDrivers = $False
@@ -628,7 +629,7 @@ If ($DownloadDrivers)
     # TODO: Add ability to select DP
     ForEach ($Content_UniqueID in $Content_UniqueIDs)
     {
-        Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMServer $SCCMServer
+        Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMServer $SCCMDistributionPoint
     }
 }
 
