@@ -217,7 +217,11 @@ function Download-Drivers
 
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
-		[string]$SCCMDistributionPoint
+		[string]$SCCMDistributionPoint,
+
+		[Parameter()]
+		[ValidateNotNullOrEmpty()]
+		[pscredential]$Credential
 	)
 	begin
 	{
@@ -248,7 +252,15 @@ function Download-Drivers
 
             Write-Host "Getting list of drivers from IIS"
 
-            $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing
+            If ($Credential)
+            {
+                $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -Credential $Credential
+            }
+            Else
+            {
+                $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -UseDefaultCredentials
+            }
+
             $links = $request.Links.outerHTML
 
             foreach ($link in $links)
@@ -332,14 +344,7 @@ function Write-Log
 
 		try
 		{
-            #None of these work.  WHY?!?!?
             $Output | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
-            # "$Ouput" | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
-            # $Ouput | Out-String | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
-            # $Ouput | Write-Output | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
-            # "$Ouput" | Out-String | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
-            # "$Ouput" | Write-Output | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
-            # $Ouput | Out-String | Write-Output | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
 
             If($WriteHost)
             {
@@ -403,15 +408,17 @@ $basepath = "c:\Temp\Drivers"
 # Uncomment to use a specific set of credentials
 $Credential = Get-Credential
 
-$SCCMServer = "172.20.2.195"
-$SCCMDistributionPoint = "172.20.2.195"
+$SCCMServer = "169.254.201.223"
+$SCCMDistributionPoint = "169.254.201.223"
 $SCCMServerDB = "ConfigMgr_CHQ"
 
 $InstallDrivers = $False
 $DownloadDrivers = $True
 $FindAllDrivers = $False
+$HardwareMustBePresent = $True
 
-$Categories = @("9370")
+$Categories = @("9370","Test")
+#$Categories = @()
 $CategoryWildCard = $True
 
 $LoggingWriteInfoHost = $True
@@ -439,7 +446,8 @@ If ($Categories)
 
     $xml += "<Categories>"
 
-
+    # WMI query: SELECT * FROM SMS_CategoryInstance where CategoryTypeName = 'DriverCategories'
+    # https://cm1/AdminService/wmi/CategoryInstance?$filter=CategoryTypeName
     ForEach ($Category in $Categories)
     {
         If ($CategoryWildCard)
@@ -468,42 +476,38 @@ If ($Categories)
 
 $localdevices = Get-PnpDevice
 
-ForEach ($localdevicearray in $localdevices){
-    ForEach ($localdevice in $localdevicearray.HardwareID){
-        if (-not $localdevice){
-            if ($Debug){Write-Log -Path $basepath -Output "Hardware ID is null, skip." -WriteHost $LoggingWriteDebugHost}
-            Continue
-        }
-
-        If ($localdevice -like "*\*"){
-            if ($Debug){Write-Log -Path $basepath -Output "Adding hardware to list." -WriteHost $LoggingWriteDebugHost}
-            $hwidrow = $hwidtable.NewRow()
-            $hwidrow.FriendlyName = $localdevicearray.FriendlyName
-            $hwidrow.HardwareID = $localdevice
-            $hwidtable.Rows.Add($hwidrow)
-        }
-        Else{
-            if ($Debug){Write-Log -Path $basepath -Output "Skipping $localdevice" -WriteHost $LoggingWriteDebugHost}
-            Continue
-        }
-    }
-}
-
 $xml += "<Devices>"
 
-ForEach ($_ in ($hwidtable.FriendlyName | Get-Unique))
+If ($HardwareMustBePresent)
 {
-    $xml += "<Device>"
-    $xml += "<!-- $_ -->"
+    $localdevices = $localdevices | Where-Object {$_.Present}
+}
 
-    $HardwareID = $hwidtable | Where FriendlyName -like $_
-
-    ForEach ($_ in $HardwareID)
+ForEach ($_ in $localdevices){
+    
+    # Find out all our use cases where we want to skip this device
+    If (-not $_)
     {
-        $xml += "<HwId>"+$_.HardwareID.ToString()+"</HwId>"
+        Continue
+    }
+
+    $xml += "<Device>"
+    $xml += "<!-- "+$_.Manufacturer+" | "+$_.FriendlyName+" -->"
+
+    ForEach ($__ in $_.HardwareID)
+    {
+        If ($__.ToString() -like "*\*")
+        {
+            $xml += "<HwId>"+$__.ToString()+"</HwId>"
+        }
+        Else
+        {
+            Continue
+        }
     }
 
     $xml += "</Device>"
+
 }
 
 $xml = $xml+"</Devices></DriverCatalogRequest>"
@@ -511,8 +515,7 @@ $xml = $xml.Replace("&","&amp;")
 
 $xml | Format-Xml | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "Drivers.xml")
 
-
-$hwidtable | Sort-Object | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "PnPDevices.log")
+$localdevices | Sort-Object | Format-Table -Wrap -AutoSize -Property Class, FriendlyName, InstanceId | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "PnPDevices.log")
 
 # Run the drivers against the stored procs to find matches
 Write-Log -Path $basepath -Output "Querying MP for list of matching drivers" -WriteHost $LoggingWriteInfoHost
@@ -568,34 +571,34 @@ else
 }
 
 
-$return = $return | Sort-Object
+$DriverListAll = $return[1] | Sort-Object -Property @{Expression = "DriverINFFile"; Descending = $False}, @{Expression = "DriverDate"; Descending = $True}, @{Expression = "DriverVersion"; Descending = $True} 
 $DriverList = @()
 
-ForEach ($obj in $return[1])
+If ($FindAllDrivers)
 {
-    If ($FindAllDrivers)
+    $DriverList = $DriverListAll
+}
+Else
+{
+    ForEach ($_ in $DriverListAll)
     {
-        $DriverList += $obj
-    }
-    Else
-    {
-        If (($DriverList.DriverINFFile -contains $obj.DriverINFFile) -and ($DriverList.DriverClass -contains $obj.DriverClass) -and ($DriverList.DriverProvider -contains $obj.DriverProvider))
+        If (($DriverList.DriverINFFile -contains $_.DriverINFFile) -and ($DriverList.DriverClass -contains $_.DriverClass) -and ($DriverList.DriverProvider -contains $_.DriverProvider))
         {
             if ($Debug){Write-Log -Path $basepath -Output "Newer driver already exists, skipping." -WriteHost $LoggingWriteDebugHost}
         }
         Else
         {
             if ($Debug){Write-Log -Path $basepath -Output "Adding driver to list." -WriteHost $LoggingWriteDebugHost}
-            $DriverList += $obj
+            $DriverList += $_
         }
     }
 }
 
 "All drivers found:" | Out-String | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-$return[1] | Sort-Object | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
+$DriverListAll | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 "" | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 "Targeted drivers:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-$DriverList | Sort-Object | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
+$DriverList | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 
 
 
