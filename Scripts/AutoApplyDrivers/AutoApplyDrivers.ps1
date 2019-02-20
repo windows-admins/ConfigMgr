@@ -91,7 +91,8 @@ function New-SqlConnectionString
 				'TrustServerCertificate' = 'True'
 				'Connection Timeout' = '30'
                 'trusted_connection' = 'False'
-			}
+                'Integrated Security' = 'True'
+            }
 
 			$connectionString = ''
 			@($connectionStringElements.GetEnumerator()).foreach({
