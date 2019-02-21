@@ -82,10 +82,10 @@ If (-not $Credential -and $tsenv)
     $TSPasswordVar = $tsvars | Where-Object {$_ -like "_SMSTSReserved2*"}
 
 
-    If ($NAAUsername.Count -ge 1)
+    If ($TSUsernameVar.Count -ge 1)
     {
-        $username = $_SMSTSLogPath = $tsenv.Value($TSUsernameVar)
-        $password = $_SMSTSLogPath = $tsenv.Value($TSPasswordVar) | ConvertTo-SecureString -asPlainText -Force
+        $username = $tsenv.Value($TSUsernameVar)
+        $password = $tsenv.Value($TSPasswordVar) | ConvertTo-SecureString -asPlainText -Force
 
         LogIt -message ("Running as: $username") -component "Main()" -type "Info" -LogFile $LogFile
 
