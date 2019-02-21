@@ -439,7 +439,7 @@ if ($InstallDrivers)
 
         LogIt -message ("Apply downloaded drivers to online operating system.") -component "Main()" -type "Info" -LogFile $LogFile
 
-        Install-Drivers -driverbasepath $Path
+        Install-Drivers -Path $Path
     }
     Else
     {

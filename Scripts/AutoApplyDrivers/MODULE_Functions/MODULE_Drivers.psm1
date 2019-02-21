@@ -7,7 +7,7 @@ function Install-Drivers
 	(
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
-		[string]$basepath
+		[string]$Path
 	)
 	begin
 	{
@@ -17,12 +17,12 @@ function Install-Drivers
 	{
 		try
 		{
-            $installlist = Get-ChildItem -Path $basepath -Filter *.inf -r
+            $installlist = Get-ChildItem -Path $Path -Filter *.inf -r
 
             ForEach ($inf in $installlist)
             {
                 Write-Host "Installing $inf.name"
-                pnputil /add-driver $inf.FullName /subdirs /install | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "pnputil.log") -Append
+                pnputil /add-driver $inf.FullName /subdirs /install | Out-File -FilePath (Join-Path -Path $Path -ChildPath "pnputil.log") -Append
             }
         }
         Catch
