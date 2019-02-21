@@ -31,20 +31,18 @@
 Param(
     [Parameter(Mandatory=$true)]
     $Path,
-    # [Parameter(Mandatory=$true)]
-    # [ValidateSet("Development","Production","Retired")] 
-    # $Action,
     [string]$SCCMServer,
     $Credential,
-    [bool]$Global:Debug = $False,
-    $Categories = @(), # @("9370","Test")
-    [bool]$CategoryWildCard = $True,
-    $SCCMServerDB = "ConfigMgr_CHQ",
+    [System.Array]$Categories = @(), # @("9370","Test")
+    [bool]$CategoryWildCard = $False,
+    [Parameter(Mandatory=$true)]
+    [string]$SCCMServerDB, # "ConfigMgr_CHQ"
     [bool]$InstallDrivers = $False,
     [bool]$DownloadDrivers = $True,
     [bool]$FindAllDrivers = $False,
     [bool]$HardwareMustBePresent = $True,
-    [bool]$UpdateOnlyDatedDrivers = $True # Use this to exclude any drivers we already have updated on the system
+    [bool]$UpdateOnlyDatedDrivers = $True, # Use this to exclude any drivers we already have updated on the system
+    [bool]$Global:Debug = $False
 )
 
 
@@ -55,6 +53,10 @@ Param(
 Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 Import-Module $PSScriptRoot\MODULE_Functions -Force -WarningAction SilentlyContinue
 
+If(!(test-path $Path))
+{
+      New-Item -ItemType Directory -Force -Path $Path
+}
 
 $Global:LogFile = Join-Path ($Path) 'AutoApplyDrivers.log' 
 
@@ -105,10 +107,6 @@ Else
 {
     Write-Host Running under current credentials.
 }
-
-
-#Definitions
-$Path = "c:\Temp\Drivers"
 
 If (-not $SCCMServer -and $tsenv)
 {
