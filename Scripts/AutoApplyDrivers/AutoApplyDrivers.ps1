@@ -43,7 +43,7 @@ Param(
     [bool]$InstallDrivers = $False,
     [bool]$DownloadDrivers = $True,
     [bool]$FindAllDrivers = $False,
-    [bool]$HardwareMustBePresent = $False,
+    [bool]$HardwareMustBePresent = $True,
     [bool]$UpdateOnlyDatedDrivers = $True # Use this to exclude any drivers we already have updated on the system
 )
 
@@ -402,19 +402,31 @@ $Content_UniqueIDs = $Content_UniqueID | Sort-Object | Get-Unique
 If ($DownloadDrivers)
 {
     LogIt -message ("Downloading drivers from distribution point") -component "Main()" -type "Info" -LogFile $LogFile
-    # Download drivers
-    # TODO: Add ability to select DP
-    ForEach ($Content_UniqueID in $Content_UniqueIDs)
+
+    If ($Content_UniqueIDs)
     {
-        If ($Credential)
+        # Download drivers
+        # TODO: Add ability to select DP
+        ForEach ($Content_UniqueID in $Content_UniqueIDs)
         {
-            Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential
-        }
-        else
-        {
-            Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint
+            If ($Credential)
+            {
+                Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential
+            }
+            else
+            {
+                Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint
+            }
         }
     }
+    Else
+    {
+        LogIt -message ("No drivers found to download.") -component "Main()" -type "Warning" -LogFile $LogFile
+    }
+}
+Else
+{
+    LogIt -message ("Skipping downloading of drivers.") -component "Main()" -type "Warning" -LogFile $LogFile
 }
 
 
