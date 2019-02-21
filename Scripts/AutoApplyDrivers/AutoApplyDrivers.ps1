@@ -253,13 +253,22 @@ function Download-Drivers
 
             Write-Host "Getting list of drivers from IIS"
 
-            If ($Credential)
+            try 
             {
-                $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -Credential $Credential
+                If ($Credential)
+                {
+                    $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
+                }
+                Else
+                {
+                    $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
+                }
             }
-            Else
+            catch
             {
-                $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -UseDefaultCredentials
+                # TODO: Output this information
+                Write-Host $_.Exception
+                Write-Host $_.ErrorDetails.ToSTring()
             }
 
             $links = $request.Links.outerHTML
@@ -268,10 +277,28 @@ function Download-Drivers
             {
                 Write-Host "Downloading: $FileName"
                 $URL = $link.Split("""")[1]
-                $FileName = $URL.Replace("http://$SCCMDistributionPoint/SMS_DP_SMSPKG$/$DriverGUID/","")
+
+                #We can get different casing on this, use RegEx to handle that scenario
+                $FileName = $URL -ireplace [regex]::Escape("http://$SCCMDistributionPoint/SMS_DP_SMSPKG$/$DriverGUID/"), ""
                 $outfilepath = Join-Path -Path $driverpath -ChildPath $FileName
 
-                Invoke-Webrequest -uri $URL -outfile $outfilepath
+                try 
+                {
+                    If ($Credential)
+                    {
+                        $request = Invoke-WebRequest -Uri $URL -outfile $outfilepath -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
+                    }
+                    Else
+                    {
+                        $request = Invoke-WebRequest -Uri $URL -outfile $outfilepath -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
+                    }
+                }
+                catch
+                {
+                    # TODO: Output this information
+                    Write-Host $_.Exception
+                    Write-Host $_.ErrorDetails.ToSTring()
+                }
             }
         }
         Catch
@@ -409,8 +436,8 @@ $basepath = "c:\Temp\Drivers"
 # Uncomment to use a specific set of credentials
 $Credential = Get-Credential
 
-$SCCMServer = "169.254.201.223"
-$SCCMDistributionPoint = "169.254.201.223"
+$SCCMServer = "CM1.corp.contoso.com"
+$SCCMDistributionPoint = "CM1.corp.contoso.com"
 $SCCMServerDB = "ConfigMgr_CHQ"
 
 $InstallDrivers = $False
@@ -418,8 +445,8 @@ $DownloadDrivers = $True
 $FindAllDrivers = $False
 $HardwareMustBePresent = $True
 
-$Categories = @("9370","Test")
-#$Categories = @()
+#$Categories = @("9370","Test")
+$Categories = @()
 $CategoryWildCard = $True
 
 $LoggingWriteInfoHost = $True
@@ -505,6 +532,14 @@ ForEach ($_ in $localdevices){
         {
             Continue
         }
+
+        If ($__.ToString() -like "*{*")
+        {
+            # Fixes an issue where items with curly braces seem to not match unless we strip the first part.
+            # Edge case but vOv
+            $xml += "<HwId>"+$__.Split("\")[1].ToString()+"</HwId>"
+        }
+        
     }
 
     $xml += "</Device>"
@@ -633,7 +668,14 @@ If ($DownloadDrivers)
     # TODO: Add ability to select DP
     ForEach ($Content_UniqueID in $Content_UniqueIDs)
     {
-        Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint
+        If ($Credential)
+        {
+            Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential
+        }
+        else
+        {
+            Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint
+        }
     }
 }
 
