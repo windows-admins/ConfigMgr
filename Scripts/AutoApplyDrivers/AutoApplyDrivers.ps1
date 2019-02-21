@@ -1,9 +1,62 @@
-﻿#Import Modules
+﻿<#
+    ALL THESE ARE WRONG! NEED TO UPDATE
+    .DESCRIPTION
+        Creates Application and Deployment Types.
+        This script is run against an XML file, and then can deploy applications to Development, Production, or Retire them.
+    .PARAMETER $XMLDocument
+        Path to the XML document to read, where the applications that need to be modified (created, moved into Production, or Retired) are documented.
+    .PARAMETER $Action
+        Action to be taken against the XML Document.  Provided actions are Development, Production, or Retired.
+    .PARAMETER CMSite
+        CM site code
+    .PARAMETER CMServer
+        CM site server
+    .PARAMETER VerboseLogging
+        If VerboseLogging is set to be $true, then detailed logging will be written
+    .INPUTS
+        None. You cannot pipe objects in.
+    .OUTPUTS
+        None. Does not generate any output.
+    .EXAMPLE
+        .\CreateApplication.ps1 -XMLDocument "c:\temp\Applications.xml" -Action "Development"
+        Creates the application and collections for the development environment.
+    .EXAMPLE
+        .\CreateApplication.ps1 -XMLDocument "c:\temp\Applications.xml" -Action "Production"
+        Moves the applications from development to production.
+    .EXAMPLE
+        .\CreateApplication.ps1 -XMLDocument "c:\temp\Applications.xml" -Action "Retired"
+        Moves the Applications to the Retired folder.
+#>
+
+Param(
+    [Parameter(Mandatory=$true)]
+    $Path,
+    # [Parameter(Mandatory=$true)]
+    # [ValidateSet("Development","Production","Retired")] 
+    # $Action,
+    [string]$SCCMServer,
+    $Credential,
+    [bool]$Global:Debug = $False,
+    $Categories = @(), # @("9370","Test")
+    [bool]$CategoryWildCard = $True,
+    $SCCMServerDB = "ConfigMgr_CHQ",
+    [bool]$InstallDrivers = $False,
+    [bool]$DownloadDrivers = $True,
+    [bool]$FindAllDrivers = $False,
+    [bool]$HardwareMustBePresent = $False,
+    [bool]$UpdateOnlyDatedDrivers = $True # Use this to exclude any drivers we already have updated on the system
+)
+
+
+# _SMSTSSiteCode = CHQ
+
+
+#Import Modules
 Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 Import-Module $PSScriptRoot\MODULE_Functions -Force -WarningAction SilentlyContinue
 
-$basepath = "c:\Temp\Drivers"
-$Global:LogFile = Join-Path ($basepath) 'AutoApplyDrivers.log' 
+
+$Global:LogFile = Join-Path ($Path) 'AutoApplyDrivers.log' 
 
 LogIt -message (" ") -component "Main()" -type "Info" -LogFile $LogFile
 LogIt -message (" ") -component "Main()" -type "Info" -LogFile $LogFile
@@ -44,7 +97,7 @@ If (-not $Credential -and $tsenv)
         Write-Host No credentials found in task sequence variables, attempting to run under current credentials.
     }
 }
-ElseIf(-not $Credential -and $PromptForCredentials)
+ElseIf(-not $Credential -and $Debug)
 {
     $Credential = Get-Credential
 }
@@ -55,14 +108,13 @@ Else
 
 
 #Definitions
-$basepath = "c:\Temp\Drivers"
+$Path = "c:\Temp\Drivers"
 
 If (-not $SCCMServer -and $tsenv)
 {
     # $SCCMServer = "CM1.corp.contoso.com"
     $SCCMServer = $tsenv.Value("_SMSTSMP")
 }
-
 
 # _SMSTSCHQ00005 = http://cm1.corp.contoso.com/sms_dp_smspkg$/chq00005 
 # Maybe use this for the DP?
@@ -72,25 +124,6 @@ If (-not $SCCMServer -and $tsenv)
 {
     $SCCMDistributionPoint = $tsenv.Value("_SMSTSMP")
 }
-
-
-# _SMSTSSiteCode = CHQ
-$SCCMServerDB = "ConfigMgr_CHQ"
-
-$InstallDrivers = $False
-$DownloadDrivers = $True
-$FindAllDrivers = $False
-$HardwareMustBePresent = $False
-$UpdateOnlyDatedDrivers = $True # Use this to exclude any drivers we already have updated on the system
-
-#$Categories = @("9370","Test")
-$Categories = @()
-$CategoryWildCard = $True
-
-$LoggingWriteInfoHost = $True
-$LoggingWriteDebugHost = $True
-
-$Global:Debug = $False
 
 LogIt -message ("Starting execution....") -component "Main()" -type "Info" -LogFile $LogFile
 
@@ -106,7 +139,7 @@ $xml = "<DriverCatalogRequest>"
 
 $CategoryInstance_UniqueIDs = @()
 
-If ($Categories)
+If ($Categories -and $SCCMServer)
 {
     LogIt -message ("Querying driver category information.") -component "Main()" -type "Info" -LogFile $LogFile
 
@@ -139,6 +172,10 @@ If ($Categories)
     }
 
     $xml += "</Categories>"
+}
+ElseIf (-not $SCCMServer)
+{
+    LogIt -message ("Nothing passed in for the Database Server. Running locally only for gathering/testing purposes.") -component "Main()" -type "Warning" -LogFile $LogFile
 }
 
 $localdevices = Get-PnpDevice
@@ -188,9 +225,15 @@ ForEach ($_ in $localdevices){
 $xml = $xml+"</Devices></DriverCatalogRequest>"
 $xml = $xml.Replace("&","&amp;")
 
-$xml | Format-Xml | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "Drivers.xml")
+$xml | Format-Xml | Out-File -FilePath (Join-Path -Path $Path -ChildPath "Drivers.xml")
 
-$localdevices | Sort-Object | Format-Table -Wrap -AutoSize -Property Class, FriendlyName, InstanceId | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "PnPDevices.log")
+$localdevices | Sort-Object | Format-Table -Wrap -AutoSize -Property Class, FriendlyName, InstanceId | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log")
+
+If (-not $SCCMServer)
+{
+    LogIt -message ("Cannot continue as no SCCM/DB server specified. Exiting...") -component "Main()" -type "Warning" -LogFile $LogFile
+    Exit 1
+}
 
 # Run the drivers against the stored procs to find matches
 LogIt -message ("Querying MP for list of matching drivers.") -component "Main()" -type "Info" -LogFile $LogFile
@@ -318,14 +361,14 @@ Else
 
 
 
-"All drivers found:" | Out-String | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-$DriverListAll | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-"" | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-"Targeted drivers:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-$DriverList | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-"" | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-"Drivers Newer than Current:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-$DriverListFinal | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
+"All drivers found:" | Out-String | Out-File -FilePath (Join-Path -Path $Path -ChildPath "SCCMDrivers.log")
+$DriverListAll | Format-Table | Out-File -Append -FilePath (Join-Path -Path $Path -ChildPath "SCCMDrivers.log")
+"" | Out-File -Append -FilePath (Join-Path -Path $Path -ChildPath "SCCMDrivers.log")
+"Targeted drivers:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $Path -ChildPath "SCCMDrivers.log")
+$DriverList | Format-Table | Out-File -Append -FilePath (Join-Path -Path $Path -ChildPath "SCCMDrivers.log")
+"" | Out-File -Append -FilePath (Join-Path -Path $Path -ChildPath "SCCMDrivers.log")
+"Drivers Newer than Current:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $Path -ChildPath "SCCMDrivers.log")
+$DriverListFinal | Format-Table | Out-File -Append -FilePath (Join-Path -Path $Path -ChildPath "SCCMDrivers.log")
 
 
 If ($UpdateOnlyDatedDrivers)
@@ -365,11 +408,11 @@ If ($DownloadDrivers)
     {
         If ($Credential)
         {
-            Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential
+            Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential
         }
         else
         {
-            Download-Drivers -P $basepath -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint
+            Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint
         }
     }
 }
@@ -384,7 +427,7 @@ if ($InstallDrivers)
 
         LogIt -message ("Apply downloaded drivers to online operating system.") -component "Main()" -type "Info" -LogFile $LogFile
 
-        Install-Drivers -driverbasepath $basepath
+        Install-Drivers -driverbasepath $Path
     }
     Else
     {
