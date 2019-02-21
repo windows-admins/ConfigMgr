@@ -1,5 +1,5 @@
 To Run:
-.\AutoApplyDrivers.ps1 -Path "c:\Temp\Drivers\" -SCCMServer cm1.corp.contoso.com -Credential (Get-Credential -UserName "CORP\Drivers" -Message "Enter password")
+.\AutoApplyDrivers.ps1 -Path "c:\Temp\Drivers\" -SCCMServer cm1.corp.contoso.com -SCCMServerDB "ConfigMgr_CHQ" -Credential (Get-Credential -UserName "CORP\Drivers" -Message "Enter password")
 
 To setup:
 

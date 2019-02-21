@@ -87,25 +87,28 @@ If (-not $Credential -and $tsenv)
         $username = $_SMSTSLogPath = $tsenv.Value($TSUsernameVar)
         $password = $_SMSTSLogPath = $tsenv.Value($TSPasswordVar) | ConvertTo-SecureString -asPlainText -Force
 
+        LogIt -message ("Running as: $username") -component "Main()" -type "Info" -LogFile $LogFile
+
         $Credential = New-Object System.Management.Automation.PSCredential($username,$password)
 
         If ($NAAUsername.Count -gt 1)
         {
-            Write-Host WARNING: More than one username found.  Using first found credential.
+            LogIt -message ("More than one username found.  Using first found credential.") -component "Main()" -type "Warning" -LogFile $LogFile
         }
     }
     Else
     {
-        Write-Host No credentials found in task sequence variables, attempting to run under current credentials.
+        LogIt -message ("More than one username found.  Using first found credential.") -component "Main()" -type "Warning" -LogFile $LogFile
     }
 }
 ElseIf(-not $Credential -and $Debug)
 {
+    LogIt -message ("Fetching credentials from user.") -component "Main()" -type "Info" -LogFile $LogFile
     $Credential = Get-Credential
 }
 Else
 {
-    Write-Host Running under current credentials.
+    LogIt -message ("Running under current credentials.") -component "Main()" -type "Info" -LogFile $LogFile
 }
 
 If (-not $SCCMServer -and $tsenv)
