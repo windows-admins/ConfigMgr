@@ -443,7 +443,8 @@ $SCCMServerDB = "ConfigMgr_CHQ"
 $InstallDrivers = $False
 $DownloadDrivers = $True
 $FindAllDrivers = $False
-$HardwareMustBePresent = $True
+$HardwareMustBePresent = $False
+$UpdateOnlyDatedDrivers # Use this to exclude any drivers we already have updated on the system
 
 #$Categories = @("9370","Test")
 $Categories = @()
@@ -630,13 +631,38 @@ Else
     }
 }
 
+
+$OnlineDrivers = Get-WindowsDriver -Online -All
+$DriverListFinal = @()
+
+# Remove drivers that don't need to be updated
+ForEach ($Driver in $DriverList)
+{
+    If (($OnlineDrivers | Where-Object {$_.ClassName -eq $DriverList[0].DriverClass -and $_.ProviderName -eq $DriverList[0].DriverProvider -and $_.Driver -eq $DriverList[0].DriverINFFile -and $_.Version -eq $DriverList[0].DriverVersion -and $_.Date -eq $DriverList[0].DriverDate}).Count -gt 0)
+    {
+        # Found a matching driver, we can skip this one.
+        Continue
+    }
+    Else
+    {
+        $DriverListFinal += $Driver
+    }
+}
+
+
 "All drivers found:" | Out-String | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 $DriverListAll | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 "" | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 "Targeted drivers:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 $DriverList | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
+"" | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
+"Non-updated drivers:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
+$DriverListFinal | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 
-
+If ($UpdateOnlyDatedDrivers)
+{
+    $DriverList = $DriverListFinal
+}
 
 # Parse CI_ID against v_DriverContentToPackage to get the Content_UniqueID
 Write-Log -Path $basepath -Output "Parsing v_DriverContentToPackage to map drivers to content download location" -WriteHost $LoggingWriteDebugHost
