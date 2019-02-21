@@ -1,450 +1,87 @@
-﻿
-function Get-SqlCommand
+﻿#Import Modules
+Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+Import-Module $PSScriptRoot\MODULE_Functions -Force -WarningAction SilentlyContinue
+
+$basepath = "c:\Temp\Drivers"
+$Global:LogFile = Join-Path ($basepath) 'AutoApplyDrivers.log' 
+
+LogIt -message (" ") -component "Main()" -type "Info" -LogFile $LogFile
+LogIt -message (" ") -component "Main()" -type "Info" -LogFile $LogFile
+LogIt -message ("_______________________________________________________________________") -component "Main()" -type "Info" -LogFile $LogFile
+
+Try
 {
-	[OutputType([Microsoft.SqlServer.Management.Smo.StoredProcedure])]
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$ServerName,
+    $tsenv = New-Object -COMObject Microsoft.SMS.TSEnvironment 
+    $tsvars = $tsenv.GetVariables()
 
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$Database,
-
-        [Parameter()]
-		[ValidateNotNullOrEmpty()]
-		[pscredential]$Credential		
-	)
-	begin
-	{
-		$ErrorActionPreference = 'Stop'
-	}
-	process
-	{
-		try
-		{
-			[System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SMO') | out-null
-
-			if ($PSBoundParameters.ContainsKey('Credential'))
-			{
-			    $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database -Credential $Credential
-            }
-            else
-            {
-                $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database
-            }
-
-			$sqlConnection = New-SqlConnection -ConnectionString $connectionString
-
-			$serverInstance = New-Object ('Microsoft.SqlServer.Management.Smo.Server') $sqlConnection
-			$serverInstance.Databases[$Database].StoredProcedures
-		}
-		catch
-		{
-			$PSCmdlet.ThrowTerminatingError($_)
-		}
-	}
+}
+Catch
+{
+    Write-Host "Not running in a task sequence."
 }
 
-function New-SqlConnectionString
+
+If (-not $Credential -and $tsenv)
 {
-	[OutputType([string])]
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$ServerName,
+    $TSUsernameVar = $tsvars | Where-Object {$_ -like "_SMSTSReserved1*"}
+    $TSPasswordVar = $tsvars | Where-Object {$_ -like "_SMSTSReserved2*"}
 
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$Database,
 
-		[Parameter()]
-		[ValidateNotNullOrEmpty()]
-		[pscredential]$Credential
-	)
-	begin
-	{
-		$ErrorActionPreference = 'Stop'
-	}
-	process
-	{
-		try
-		{
-			#region Build the connection string. Doing this allows for easy addition or removal of attributes
-			$connectionStringElements = [ordered]@{
-				Server = "tcp:$ServerName,1433"
-				'Initial Catalog' = $Database
-				'Persist Security Info' = 'False'
-			}
-			if ($PSBoundParameters.ContainsKey('Credential'))
-			{
-				$connectionStringElements.'User ID' = $Credential.UserName
-				$connectionStringElements.'Password' = $Credential.GetNetworkCredential().Password 
-			}
-			$connectionStringElements += @{
-				'MultipleActiveResultSets' = 'False'
-				'Encrypt' = 'False'
-				'TrustServerCertificate' = 'True'
-				'Connection Timeout' = '30'
-                'trusted_connection' = 'False'
-                'Integrated Security' = 'True'
-            }
+    If ($NAAUsername.Count -ge 1)
+    {
+        $username = $_SMSTSLogPath = $tsenv.Value($TSUsernameVar)
+        $password = $_SMSTSLogPath = $tsenv.Value($TSPasswordVar) | ConvertTo-SecureString -asPlainText -Force
 
-			$connectionString = ''
-			@($connectionStringElements.GetEnumerator()).foreach({
-				$connectionString += "$($_.Key)=$($_.Value);"
-			})
-			return $connectionString
-		}
-		catch
-		{
-			$PSCmdlet.ThrowTerminatingError($_)
-		}
-	}
-}
+        $Credential = New-Object System.Management.Automation.PSCredential($username,$password)
 
-function New-SqlConnection
-{
-	[OutputType([System.Data.SqlClient.SqlConnection])]
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$ConnectionString	
-	)
-	begin
-	{
-		$ErrorActionPreference = 'Stop'
-	}
-	process
-	{
-		try
-		{
-			$SqlConnection = New-Object System.Data.SqlClient.SqlConnection
-			$SqlConnection.ConnectionString = $connectionString
-			return $SqlConnection
-		}
-		catch
-		{
-			$PSCmdlet.ThrowTerminatingError($_)
-		}
-	}
-}
-
-function Invoke-SqlCommand
-{
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$ServerName,
-
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$Database,
-
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$Name,
-
-		[string]$Parameter,
-
-		[Parameter()]
-		[ValidateNotNullOrEmpty()]
-		[pscredential]$Credential
-	)
-	begin
-	{
-		$ErrorActionPreference = 'Stop'
-	}
-	process
-	{
-		try
-		{
-            if ($PSBoundParameters.ContainsKey('Credential'))
-			{
-			    $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database -Credential $Credential
-            }
-            else
-            {
-                $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database 
-            }
-
-			$SqlConnection = New-SqlConnection -ConnectionString $connectionString
-
-			$SqlCmd = New-Object System.Data.SqlClient.SqlCommand
-			$SqlCmd.CommandText = $Name
-			$SqlCmd.Connection = $SqlConnection
-
-            if ($Parameter)
-            {
-                $SqlCmd.CommandType=[System.Data.CommandType]’StoredProcedure’
-                $SqlCmd.Parameters.AddWithValue("@xtext", $Parameter) | Out-Null
-            }
-
-            # Write-Host $SqlCmd.Parameters
-			$SqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-			$SqlAdapter.SelectCommand = $SqlCmd
-			$DataSet = New-Object System.Data.DataSet
-			$SqlAdapter.Fill($DataSet)
-            # Write-Host $SqlAdapter
-            Return $DataSet.Tables
-		}
-		catch
-		{
-			$PSCmdlet.ThrowTerminatingError($_)
-		}
-	}
-}
-
-function Download-Drivers
-{
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$Path,
-
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$DriverGUID,
-
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$SCCMDistributionPoint,
-
-		[Parameter()]
-		[ValidateNotNullOrEmpty()]
-		[pscredential]$Credential
-	)
-	begin
-	{
-		$ErrorActionPreference = 'Stop'
-	}
-	process
-	{
-		try
-		{
-            Write-Host "Download Drivers from DP"
-            if (-not (Test-Path -Path $Path))
-            {
-                Write-Host "Driver download path does not exist.  Exiting."
-                Exit 3
-            }
-
-            #$DriverGUID = "1665CB2C-8B4F-4404-B4E5-94B527978D05"
-
-            $driverpath = Join-Path -Path $Path -ChildPath $DriverGUID
-
-            if (Test-Path -Path $driverpath)
-            {
-                Write-Host "Driver folder exists, nuke."
-                Remove-Item $driverpath -Force -Recurse
-            }
-
-            New-Item -ItemType directory -Path $driverpath
-
-            Write-Host "Getting list of drivers from IIS"
-
-            try 
-            {
-                If ($Credential)
-                {
-                    $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
-                }
-                Else
-                {
-                    $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
-                }
-            }
-            catch
-            {
-                # TODO: Output this information
-                Write-Host $_.Exception
-                Write-Host $_.ErrorDetails.ToSTring()
-            }
-
-            $links = $request.Links.outerHTML
-
-            foreach ($link in $links)
-            {
-                Write-Host "Downloading: $FileName"
-                $URL = $link.Split("""")[1]
-
-                #We can get different casing on this, use RegEx to handle that scenario
-                $FileName = $URL -ireplace [regex]::Escape("http://$SCCMDistributionPoint/SMS_DP_SMSPKG$/$DriverGUID/"), ""
-                $outfilepath = Join-Path -Path $driverpath -ChildPath $FileName
-
-                try 
-                {
-                    If ($Credential)
-                    {
-                        $request = Invoke-WebRequest -Uri $URL -outfile $outfilepath -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
-                    }
-                    Else
-                    {
-                        $request = Invoke-WebRequest -Uri $URL -outfile $outfilepath -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
-                    }
-                }
-                catch
-                {
-                    # TODO: Output this information
-                    Write-Host $_.Exception
-                    Write-Host $_.ErrorDetails.ToSTring()
-                }
-            }
-        }
-        Catch
+        If ($NAAUsername.Count -gt 1)
         {
-            # Do things
+            Write-Host WARNING: More than one username found.  Using first found credential.
         }
     }
+    Else
+    {
+        Write-Host No credentials found in task sequence variables, attempting to run under current credentials.
+    }
 }
-
-
-function Install-Drivers
+ElseIf(-not $Credential -and $PromptForCredentials)
 {
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$basepath
-	)
-	begin
-	{
-		$ErrorActionPreference = 'Stop'
-	}
-	process
-	{
-		try
-		{
-            $installlist = Get-ChildItem -Path $basepath -Filter *.inf -r
-
-            ForEach ($inf in $installlist)
-            {
-                Write-Host "Installing $inf.name"
-                pnputil /add-driver $inf.FullName /subdirs /install | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "pnputil.log") -Append
-            }
-        }
-        Catch
-        {
-            # Do things
-        }
-    }
+    $Credential = Get-Credential
 }
-
-function Write-Log
+Else
 {
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$Path,
-
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$Output,
-
-		[ValidateNotNullOrEmpty()]
-		#[binary]$WriteHost=$False,
-        $WriteHost=$False,
-        
-		[string]$DebugLevel
-	)
-	begin
-	{
-		$ErrorActionPreference = 'Stop'
-	}
-	process
-	{
-        # Examples:
-        # Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteInfoHost -DebugLevel "Error"
-        # Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteInfoHost -DebugLevel "Warning"
-
-		try
-		{
-            $Output | Out-File -Append -Encoding string -Force -FilePath (Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log")
-
-            If($WriteHost)
-            {
-                If ($DebugLevel -eq "Error")
-                {
-                    Write-Host -ForegroundColor Red $Output
-                }
-                ElseIf ($DebugLevel -eq "Warning")
-                {
-                    Write-Host -ForegroundColor Yellow $Output
-                }
-                Else
-                {
-                    Write-Host $Output
-                }
-            }
-        }
-        Catch
-        {
-            Write-Host -ForegroundColor Red "Failed to execute function Write-Log"
-        }
-    }
+    Write-Host Running under current credentials.
 }
-
-function Format-Xml {
-<#
-.SYNOPSIS
-Format the incoming object as the text of an XML document.
-#>
-    param(
-        ## Text of an XML document.
-        [Parameter(ValueFromPipeline = $true)]
-        [string[]]$Text
-    )
-
-    begin {
-        $data = New-Object System.Collections.ArrayList
-    }
-    process {
-        [void] $data.Add($Text -join "`n")
-    }
-    end {
-        $doc=New-Object System.Xml.XmlDataDocument
-        $doc.LoadXml($data -join "`n")
-        $sw=New-Object System.Io.Stringwriter
-        $writer=New-Object System.Xml.XmlTextWriter($sw)
-        $writer.Formatting = [System.Xml.Formatting]::Indented
-        $doc.WriteContentTo($writer)
-        $sw.ToString()
-    }
-}
-
-
-
-#=========================================================================================================================================
 
 
 #Definitions
 $basepath = "c:\Temp\Drivers"
 
-# Uncomment to use a specific set of credentials
-$Credential = Get-Credential
+If (-not $SCCMServer -and $tsenv)
+{
+    # $SCCMServer = "CM1.corp.contoso.com"
+    $SCCMServer = $tsenv.Value("_SMSTSMP")
+}
 
-$SCCMServer = "CM1.corp.contoso.com"
-$SCCMDistributionPoint = "CM1.corp.contoso.com"
+
+# _SMSTSCHQ00005 = http://cm1.corp.contoso.com/sms_dp_smspkg$/chq00005 
+# Maybe use this for the DP?
+
+#$SCCMDistributionPoint = "CM1.corp.contoso.com"
+If (-not $SCCMServer -and $tsenv)
+{
+    $SCCMDistributionPoint = $tsenv.Value("_SMSTSMP")
+}
+
+
+# _SMSTSSiteCode = CHQ
 $SCCMServerDB = "ConfigMgr_CHQ"
 
 $InstallDrivers = $False
 $DownloadDrivers = $True
 $FindAllDrivers = $False
 $HardwareMustBePresent = $False
-$UpdateOnlyDatedDrivers # Use this to exclude any drivers we already have updated on the system
+$UpdateOnlyDatedDrivers = $True # Use this to exclude any drivers we already have updated on the system
 
 #$Categories = @("9370","Test")
 $Categories = @()
@@ -453,13 +90,13 @@ $CategoryWildCard = $True
 $LoggingWriteInfoHost = $True
 $LoggingWriteDebugHost = $True
 
-$Debug = $False
+$Global:Debug = $False
 
-Write-Log -Path $basepath -Output "Starting execution...." -WriteHost $LoggingWriteInfoHost
-
+LogIt -message ("Starting execution....") -component "Main()" -type "Info" -LogFile $LogFile
 
 # Need to get local drivers and build out the XML
-Write-Log -Path $basepath -Output "Generating XML from list of devices on the device" -WriteHost $LoggingWriteInfoHost
+LogIt -message ("Generating XML from list of devices on the device") -component "Main()" -type "Info" -LogFile $LogFile
+
 
 $hwidtable = New-Object System.Data.DataTable
 $hwidtable.Columns.Add("FriendlyName","string") | Out-Null
@@ -471,7 +108,8 @@ $CategoryInstance_UniqueIDs = @()
 
 If ($Categories)
 {
-    Write-Log -Path $basepath -Output "Querying driver category information." -WriteHost $LoggingWriteInfoHost
+    LogIt -message ("Querying driver category information.") -component "Main()" -type "Info" -LogFile $LogFile
+
 
     $xml += "<Categories>"
 
@@ -555,7 +193,8 @@ $xml | Format-Xml | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "Dr
 $localdevices | Sort-Object | Format-Table -Wrap -AutoSize -Property Class, FriendlyName, InstanceId | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "PnPDevices.log")
 
 # Run the drivers against the stored procs to find matches
-Write-Log -Path $basepath -Output "Querying MP for list of matching drivers" -WriteHost $LoggingWriteInfoHost
+LogIt -message ("Querying MP for list of matching drivers.") -component "Main()" -type "Info" -LogFile $LogFile
+
 
 if ($Credential)
 {
@@ -568,12 +207,12 @@ else
 
 if ($drivers[0] -eq 0)
 {
-    Write-Log -Path $basepath -Output "No valid drivers found.  Exiting." -WriteHost $LoggingWriteInfoHost
+    LogIt -message ("No valid drivers found.  Exiting.") -component "Main()" -type "Warning" -LogFile $LogFile
     Exit 119
 }
 
-# Write-Log -Path $basepath -Output "Found the following drivers:" -WriteHost $LoggingWriteDebugHost
-# Write-Log -Path $basepath -Output "$drivers.CI_ID" -WriteHost $LoggingWriteDebugHost
+LogIt -message ("Found the following drivers (CI_ID):") -component "Main()" -type "Debug" -LogFile $LogFile
+LogIt -message ("$drivers.CI_ID") -component "Main()" -type "Debug" -LogFile $LogFile
 
 $CI_ID_list = "("
 $count = 0
@@ -594,7 +233,7 @@ ForEach ($CI_ID in $drivers.CI_ID)
 $CI_ID_list += ")"
 
 
-Write-Log -Path $basepath -Output "Querying additional driver information for matching drivers." -WriteHost $LoggingWriteInfoHost
+LogIt -message ("Querying additional driver information for matching drivers.") -component "Main()" -type "Info" -LogFile $LogFile
 
 $SqlQuery = "SELECT CI_ID, DriverType, DriverINFFile, DriverDate, DriverVersion, DriverClass, DriverProvider, DriverSigned, DriverBootCritical FROM v_CI_DriversCIs WHERE CI_ID IN $CI_ID_list"
 
@@ -607,9 +246,17 @@ else
     $return = Invoke-SqlCommand -ServerName $SCCMServer -Database $SCCMServerDB -Name $SqlQuery
 }
 
+Try
+{
+    $DriverListAll = $return[1] | Sort-Object -Property @{Expression = "DriverINFFile"; Descending = $False}, @{Expression = "DriverDate"; Descending = $True}, @{Expression = "DriverVersion"; Descending = $True} 
+    $DriverList = @()
+}
+Catch
+{
+    LogIt -message ("Unable to find valid driver information. Exiting...") -component "Main()" -type "Error" -LogFile $LogFile
+    Exit 1
+}
 
-$DriverListAll = $return[1] | Sort-Object -Property @{Expression = "DriverINFFile"; Descending = $False}, @{Expression = "DriverDate"; Descending = $True}, @{Expression = "DriverVersion"; Descending = $True} 
-$DriverList = @()
 
 If ($FindAllDrivers)
 {
@@ -621,33 +268,54 @@ Else
     {
         If (($DriverList.DriverINFFile -contains $_.DriverINFFile) -and ($DriverList.DriverClass -contains $_.DriverClass) -and ($DriverList.DriverProvider -contains $_.DriverProvider))
         {
-            if ($Debug){Write-Log -Path $basepath -Output "Newer driver already exists, skipping." -WriteHost $LoggingWriteDebugHost}
+            LogIt -message ("Newer driver already exists, skipping.") -component "Main()" -type "Debug" -LogFile $LogFile
         }
         Else
         {
-            if ($Debug){Write-Log -Path $basepath -Output "Adding driver to list." -WriteHost $LoggingWriteDebugHost}
+            LogIt -message ("Adding driver to list." ) -component "Main()" -type "Debug" -LogFile $LogFile
             $DriverList += $_
         }
     }
 }
 
 
-$OnlineDrivers = Get-WindowsDriver -Online -All
-$DriverListFinal = @()
-
-# Remove drivers that don't need to be updated
-ForEach ($Driver in $DriverList)
+If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] “Administrator”))
 {
-    If (($OnlineDrivers | Where-Object {$_.ClassName -eq $DriverList[0].DriverClass -and $_.ProviderName -eq $DriverList[0].DriverProvider -and $_.Driver -eq $DriverList[0].DriverINFFile -and $_.Version -eq $DriverList[0].DriverVersion -and $_.Date -eq $DriverList[0].DriverDate}).Count -gt 0)
+    $OnlineDrivers = Get-WindowsDriver -Online -All
+    $DriverListFinal = @()
+
+    # Remove drivers that don't need to be updated
+    ForEach ($Driver in $DriverList)
     {
-        # Found a matching driver, we can skip this one.
-        Continue
-    }
-    Else
-    {
-        $DriverListFinal += $Driver
+        # We have to do this in two steps because the date should ALWAYS win even if the version is newer.
+        If (($OnlineDrivers | Where-Object {$_.ClassName -eq $DriverList[0].DriverClass -and $_.ProviderName -eq $DriverList[0].DriverProvider -and $_.Driver -eq $DriverList[0].DriverINFFile -and $_.Date -lt $DriverList[0].DriverDate}).Count -gt 0)
+        {
+
+            LogIt -message ("Found a newer driver, add it to the list.") -component "Main()" -type "Debug" -LogFile $LogFile
+            $DriverListFinal += $Driver
+            Continue
+        }
+        ElseIf (($OnlineDrivers | Where-Object {$_.ClassName -eq $DriverList[0].DriverClass -and $_.ProviderName -eq $DriverList[0].DriverProvider -and $_.Driver -eq $DriverList[0].DriverINFFile -and [Version]$_.Version -lt [Version]$DriverList[0].DriverVersion -and $_.Date -lt $DriverList[0].DriverDate}).Count -gt 0)
+        {
+            LogIt -message ("Found a newer driver, add it to the list.") -component "Main()" -type "Debug" -LogFile $LogFile
+            $DriverListFinal += $Driver
+            Continue
+        }
+        Else
+        {
+            LogIt -message ("No newer driver found, skip!") -component "Main()" -type "Debug" -LogFile $LogFile
+            Continue
+        }
     }
 }
+Else
+{
+    $DriverListFinal = "Not running as administrator.  Unable to check SCCM drivers against local drivers to see if the local drivers are newer than targetted drivers."
+    LogIt -message ($DriverListFinal) -component "Main()" -type "Warning" -LogFile $LogFile
+    $UpdateOnlyDatedDrivers = $False # Force this to false so we don't try and do this.
+}
+
+
 
 
 "All drivers found:" | Out-String | Out-File -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
@@ -656,8 +324,9 @@ $DriverListAll | Format-Table | Out-File -Append -FilePath (Join-Path -Path $bas
 "Targeted drivers:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 $DriverList | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 "" | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
-"Non-updated drivers:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
+"Drivers Newer than Current:" | Out-String | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
 $DriverListFinal | Format-Table | Out-File -Append -FilePath (Join-Path -Path $basepath -ChildPath "SCCMDrivers.log")
+
 
 If ($UpdateOnlyDatedDrivers)
 {
@@ -665,7 +334,7 @@ If ($UpdateOnlyDatedDrivers)
 }
 
 # Parse CI_ID against v_DriverContentToPackage to get the Content_UniqueID
-Write-Log -Path $basepath -Output "Parsing v_DriverContentToPackage to map drivers to content download location" -WriteHost $LoggingWriteDebugHost
+LogIt -message ("Parsing v_DriverContentToPackage to map drivers to content download location") -component "Main()" -type "Info" -LogFile $LogFile
 
 $Content_UniqueID = @()
 
@@ -689,7 +358,7 @@ $Content_UniqueIDs = $Content_UniqueID | Sort-Object | Get-Unique
 
 If ($DownloadDrivers)
 {
-    Write-Log -Path $basepath -Output "Downloading drivers from distribution point" -WriteHost $LoggingWriteInfoHost
+    LogIt -message ("Downloading drivers from distribution point") -component "Main()" -type "Info" -LogFile $LogFile
     # Download drivers
     # TODO: Add ability to select DP
     ForEach ($Content_UniqueID in $Content_UniqueIDs)
@@ -710,17 +379,26 @@ If ($DownloadDrivers)
 
 if ($InstallDrivers)
 {
-    Write-Log -Path $basepath -Output "Apply downloaded drivers to online operating system." -WriteHost $LoggingWriteInfoHost
+    If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] “Administrator”))
+    {
 
-    Install-Drivers -driverbasepath $basepath
+        LogIt -message ("Apply downloaded drivers to online operating system.") -component "Main()" -type "Info" -LogFile $LogFile
+
+        Install-Drivers -driverbasepath $basepath
+    }
+    Else
+    {
+        LogIt -message ("Not running as administrator.  Unable to install drivers.") -component "Main()" -type "Error" -LogFile $LogFile
+    }
 }
 else
 {
-    Write-Log -Path $basepath -Output "Skipping installation of drivers" -WriteHost $LoggingWriteInfoHost
+    LogIt -message ("Skipping installation of drivers.") -component "Main()" -type "Warning" -LogFile $LogFile
 }
 
-Write-Log -Path $basepath -Output "Script Execution Complete" -WriteHost $LoggingWriteInfoHost
-Write-Log -Path $basepath -Output " " -WriteHost $LoggingWriteInfoHost
-Write-Log -Path $basepath -Output " " -WriteHost $LoggingWriteInfoHost
+
+LogIt -message ("Script Execution Complete") -component "Main()" -type "Info" -LogFile $LogFile
+LogIt -message (" ") -component "Main()" -type "Info" -LogFile $LogFile
+LogIt -message (" ") -component "Main()" -type "Info" -LogFile $LogFile
 
 # :beer:
