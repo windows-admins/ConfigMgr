@@ -59,12 +59,16 @@ function Download-Drivers
 	}
 	process
 	{
+        LogIt -message ("Getting list of drivers from IIS") -component "Main()" -type "Info" -LogFile $LogFile
+        LogIt -message ("Path: "+$Path) -component "Main()" -type "Debug" -LogFile $LogFile
+        LogIt -message ("DriverGUID: "+$DriverGUID) -component "Main()" -type "Debug" -LogFile $LogFile
+        LogIt -message ("SCCMDistributionPoint: "+$SCCMDistributionPoint) -component "Main()" -type "Debug" -LogFile $LogFile
+        LogIt -message ("Credential: "+($Credential.UserName.ToString())) -component "Main()" -type "Debug" -LogFile $LogFile
 		try
 		{
-            Write-Host "Download Drivers from DP"
             if (-not (Test-Path -Path $Path))
             {
-                Write-Host "Driver download path does not exist.  Exiting."
+                LogIt -message ("Driver download path does not exist.  Exiting...") -component "Main()" -type "Error" -LogFile $LogFile
                 Exit 3
             }
 
@@ -74,22 +78,23 @@ function Download-Drivers
 
             if (Test-Path -Path $driverpath)
             {
-                Write-Host "Driver folder exists, nuke."
+                LogIt -message ("Driver folder exists, nuking folder from orbit.") -component "Main()" -type "Warning" -LogFile $LogFile
                 Remove-Item $driverpath -Force -Recurse
             }
 
             New-Item -ItemType directory -Path $driverpath
 
-            Write-Host "Getting list of drivers from IIS"
-
             try 
             {
+                LogIt -message ("Fetching: http://"+$SCCMDistributionPoint+"/SMS_DP_SMSPKG$/"+$DriverGUID) -component "Main()" -type "Debug" -LogFile $LogFile
                 If ($Credential)
                 {
+                    LogIt -message ("Invoking web request with credentials") -component "Main()" -type "Debug" -LogFile $LogFile
                     $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
                 }
                 Else
                 {
+                    LogIt -message ("Invoking web request without credentials") -component "Main()" -type "Debug" -LogFile $LogFile
                     $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
                 }
             }
@@ -113,18 +118,23 @@ function Download-Drivers
 
                 try 
                 {
+                    LogIt -message ("Fetching: "+$URL) -component "Main()" -type "Debug" -LogFile $LogFile
                     If ($Credential)
                     {
+                        LogIt -message ("Invoking web request with credentials") -component "Main()" -type "Debug" -LogFile $LogFile
                         $request = Invoke-WebRequest -Uri $URL -outfile $outfilepath -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
                     }
                     Else
                     {
+                        LogIt -message ("Invoking web request without credentials") -component "Main()" -type "Debug" -LogFile $LogFile
                         $request = Invoke-WebRequest -Uri $URL -outfile $outfilepath -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
                     }
                 }
                 catch
                 {
-                    # TODO: Output this information
+                    LogIt -message ("Failed to download drivers") -component "Main()" -type "Error" -LogFile $LogFile
+                    LogIt -message ($_.Exception) -component "Main()" -type "Error" -LogFile $LogFile
+                    LogIt -message ($_.ErrorDetails.ToSTring()) -component "Main()" -type "Error" -LogFile $LogFile
                     Write-Host $_.Exception
                     Write-Host $_.ErrorDetails.ToSTring()
                 }

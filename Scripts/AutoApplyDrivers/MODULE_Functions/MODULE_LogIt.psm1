@@ -32,6 +32,7 @@
 #        2 { $type = "Warning" }
 #        3 { $type = "Error" }
 #        4 { $type = "Verbose" }
+#        5 { $type = "Debug" }
 #    }
 
     If (-not (Test-Path -Path $LogFile))
@@ -67,14 +68,11 @@
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
         Write-Host $message -foreground "white"
     }
-    elseif ($type -eq "Debug")
+    elseif ($type -eq "Debug" -and ($Global:Debug))
     {
-        If ($Global:Debug)
-        {
-            $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
-            $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
-            Write-Host $message -foreground "white"
-        }
+        $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
+        $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
+        Write-Host $message -foreground "white"
     }
     else
     {

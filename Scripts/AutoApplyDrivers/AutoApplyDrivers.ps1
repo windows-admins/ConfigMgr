@@ -29,18 +29,19 @@
 #>
 
 Param(
-    $Path,
-    [string]$SCCMServer,
+    $Path = (Get-ChildItem env:SystemDrive).Value+"\Drivers\",
+    [string]$SCCMServer = "cm1.corp.contoso.com",
     $Credential,
+    # $Credential = (Get-Credential -UserName 'CORP\Drivers' -Message "Enter password"),
     [System.Array]$Categories = @(), # @("9370","Test")
     [bool]$CategoryWildCard = $False,
-    [string]$SCCMServerDB, # "ConfigMgr_CHQ"
+    [string]$SCCMServerDB = "ConfigMgr_CHQ",
     [bool]$InstallDrivers = $False,
     [bool]$DownloadDrivers = $True,
     [bool]$FindAllDrivers = $False,
     [bool]$HardwareMustBePresent = $True,
-    [bool]$UpdateOnlyDatedDrivers = $True, # Use this to exclude any drivers we already have updated on the system
-    [bool]$Global:Debug = $False
+    [bool]$UpdateOnlyDatedDrivers = $False, # Use this to exclude any drivers we already have updated on the system
+    [bool]$Global:Debug = $True
 )
 
 # _SMSTSSiteCode = CHQ
@@ -50,6 +51,8 @@ Param(
 Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 Import-Module $PSScriptRoot\MODULE_Functions -Force -WarningAction SilentlyContinue
 
+# Need to be able to seperate this out but for now......
+$SCCMDistributionPoint = $SCCMServer
 
 Try
 {
@@ -276,8 +279,8 @@ If (-not $Credential -and $tsenv)
 ElseIf(-not $Credential -and $Debug)
 {
     LogIt -message ("Fetching credentials from user.") -component "Main()" -type "Info" -LogFile $LogFile
-    $Credential = Get-Credential
-    LogIt -message ("Running as: "+$Credential.UserName.ToString()) -component "Main()" -type "Info" -LogFile $LogFile
+    #$Credential = Get-Credential
+    #LogIt -message ("Running as: "+$Credential.UserName.ToString()) -component "Main()" -type "Info" -LogFile $LogFile
 }
 ElseIf(-not $Credential)
 {
@@ -581,14 +584,21 @@ If ($DownloadDrivers)
     {
         # Download drivers
         # TODO: Add ability to select DP
+
+        LogIt -message ("Parsing Found Drivers: "+$Content_UniqueIDs) -component "Main()" -type "Debug" -LogFile $LogFile
+
         ForEach ($Content_UniqueID in $Content_UniqueIDs)
         {
+            LogIt -message ("Parsing Content_UniqueID: "+$Content_UniqueID) -component "Main()" -type "Debug" -LogFile $LogFile
+
             If ($Credential)
             {
+                LogIt -message ("Calling Download-Drivers with credentials") -component "Main()" -type "Debug" -LogFile $LogFile
                 Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential
             }
             else
             {
+                LogIt -message ("Calling Download-Drivers without credentials") -component "Main()" -type "Debug" -LogFile $LogFile
                 Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint
             }
         }

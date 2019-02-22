@@ -44,7 +44,7 @@ function Get-SqlCommand-DEPRECIATED
 		catch
 		{
             LogIt -message ("Failed to create SQL connection and server instance") -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ("$_") -component "Main()" -type "ERROR" -LogFile $LogFile
+            LogIt -message ($_) -component "Main()" -type "ERROR" -LogFile $LogFile
 			$PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
@@ -122,7 +122,7 @@ function New-SqlConnectionString
 		catch
 		{
             LogIt -message ("Failed to create SQL connection string") -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ("$_") -component "Main()" -type "ERROR" -LogFile $LogFile
+            LogIt -message ($_) -component "Main()" -type "ERROR" -LogFile $LogFile
 			$PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
@@ -153,7 +153,7 @@ function New-SqlConnection
 		catch
 		{
             LogIt -message ("Failed to create SQL connection") -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ("$_") -component "Main()" -type "ERROR" -LogFile $LogFile
+            LogIt -message ($_) -component "Main()" -type "ERROR" -LogFile $LogFile
 			$PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
@@ -219,7 +219,7 @@ function Invoke-SqlCommand
 
             # Write-Host $SqlCmd.Parameters
 			$SqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-            LogIt -message ("SelectCommand: "+$SqlCmd) -component "Main()" -type "DEBUG" -LogFile $LogFile
+            LogIt -message ("SelectCommand: "+$SqlCmd.ToString()) -component "Main()" -type "DEBUG" -LogFile $LogFile
 			$SqlAdapter.SelectCommand = $SqlCmd
 			$DataSet = New-Object System.Data.DataSet
 			$SqlAdapter.Fill($DataSet)
@@ -230,7 +230,7 @@ function Invoke-SqlCommand
 		{
             LogIt -message ("Failed to execute SQL command") -component "Main()" -type "ERROR" -LogFile $LogFile
             LogIt -message ("SQL: "+$Name) -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ("$_") -component "Main()" -type "ERROR" -LogFile $LogFile
+            LogIt -message ($_) -component "Main()" -type "ERROR" -LogFile $LogFile
 			$PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
