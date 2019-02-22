@@ -29,13 +29,11 @@
 #>
 
 Param(
-    [Parameter(Mandatory=$true)]
     $Path,
     [string]$SCCMServer,
     $Credential,
     [System.Array]$Categories = @(), # @("9370","Test")
     [bool]$CategoryWildCard = $False,
-    [Parameter(Mandatory=$true)]
     [string]$SCCMServerDB, # "ConfigMgr_CHQ"
     [bool]$InstallDrivers = $False,
     [bool]$DownloadDrivers = $True,
@@ -45,7 +43,6 @@ Param(
     [bool]$Global:Debug = $False
 )
 
-
 # _SMSTSSiteCode = CHQ
 
 
@@ -53,7 +50,192 @@ Param(
 Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 Import-Module $PSScriptRoot\MODULE_Functions -Force -WarningAction SilentlyContinue
 
-If(!(test-path $Path))
+
+Try
+{
+    $Global:tsenv = New-Object -COMObject Microsoft.SMS.TSEnvironment 
+    $tsvars = $tsenv.GetVariables()
+    Write-Host "Fetching TS Environment"
+}
+Catch
+{
+    Write-Host "Not running in a task sequence."
+}
+
+
+If ($tsenv)
+{
+    Write-Host "Get TS Variables"
+
+    If (-not $SCCMServer)
+    {
+        # $SCCMServer = "CM1.corp.contoso.com"
+        $SCCMServer = $tsenv.Value("_SMSTSMP")
+
+        # _SMSTSCHQ00005 = http://cm1.corp.contoso.com/sms_dp_smspkg$/chq00005 
+        # Maybe use this for the DP?
+
+        #$SCCMDistributionPoint = "CM1.corp.contoso.com"
+
+        $SCCMDistributionPoint = $tsenv.Value("_SMSTSMP")
+    }
+
+    Try
+    {
+        $TSVar_Path = $tsenv.Value("TSVar_Path")
+    }
+    Catch
+    {
+        Write-Host "Could not get TSVar_Path."
+    }
+
+    Try
+    {
+        $TSVar_SCCMServerDB = $tsenv.Value("TSVar_SCCMServerDB")
+    }
+    Catch
+    {
+        Write-Host "Could not get TSVar_SCCMServerDB."
+    }
+
+    Try
+    {
+        $TSVar_InstallDrivers = $tsenv.Value("TSVar_InstallDrivers")
+    }
+    Catch
+    {
+        Write-Host "Could not get TSVar_InstallDrivers."
+    }
+
+    Try
+    {
+        $TSVar_Categories = $tsenv.Value("TSVar_Categories")
+    }
+    Catch
+    {
+        # Do nothing
+    }
+
+    Try
+    {
+        $TSVar_DownloadDrivers = $tsenv.Value("TSVar_DownloadDrivers")
+    }
+    Catch
+    {
+        # Do nothing
+    }
+
+    Try
+    {
+        $TSVar_FindAllDrivers = $tsenv.Value("TSVar_FindAllDrivers")
+    }
+    Catch
+    {
+        # Do nothing
+    }
+
+    Try
+    {
+        $TSVar_HardwareMustBePresent = $tsenv.Value("TSVar_HardwareMustBePresent")
+    }
+    Catch
+    {
+        # Do nothing
+    }
+
+    Try
+    {
+        $TSVar_UpdateOnlyDatedDrivers = $tsenv.Value("TSVar_UpdateOnlyDatedDrivers")
+    }
+    Catch
+    {
+        # Do nothing
+    }
+
+    Try
+    {
+        $TSVar_Debug = $tsenv.Value("TSVar_Debug")
+    }
+    Catch
+    {
+        # Do nothing
+    }
+
+    If ($TSVar_Path)
+    {
+        $Path = $TSVar_Path
+    }
+    If ($TSVar_SCCMServerDB)
+    {
+        $SCCMServerDB = $TSVar_SCCMServerDB
+    }
+    If ($TSVar_Categories)
+    {
+        $Categories = $TSVar_Categories
+    }
+    If ($TSVar_InstallDrivers)
+    {
+       $InstallDrivers = [bool]$TSVar_InstallDrivers
+    }
+    If ($TSVar_DownloadDrivers)
+    {
+       $DownloadDrivers = [bool]$TSVar_DownloadDrivers
+    }
+    If ($TSVar_FindAllDrivers)
+    {
+       $FindAllDrivers = [bool]$TSVar_FindAllDrivers
+    }
+    If ($TSVar_HardwareMustBePresent)
+    {
+       $HardwareMustBePresent = [bool]$TSVar_HardwareMustBePresent
+    }
+    If ($TSVar_UpdateOnlyDatedDrivers)
+    {
+       $UpdateOnlyDatedDrivers = [bool]$TSVar_UpdateOnlyDatedDrivers
+    }
+    If ($TSVar_UpdateOnlyDatedDrivers)
+    {
+       $UpdateOnlyDatedDrivers = [bool]$TSVar_UpdateOnlyDatedDrivers
+    }
+    If ($TSVar_Debug)
+    {
+       $Debug = [bool]$TSVar_Debug
+    }
+}
+
+If (-not $Path)
+{
+    Write-Host "Missing critical information:"
+    Write-Host "Path: $Path"
+    Write-Host "Exiting...."
+    LogIt -message ("Missing critical information:") -component "Main()" -type "Error" -LogFile $LogFile
+    LogIt -message ("Path: "+$Path) -component "Main()" -type "Error" -LogFile $LogFile
+    LogIt -message ("Exiting....") -component "Main()" -type "Error" -LogFile $LogFile
+    Exit 1
+}
+ElseIf (-not $SCCMServer)
+{
+    Write-Host "Missing critical information:"
+    Write-Host "SCCMServer: $SCCMServer"
+    Write-Host "Exiting...."
+    LogIt -message ("Missing critical information:") -component "Main()" -type "Error" -LogFile $LogFile
+    LogIt -message ("SCCMServer: "+$SCCMServer) -component "Main()" -type "Error" -LogFile $LogFile
+    LogIt -message ("Exiting....") -component "Main()" -type "Error" -LogFile $LogFile
+    Exit 1
+}
+ElseIf (-not $SCCMServerDB)
+{
+    Write-Host "Missing critical information:"
+    Write-Host "SCCMServerDB: $SCCMServerDB"
+    Write-Host "Exiting...."
+    LogIt -message ("Missing critical information:") -component "Main()" -type "Error" -LogFile $LogFile
+    LogIt -message ("SCCMServerDB: "+$SCCMServerDB) -component "Main()" -type "Error" -LogFile $LogFile
+    LogIt -message ("Exiting....") -component "Main()" -type "Error" -LogFile $LogFile
+    Exit 1
+}
+
+
+If(-not (test-path $Path))
 {
       New-Item -ItemType Directory -Force -Path $Path
 }
@@ -63,17 +245,6 @@ $Global:LogFile = Join-Path ($Path) 'AutoApplyDrivers.log'
 LogIt -message (" ") -component "Main()" -type "Info" -LogFile $LogFile
 LogIt -message (" ") -component "Main()" -type "Info" -LogFile $LogFile
 LogIt -message ("_______________________________________________________________________") -component "Main()" -type "Info" -LogFile $LogFile
-
-Try
-{
-    $tsenv = New-Object -COMObject Microsoft.SMS.TSEnvironment 
-    $tsvars = $tsenv.GetVariables()
-
-}
-Catch
-{
-    Write-Host "Not running in a task sequence."
-}
 
 
 If (-not $Credential -and $tsenv)
@@ -87,43 +258,34 @@ If (-not $Credential -and $tsenv)
         $username = $tsenv.Value($TSUsernameVar)
         $password = $tsenv.Value($TSPasswordVar) | ConvertTo-SecureString -asPlainText -Force
 
-        LogIt -message ("Running as: $username") -component "Main()" -type "Info" -LogFile $LogFile
+        LogIt -message ("Running as: "+$username) -component "Main()" -type "Info" -LogFile $LogFile
 
         $Credential = New-Object System.Management.Automation.PSCredential($username,$password)
+        $Credential | Add-Member -name "ClearTextPassword" -type NoteProperty -value $tsenv.Value($TSPasswordVar)
 
-        If ($NAAUsername.Count -gt 1)
+        If ($username.Count -gt 1)
         {
             LogIt -message ("More than one username found.  Using first found credential.") -component "Main()" -type "Warning" -LogFile $LogFile
         }
     }
     Else
     {
-        LogIt -message ("More than one username found.  Using first found credential.") -component "Main()" -type "Warning" -LogFile $LogFile
+        LogIt -message ("No task sequence variable for username found. Running in current context.") -component "Main()" -type "Warning" -LogFile $LogFile
     }
 }
 ElseIf(-not $Credential -and $Debug)
 {
     LogIt -message ("Fetching credentials from user.") -component "Main()" -type "Info" -LogFile $LogFile
     $Credential = Get-Credential
+    LogIt -message ("Running as: "+$Credential.UserName.ToString()) -component "Main()" -type "Info" -LogFile $LogFile
 }
-Else
+ElseIf(-not $Credential)
 {
     LogIt -message ("Running under current credentials.") -component "Main()" -type "Info" -LogFile $LogFile
 }
-
-If (-not $SCCMServer -and $tsenv)
+Else
 {
-    # $SCCMServer = "CM1.corp.contoso.com"
-    $SCCMServer = $tsenv.Value("_SMSTSMP")
-}
-
-# _SMSTSCHQ00005 = http://cm1.corp.contoso.com/sms_dp_smspkg$/chq00005 
-# Maybe use this for the DP?
-
-#$SCCMDistributionPoint = "CM1.corp.contoso.com"
-If (-not $SCCMServer -and $tsenv)
-{
-    $SCCMDistributionPoint = $tsenv.Value("_SMSTSMP")
+    LogIt -message ("Running as: "+$Credential.UserName.ToString()) -component "Main()" -type "Info" -LogFile $LogFile
 }
 
 LogIt -message ("Starting execution....") -component "Main()" -type "Info" -LogFile $LogFile
@@ -179,48 +341,57 @@ ElseIf (-not $SCCMServer)
     LogIt -message ("Nothing passed in for the Database Server. Running locally only for gathering/testing purposes.") -component "Main()" -type "Warning" -LogFile $LogFile
 }
 
-$localdevices = Get-PnpDevice
-
 $xml += "<Devices>"
 
-If ($HardwareMustBePresent)
+Try
 {
-    $localdevices = $localdevices | Where-Object {$_.Present}
-}
+    $localdevices = Get-PnpDevice
 
-ForEach ($_ in $localdevices){
-    
-    # Find out all our use cases where we want to skip this device
-    If (-not $_)
+    If ($HardwareMustBePresent)
     {
-        Continue
+        $localdevices = $localdevices | Where-Object {$_.Present}
     }
 
-    $xml += "<Device>"
-    $xml += "<!-- "+$_.Manufacturer+" | "+$_.FriendlyName+" -->"
-
-    ForEach ($__ in $_.HardwareID)
-    {
-        If ($__.ToString() -like "*\*")
-        {
-            $xml += "<HwId>"+$__.ToString()+"</HwId>"
-        }
-        Else
+    ForEach ($_ in $localdevices){
+    
+        # Find out all our use cases where we want to skip this device
+        If (-not $_)
         {
             Continue
         }
 
-        If ($__.ToString() -like "*{*")
+        $xml += "<Device>"
+        $xml += "<!-- "+$_.Manufacturer+" | "+$_.FriendlyName+" -->"
+
+        ForEach ($__ in $_.HardwareID)
         {
-            # Fixes an issue where items with curly braces seem to not match unless we strip the first part.
-            # Edge case but vOv
-            $xml += "<HwId>"+$__.Split("\")[1].ToString()+"</HwId>"
-        }
+            If ($__.ToString() -like "*\*")
+            {
+                $xml += "<HwId>"+$__.ToString()+"</HwId>"
+            }
+            Else
+            {
+                Continue
+            }
+
+            If ($__.ToString() -like "*{*")
+            {
+                # Fixes an issue where items with curly braces seem to not match unless we strip the first part.
+                # Edge case but vOv
+                $xml += "<HwId>"+$__.Split("\")[1].ToString()+"</HwId>"
+            }
         
+        }
+
+        $xml += "</Device>"
+
     }
-
-    $xml += "</Device>"
-
+}
+Catch
+{
+    LogIt -message ("Cannot get local hardware devices.") -component "Main()" -type "Error" -LogFile $LogFile
+    LogIt -message ("Continuing with fake hardware list.") -component "Main()" -type "Warning" -LogFile $LogFile
+    $xml += "<Device><!-- Microsoft | Microsoft XPS Document Writer (redirected 2) --><HwId>PRINTENUM\LocalPrintQueue</HwId></Device><Device><!-- Microsoft | Microsoft Print to PDF (redirected 2) --><HwId>PRINTENUM\LocalPrintQueue</HwId></Device><Device><!-- Microsoft | Microsoft Print to PDF --><HwId>PRINTENUM\{084f01fa-e634-4d77-83ee-074817c03581}</HwId><HwId>{084f01fa-e634-4d77-83ee-074817c03581}</HwId><HwId>PRINTENUM\LocalPrintQueue</HwId></Device><Device><!-- Microsoft | Microsoft XPS Document Writer --><HwId>PRINTENUM\{0f4130dd-19c7-7ab6-99a1-980f03b2ee4e}</HwId><HwId>{0f4130dd-19c7-7ab6-99a1-980f03b2ee4e}</HwId><HwId>PRINTENUM\LocalPrintQueue</HwId></Device>"
 }
 
 $xml = $xml+"</Devices></DriverCatalogRequest>"
@@ -289,6 +460,8 @@ else
 {
     $return = Invoke-SqlCommand -ServerName $SCCMServer -Database $SCCMServerDB -Name $SqlQuery
 }
+
+$return | Out-File -Append -FilePath (Join-Path -Path $Path -ChildPath "v_CI_DriversCIs.log")
 
 Try
 {

@@ -1,3 +1,8 @@
+Usecase:
+This is ideally used in one of two difference scenarios:
+1) To stage drivers for an Upgrade in Place (UIP) scenario.  You can use this to download just the drivers required by the OS, either to prestage or directly as part of the UIP task sequence.
+2) To update online workstations (keeping drivers up to date).
+
 To Run:
 .\AutoApplyDrivers.ps1 -Path "c:\Temp\Drivers\" -SCCMServer cm1.corp.contoso.com -SCCMServerDB "ConfigMgr_CHQ" -Credential (Get-Credential -UserName "CORP\Drivers" -Message "Enter password")
 
