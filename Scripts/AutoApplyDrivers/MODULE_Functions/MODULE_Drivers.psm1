@@ -51,7 +51,11 @@ function Download-Drivers
 
 		[Parameter()]
 		[ValidateNotNullOrEmpty()]
-		[pscredential]$Credential
+		[pscredential]$Credential,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [bool]$HTTPS
 	)
 	begin
 	{
@@ -90,7 +94,14 @@ function Download-Drivers
                 If ($Credential)
                 {
                     LogIt -message ("Invoking web request with credentials") -component "Main()" -type "Debug" -LogFile $LogFile
-                    $request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
+                    If($HTTPS)
+					{
+                    	$request = Invoke-WebRequest https://$SCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
+                    }
+					Else
+					{
+                    	$request = Invoke-WebRequest http://$SCCMDistributionPoint/SMS_DP_SMSPKG`$/$DriverGUID -UseBasicParsing -Credential $Credential -TimeoutSec 180 -ErrorAction:Stop
+                    }
                 }
                 Else
                 {
@@ -110,11 +121,18 @@ function Download-Drivers
             foreach ($link in $links)
             {
                 Write-Host "Downloading: $FileName"
+
                 $URL = $link.Split("""")[1]
 
                 #We can get different casing on this, use RegEx to handle that scenario
                 $FileName = $URL -ireplace [regex]::Escape("http://$SCCMDistributionPoint/SMS_DP_SMSPKG$/$DriverGUID/"), ""
+                $FileName = $FileName -ireplace [regex]::Escape("https://$SCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG$/$DriverGUID/"), ""
                 $outfilepath = Join-Path -Path $driverpath -ChildPath $FileName
+
+                If($HTTPS)
+				{
+                    $URL = $URL.replace("http://","https://")
+                }
 
                 try 
                 {

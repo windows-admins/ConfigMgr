@@ -41,7 +41,8 @@ Param(
     [bool]$FindAllDrivers = $False,
     [bool]$HardwareMustBePresent = $True,
     [bool]$UpdateOnlyDatedDrivers = $False, # Use this to exclude any drivers we already have updated on the system
-    [bool]$Global:Debug = $True
+    [bool]$Global:Debug = $True,
+    [bool]$HTTPS = $True
 )
 
 # _SMSTSSiteCode = CHQ
@@ -594,7 +595,14 @@ If ($DownloadDrivers)
             If ($Credential)
             {
                 LogIt -message ("Calling Download-Drivers with credentials") -component "Main()" -type "Debug" -LogFile $LogFile
-                Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential
+                If($HTTPS)
+				{
+                	Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential -HTTPS $HTTPS
+                }
+				Else
+				{
+                	Download-Drivers -P $Path -DriverGUID $Content_UniqueID -SCCMDistributionPoint $SCCMDistributionPoint -Credential $Credential
+                }
             }
             else
             {
