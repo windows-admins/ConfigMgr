@@ -1,31 +1,47 @@
 ﻿<#
-    ALL THESE ARE WRONG! NEED TO UPDATE
     .DESCRIPTION
-        Creates Application and Deployment Types.
-        This script is run against an XML file, and then can deploy applications to Development, Production, or Retire them.
-    .PARAMETER $XMLDocument
-        Path to the XML document to read, where the applications that need to be modified (created, moved into Production, or Retired) are documented.
-    .PARAMETER $Action
-        Action to be taken against the XML Document.  Provided actions are Development, Production, or Retired.
-    .PARAMETER CMSite
-        CM site code
-    .PARAMETER CMServer
-        CM site server
-    .PARAMETER VerboseLogging
-        If VerboseLogging is set to be $true, then detailed logging will be written
+        ***The Synergistic Extra Modern Method of Total End-to-End Driver Management***
+        This is ideally used in one of two difference scenarios:
+        1) To stage drivers for an Upgrade in Place (UIP) scenario.  You can use this to download just the drivers required by the OS, either to prestage or directly as part of the UIP task sequence.
+        2) To update online workstations (keeping drivers up to date).
+    .PARAMETER $Path
+        Path to the desired location to download drivers to.
+    .PARAMETER $SCCMServer
+        SCCM server to connect to.
+    .PARAMETER Credential
+        Credentials to use for querying SQL and IIS.
+    .PARAMETER Categories
+        An array of categories to use for searching for drivers. Categories are inclusive not exclusive.
+        Format must be as follows: @("9370","Test")
+    .PARAMETER CategoryWildCard
+        If set will search for categories using wild cards.  Thus "9370" would match both "Dell XPS 13 9370" and "Contoso 9370 Performance Pro Plus" 
+    .PARAMETER SCCMServerDB
+        The database name.  Standard format is "ConfigMgr_" followed by the site code 
+    .PARAMETER InstallDrivers
+        Enable installation of drivers.  Disable for use in testing or prestage scenarios.
+    .PARAMETER DownloadDrivers
+        Enable downloading of drivers.  Typically only turned off for debugging/testing scenarios.
+    .PARAMETER FindAllDrivers
+        Will download and install all drivers regardless if it's a newer version or not
+        Warning: use this carefully as it will typically cause a large amount of drivers to be downloaded and installed
+    .PARAMETER HardwareMustBePresent
+        If set only hardware that is currently present to the OS will be downloaded and installed.  Turning this on will try and find drivers for any device ever connected to the workstation, while turning it off may miss devices that aren't currently connected (docks, dongles, etc).
+    .PARAMETER UpdateOnlyDatedDrivers
+        Enabling this will only download and install drivers that are newer than what is currently installed on the operating system.
+    .PARAMETER Debug
+        Enable to increase output logging.  Warning: This will also cause the script to run significantly slower.
+    .PARAMETER HTTPS
+        Enable to force the site to use HTTPS connections.  Default is HTTP.
     .INPUTS
         None. You cannot pipe objects in.
     .OUTPUTS
         None. Does not generate any output.
     .EXAMPLE
-        .\CreateApplication.ps1 -XMLDocument "c:\temp\Applications.xml" -Action "Development"
-        Creates the application and collections for the development environment.
+        .\AutoApplyDrivers.ps1 -Path "c:\Temp\Drivers\" -SCCMServer cm1.corp.contoso.com -SCCMServerDB "ConfigMgr_CHQ" -Credential (Get-Credential -UserName "CORP\Drivers" -Message "Enter password")
+        Runs with passed in configuration and prompts user running for credentials (useful for debugging)
     .EXAMPLE
-        .\CreateApplication.ps1 -XMLDocument "c:\temp\Applications.xml" -Action "Production"
-        Moves the applications from development to production.
-    .EXAMPLE
-        .\CreateApplication.ps1 -XMLDocument "c:\temp\Applications.xml" -Action "Retired"
-        Moves the Applications to the Retired folder.
+        .\AutoApplyDrivers.ps1
+        Uses default configuration and runs under the current session
 #>
 
 Param(

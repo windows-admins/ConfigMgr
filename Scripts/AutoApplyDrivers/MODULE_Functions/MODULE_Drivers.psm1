@@ -125,14 +125,17 @@ function Download-Drivers
                 $URL = $link.Split("""")[1]
 
                 #We can get different casing on this, use RegEx to handle that scenario
-                $FileName = $URL -ireplace [regex]::Escape("http://$SCCMDistributionPoint/SMS_DP_SMSPKG$/$DriverGUID/"), ""
-                $FileName = $FileName -ireplace [regex]::Escape("https://$SCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG$/$DriverGUID/"), ""
-                $outfilepath = Join-Path -Path $driverpath -ChildPath $FileName
-
                 If($HTTPS)
 				{
                     $URL = $URL.replace("http://","https://")
+                	$FileName = $URL -ireplace [regex]::Escape("https://$SCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG$/$DriverGUID/"), ""
                 }
+				Else
+				{
+                	$FileName = $URL -ireplace [regex]::Escape("http://$SCCMDistributionPoint/SMS_DP_SMSPKG$/$DriverGUID/"), ""
+				}
+
+				$outfilepath = Join-Path -Path $driverpath -ChildPath $FileName
 
                 try 
                 {
