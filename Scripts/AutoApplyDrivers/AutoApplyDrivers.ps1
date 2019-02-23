@@ -7,7 +7,9 @@
     .PARAMETER $Path
         Path to the desired location to download drivers to.
     .PARAMETER $SCCMServer
-        SCCM server to connect to.
+        SCCM server to connect to. Note that this is where the SQL database lives (typically on the MP).
+    .PARAMETER $SCCMDistributionPoint
+        IIS server to connect to. Note that this is typically the Distribution Point.
     .PARAMETER Credential
         Credentials to use for querying SQL and IIS.
     .PARAMETER Categories
@@ -56,20 +58,27 @@ Param(
     [bool]$DownloadDrivers = $True,
     [bool]$FindAllDrivers = $False,
     [bool]$HardwareMustBePresent = $True,
-    [bool]$UpdateOnlyDatedDrivers = $False, # Use this to exclude any drivers we already have updated on the system
-    [bool]$Global:Debug = $True,
-    [bool]$HTTPS = $True
+    [bool]$UpdateOnlyDatedDrivers = $True, # Use this to exclude any drivers we already have updated on the system
+    [bool]$Global:Debug = $False,
+    [bool]$HTTPS = $True,
+    [string]$SCCMDistributionPoint
 )
 
 # _SMSTSSiteCode = CHQ
 
+Try
+{
+    #Import Modules
+    Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+    Import-Module $PSScriptRoot\MODULE_Functions -Force -WarningAction SilentlyContinue
+}
+Catch
+{
+    Write-Host -ForegroundColor Red "Unable to import modules.  Check that the source files exist."
+    Exit 1
+}
 
-#Import Modules
-Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-Import-Module $PSScriptRoot\MODULE_Functions -Force -WarningAction SilentlyContinue
 
-# Need to be able to seperate this out but for now......
-$SCCMDistributionPoint = $SCCMServer
 
 Try
 {
@@ -221,6 +230,11 @@ If ($tsenv)
     {
        $Debug = [bool]$TSVar_Debug
     }
+}
+
+If (-not $SCCMDistributionPoint)
+{
+    $SCCMDistributionPoint = $SCCMServer
 }
 
 If (-not $Path)

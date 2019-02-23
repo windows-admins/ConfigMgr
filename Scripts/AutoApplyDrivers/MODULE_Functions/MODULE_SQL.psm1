@@ -1,56 +1,4 @@
-﻿
-function Get-SqlCommand-DEPRECIATED
-{
-	[OutputType([Microsoft.SqlServer.Management.Smo.StoredProcedure])]
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$ServerName,
-
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$Database,
-
-        [Parameter()]
-		[ValidateNotNullOrEmpty()]
-		[pscredential]$Credential		
-	)
-	begin
-	{
-		$ErrorActionPreference = 'Stop'
-	}
-	process
-	{
-		try
-		{
-			[System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SMO') | out-null
-
-			if ($Credential)
-			{
-			    $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database -Credential $Credential
-            }
-            else
-            {
-                $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database
-            }
-
-			$sqlConnection = New-SqlConnection -ConnectionString $connectionString
-
-			$serverInstance = New-Object ('Microsoft.SqlServer.Management.Smo.Server') $sqlConnection
-			$serverInstance.Databases[$Database].StoredProcedures
-		}
-		catch
-		{
-            LogIt -message ("Failed to create SQL connection and server instance") -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ($_) -component "Main()" -type "ERROR" -LogFile $LogFile
-			$PSCmdlet.ThrowTerminatingError($_)
-		}
-	}
-}
-
-function New-SqlConnectionString
+﻿function New-SqlConnectionString
 {
 	[OutputType([string])]
 	[CmdletBinding()]
@@ -85,8 +33,8 @@ function New-SqlConnectionString
 
 			if ($Credential)
 			{
-                Write-Host "New-SqlConnectionString - Found creds"
-                Write-Host $Credential.UserName
+                LogIt -message ("New-SqlConnectionString - Found creds: "+$Credential.UserName) -component "Main()" -type "DEBUG" -LogFile $LogFile
+
 				$connectionStringElements.'User ID' = $Credential.UserName
 
                 If ($Credential.ClearTextPassword)
@@ -190,8 +138,6 @@ function Invoke-SqlCommand
 	{
 		try
 		{
-            Write-Host "Creds: "
-            Write-Host $Credential.UserName
             if ($PSBoundParameters.ContainsKey('Credential'))
 			{
                 LogIt -message ("Calling New-SqlConnectionString with credentials") -component "Main()" -type "DEBUG" -LogFile $LogFile

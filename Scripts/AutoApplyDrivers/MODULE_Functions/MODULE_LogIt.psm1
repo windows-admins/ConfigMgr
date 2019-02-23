@@ -35,6 +35,8 @@
 #        5 { $type = "Debug" }
 #    }
 
+    $type = $type.ToLower()
+
     If (-not (Test-Path -Path $LogFile))
     {
         write-host "Creating $LogFile in UTF-8"
@@ -44,35 +46,39 @@
     }
 
 
-    if (($type -eq "Verbose") -and ($Global:Verbose))
+    if (($type -eq "verbose") -and ($Global:Verbose))
     {
         $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($type + ": " + $message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
         Write-Host $message
     }
-    elseif ($type -eq "Error")
+    elseif ($type -eq "error")
     {
         $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($type + ": " + $message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
         Write-Host $message -foreground "red"
     }
-    elseif ($type -eq "Warning")
+    elseif ($type -eq "warning")
     {
         $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($type + ": " + $message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
         Write-Host $message -foreground "yellow"
     }
-    elseif ($type -eq "Info")
+    elseif ($type -eq "info")
     {
         $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
         Write-Host $message -foreground "white"
     }
-    elseif ($type -eq "Debug" -and ($Global:Debug))
+    elseif ($type -eq "debug")
     {
-        $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
-        $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
-        Write-Host $message -foreground "white"
+        # Only write output if debugging is turned on
+        If ($Global:Debug)
+        {
+            $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
+            $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
+            Write-Host $message -foreground "white"
+        }
     }
     else
     {
