@@ -61,7 +61,7 @@ Copyright = 'Copyleft'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('MODULE_Drivers.psm1', 'MODULE_LogIt.psm1', 'MODULE_SQL.psm1', 'MODULE_XML.psm1')
+NestedModules = @('MODULE_Functions.psm1', 'MODULE_Drivers.psm1', 'MODULE_LogIt.psm1', 'MODULE_SQL.psm1')
 
 # Functions to export from this module
 FunctionsToExport = '*'
@@ -85,7 +85,7 @@ AliasesToExport = '*'
 # PrivateData = ''
 
 # HelpInfo URI of this module
-# HelpInfoURI = ''
+HelpInfoURI = 'https://github.com/winadminsdotorg/SystemCenterConfigMgr/blob/master/Scripts/AutoApplyDrivers/Readme.md'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

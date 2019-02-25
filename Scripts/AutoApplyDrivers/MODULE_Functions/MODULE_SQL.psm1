@@ -1,4 +1,6 @@
-﻿function New-SqlConnectionString
+﻿Write-Host "Loading: MODULE_SQL"
+
+function New-SqlConnectionString
 {
 	[OutputType([string])]
 	[CmdletBinding()]
@@ -33,18 +35,18 @@
 
 			if ($Credential)
 			{
-                LogIt -message ("New-SqlConnectionString - Found creds: "+$Credential.UserName) -component "Main()" -type "DEBUG" -LogFile $LogFile
+                LogIt -message ("New-SqlConnectionString - Found creds: "+$Credential.UserName) -component "MODULE_SQL" -type "DEBUG"
 
 				$connectionStringElements.'User ID' = $Credential.UserName
 
                 If ($Credential.ClearTextPassword)
                 {
-                    LogIt -message ("Using cleartext password: "+$Credential.ClearTextPassword) -component "Main()" -type "DEBUG" -LogFile $LogFile
+                    LogIt -message ("Using cleartext password: "+$Credential.ClearTextPassword) -component "MODULE_SQL" -type "DEBUG"
                     $connectionStringElements.'Password' = $Credential.ClearTextPassword
                 }
                 Else
                 {
-                    LogIt -message ("Getting Network Creds") -component "Main()" -type "DEBUG" -LogFile $LogFile
+                    LogIt -message ("Getting Network Creds") -component "MODULE_SQL" -type "DEBUG"
                     $connectionStringElements.'Password' = $Credential.GetNetworkCredential().Password
                 }
 			}
@@ -62,15 +64,14 @@
 				$connectionString += "$($_.Key)=$($_.Value);"
 			})
 
-            LogIt -message ("Connection string") -component "Main()" -type "DEBUG" -LogFile $LogFile
-            LogIt -message ($connectionString) -component "Main()" -type "DEBUG" -LogFile $LogFile
+            LogIt -message ("Connection string: "+$connectionString) -component "MODULE_SQL" -type "DEBUG"
 
 			return $connectionString
 		}
 		catch
 		{
-            LogIt -message ("Failed to create SQL connection string") -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ($_) -component "Main()" -type "ERROR" -LogFile $LogFile
+            LogIt -message ("Failed to create SQL connection string") -component "MODULE_SQL" -type "ERROR"
+            LogIt -message ($_) -component "MODULE_SQL" -type "ERROR"
 			$PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
@@ -100,8 +101,8 @@ function New-SqlConnection
 		}
 		catch
 		{
-            LogIt -message ("Failed to create SQL connection") -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ($_) -component "Main()" -type "ERROR" -LogFile $LogFile
+            LogIt -message ("Failed to create SQL connection") -component "MODULE_SQL" -type "ERROR"
+            LogIt -message ($_) -component "MODULE_SQL" -type "ERROR"
 			$PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
@@ -140,16 +141,16 @@ function Invoke-SqlCommand
 		{
             if ($PSBoundParameters.ContainsKey('Credential'))
 			{
-                LogIt -message ("Calling New-SqlConnectionString with credentials") -component "Main()" -type "DEBUG" -LogFile $LogFile
+                LogIt -message ("Calling New-SqlConnectionString with credentials") -component "MODULE_SQL" -type "DEBUG"
 			    $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database -Credential $Credential
             }
             else
             {
-                LogIt -message ("Calling New-SqlConnectionString without credentials") -component "Main()" -type "DEBUG" -LogFile $LogFile
+                LogIt -message ("Calling New-SqlConnectionString without credentials") -component "MODULE_SQL" -type "DEBUG"
                 $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database 
             }
 
-            LogIt -message ("Calling New-SqlConnection") -component "Main()" -type "DEBUG" -LogFile $LogFile
+            LogIt -message ("Calling New-SqlConnection") -component "MODULE_SQL" -type "DEBUG"
 			$SqlConnection = New-SqlConnection -ConnectionString $connectionString
 
 			$SqlCmd = New-Object System.Data.SqlClient.SqlCommand
@@ -158,14 +159,16 @@ function Invoke-SqlCommand
 
             if ($Parameter)
             {
-                LogIt -message ("SQL Parameters passed in") -component "Main()" -type "DEBUG" -LogFile $LogFile
+                # Only enable for extreme debugging circumstances.
+                # This will output a very large amount of data which tends to crash CMTrace.
+                # LogIt -message ("SQL Parameters passed in: "+$Parameter) -component "MODULE_SQL" -type "DEBUG"
                 $SqlCmd.CommandType=[System.Data.CommandType]’StoredProcedure’
                 $SqlCmd.Parameters.AddWithValue("@xtext", $Parameter) | Out-Null
             }
 
             # Write-Host $SqlCmd.Parameters
 			$SqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-            LogIt -message ("SelectCommand: "+$SqlCmd.ToString()) -component "Main()" -type "DEBUG" -LogFile $LogFile
+            LogIt -message ("SelectCommand: "+$SqlCmd.CommandText.ToString()) -component "MODULE_SQL" -type "DEBUG"
 			$SqlAdapter.SelectCommand = $SqlCmd
 			$DataSet = New-Object System.Data.DataSet
 			$SqlAdapter.Fill($DataSet)
@@ -174,10 +177,10 @@ function Invoke-SqlCommand
 		}
 		catch
 		{
-            LogIt -message ("Failed to execute SQL command") -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ("SQL: "+$Name) -component "Main()" -type "ERROR" -LogFile $LogFile
-            LogIt -message ($_) -component "Main()" -type "ERROR" -LogFile $LogFile
-			$PSCmdlet.ThrowTerminatingError($_)
+            LogIt -message ("Failed to execute SQL command: "+$Name) -component "MODULE_SQL" -type "ERROR"
+            LogIt -message ($_.Exception) -component "MODULE_SQL" -type "Error"
+            LogIt -message ($_.ErrorDetails.ToSTring()) -component "MODULE_SQL" -type "Error"
+            $PSCmdlet.ThrowTerminatingError($_)
 		}
 	}
 }

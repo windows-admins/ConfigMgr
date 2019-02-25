@@ -1,4 +1,6 @@
-﻿function LogIt
+﻿Write-Host "Loading: MODULE_LogIt"
+
+function LogIt
 {
 	<#
 	    .SYNOPSIS 
@@ -20,10 +22,9 @@
 	    [string]$message,
 	    [Parameter(Mandatory=$true)]
 	    [string]$component,
-	    [Parameter(Mandatory=$true)]
-		[ValidateSet("Info","Warning","Error","Verbose", "Debug")] 
+		[ValidateSet("INFO","WARNING","ERROR","VERBOSE", "DEBUG")] 
 	    [string]$type,
-		[string]$LogFile = $PSScriptRoot + "\LogIt.log"
+		[string]$LogFile
 	)
 
 #    switch ($type)
@@ -35,54 +36,79 @@
 #        5 { $type = "Debug" }
 #    }
 
-    $type = $type.ToLower()
-
-    If (-not (Test-Path -Path $LogFile))
+    If (-not $LogFile)
     {
-        write-host "Creating $LogFile in UTF-8"
-        $filename = "$LogFile"
-        $text = ""
-        [IO.File]::WriteAllLines($filename, $text, [System.Text.Encoding]::UTF8)
+        # Write-Host "Getting global log file"
+        $LogFile = $Global:Logfile
     }
 
+    If (-not $LogFile)
+    {
+        # Write-Host "Setting log file to default location."
+        $LogFile = $PSScriptRoot + "\LogIt.log"
+    }
 
-    if (($type -eq "verbose") -and ($Global:Verbose))
+    try
+    {
+        If (-not (Test-Path -Path $LogFile))
+        {
+            write-host "Creating $LogFile in UTF-8"
+            $filename = "$LogFile"
+            $text = ""
+            [IO.File]::WriteAllLines($filename, $text, [System.Text.Encoding]::UTF8)
+        }
+        Else
+        {
+            # Write-Host "Writing log to: $LogFile"
+        }
+    }
+    catch
+    {
+        Write-Host -ForegroundColor Red "Unable to create the log file. No information will be logged."
+        Write-Host $component": "$message
+        Return
+    }
+
+    $type = $type.ToUpper()
+    if ($type -eq "VERBOSE")
+    {
+        $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($type + ": " + $message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
+        If ($VerbosePreference -ne "SilentlyContinue")
+        {
+            $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
+        }
+        Write-Verbose $message
+    }
+    elseif ($type -eq "ERROR")
     {
         $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($type + ": " + $message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
-        Write-Host $message
+        Write-Host $message  -foreground "Red"
     }
-    elseif ($type -eq "error")
+    elseif ($type -eq "WARNING")
     {
         $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($type + ": " + $message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
-        Write-Host $message -foreground "red"
+        Write-Warning $message
     }
-    elseif ($type -eq "warning")
-    {
-        $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($type + ": " + $message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
-        $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
-        Write-Host $message -foreground "yellow"
-    }
-    elseif ($type -eq "info")
+    elseif ($type -eq "INFO")
     {
         $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
-        Write-Host $message -foreground "white"
+        Write-Host $message -foreground "White"
     }
-    elseif ($type -eq "debug")
+    elseif ($type -eq "DEBUG")
     {
-        # Only write output if debugging is turned on
-        If ($Global:Debug)
+        $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
+        If ($DebugPreference -ne "SilentlyContinue")
         {
-            $toLog = "{0} `$$<{1}><{2} {3}><thread={4}>" -f ($message), ($Global:ScriptName + ":" + $component), (Get-Date -Format "MM-dd-yyyy"), (Get-Date -Format "HH:mm:ss.ffffff"), $pid
             $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
-            Write-Host $message -foreground "white"
         }
+        Write-Debug $message
     }
     else
     {
-        Write-Host $message -foreground "white"
+        Write-Host $message -foreground "Gray"
     }
 	
 #    if (($type -eq 'Warning') -and ($Global:ScriptStatus -ne 'Error'))
