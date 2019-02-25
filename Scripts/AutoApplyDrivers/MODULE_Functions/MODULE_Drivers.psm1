@@ -84,10 +84,12 @@ function Download-Drivers
 
                 If($fHTTPS)
 				{
+                    LogIt -message ("Invoke-WebRequest https://"+$fSCCMDistributionPoint+"/NOCERT_SMS_DP_SMSPKG$/"+$fDriverGUID+" -UseBasicParsing -Credential {"+$fCredential.UserName+"} -TimeoutSec 180 -ErrorAction:Stop") -component "MODULE_Drivers" -type "Verbose"
                     $frequest = Invoke-WebRequest https://$fSCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG`$/$fDriverGUID -UseBasicParsing -Credential $fCredential -TimeoutSec 180 -ErrorAction:Stop
                 }
 				Else
 				{
+                    LogIt -message ("Invoke-WebRequest http://"+$fSCCMDistributionPoint+"/NOCERT_SMS_DP_SMSPKG$/"+$fDriverGUID+" -UseBasicParsing -Credential {"+$fCredential.UserName+"} -TimeoutSec 180 -ErrorAction:Stop") -component "MODULE_Drivers" -type "Verbose"
                     $frequest = Invoke-WebRequest http://$fSCCMDistributionPoint/SMS_DP_SMSPKG`$/$fDriverGUID -UseBasicParsing -Credential $fCredential -TimeoutSec 180 -ErrorAction:Stop
                 }
             }
@@ -97,10 +99,12 @@ function Download-Drivers
 
                 If($fHTTPS)
 				{
+                    LogIt -message ("Invoke-WebRequest https://"+$fSCCMDistributionPoint+"/NOCERT_SMS_DP_SMSPKG$/"+$fDriverGUID+" -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop") -component "MODULE_Drivers" -type "Verbose"
                     $frequest = Invoke-WebRequest https://$fSCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG`$/$fDriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
                 }
 				Else
 				{
+                    LogIt -message ("Invoke-WebRequest http://"+$fSCCMDistributionPoint+"/NOCERT_SMS_DP_SMSPKG$/"+$fDriverGUID+" -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop") -component "MODULE_Drivers" -type "Verbose"
                     $frequest = Invoke-WebRequest http://$fSCCMDistributionPoint/SMS_DP_SMSPKG`$/$fDriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
                 }
             }
@@ -132,11 +136,13 @@ function Download-Drivers
                     If ($fCredential)
                     {
                         LogIt -message ("Invoking web request with credentials") -component "MODULE_Drivers" -type "Debug"
+                        LogIt -message ("Invoke-WebRequest -Uri "+$fURL+" -outfile "+$foutfilepath+" -Credential {"+$fCredential.UserName+"} -TimeoutSec 180 -ErrorAction:Stop") -component "MODULE_Drivers" -type "Verbose"
                         $frequest = Invoke-WebRequest -Uri $fURL -outfile $foutfilepath -UseBasicParsing -Credential $fCredential -TimeoutSec 180 -ErrorAction:Stop
                     }
                     Else
                     {
                         LogIt -message ("Invoking web request without credentials") -component "MODULE_Drivers" -type "Debug"
+                        LogIt -message ("Invoke-WebRequest -Uri "+$fURL+" -outfile "+$foutfilepath+" -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop") -component "MODULE_Drivers" -type "Verbose"
                         $frequest = Invoke-WebRequest -Uri $fURL -outfile $foutfilepath -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
                     }
                 }
