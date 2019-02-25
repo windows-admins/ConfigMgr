@@ -45,7 +45,7 @@
 #>
 
 Param(
-    $Global:Path = (Get-ChildItem env:SystemDrive).Value+"\Drivers\",
+    $Path = (Get-ChildItem env:SystemDrive).Value+"\Drivers\",
     [string]$SCCMServer = "cm1.corp.contoso.com",
     $Credential,
     # $Credential = (Get-Credential -UserName 'CORP\Drivers' -Message "Enter password"),
