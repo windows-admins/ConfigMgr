@@ -92,6 +92,7 @@ Try
           New-Item -ItemType Directory -Force -Path $Path
     }
 
+    $Global:Path = $Path
     $Global:LogFile = Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log"
 }
 Catch
