@@ -77,18 +77,18 @@ function Download-Drivers
 
             New-Item -ItemType directory -Path $fdriverpath
 
-            LogIt -message ("Fetching: http://"+$fSCCMDistributionPoint+"/SMS_DP_SMSPKG$f/"+$fDriverGUID) -component "MODULE_Drivers" -type "Debug"
+            LogIt -message ("Fetching: http://"+$fSCCMDistributionPoint+"/SMS_DP_SMSPKG$/"+$fDriverGUID) -component "MODULE_Drivers" -type "Debug"
             If ($fCredential)
             {
                 LogIt -message ("Invoking web request with credentials") -component "MODULE_Drivers" -type "Verbose"
 
                 If($fHTTPS)
 				{
-                    $frequest = Invoke-WebRequest https://$fSCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG`$f/$fDriverGUID -UseBasicParsing -Credential $fCredential -TimeoutSec 180 -ErrorAction:Stop
+                    $frequest = Invoke-WebRequest https://$fSCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG`$/$fDriverGUID -UseBasicParsing -Credential $fCredential -TimeoutSec 180 -ErrorAction:Stop
                 }
 				Else
 				{
-                    $frequest = Invoke-WebRequest http://$fSCCMDistributionPoint/SMS_DP_SMSPKG`$f/$fDriverGUID -UseBasicParsing -Credential $fCredential -TimeoutSec 180 -ErrorAction:Stop
+                    $frequest = Invoke-WebRequest http://$fSCCMDistributionPoint/SMS_DP_SMSPKG`$/$fDriverGUID -UseBasicParsing -Credential $fCredential -TimeoutSec 180 -ErrorAction:Stop
                 }
             }
             Else
@@ -97,11 +97,11 @@ function Download-Drivers
 
                 If($fHTTPS)
 				{
-                    $frequest = Invoke-WebRequest https://$fSCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG`$f/$fDriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
+                    $frequest = Invoke-WebRequest https://$fSCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG`$/$fDriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
                 }
 				Else
 				{
-                    $frequest = Invoke-WebRequest http://$fSCCMDistributionPoint/SMS_DP_SMSPKG`$f/$fDriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
+                    $frequest = Invoke-WebRequest http://$fSCCMDistributionPoint/SMS_DP_SMSPKG`$/$fDriverGUID -UseBasicParsing -UseDefaultCredentials -TimeoutSec 180 -ErrorAction:Stop
                 }
             }
 
@@ -117,11 +117,11 @@ function Download-Drivers
                 If($fHTTPS)
 				{
                     $fURL = $fURL.replace("http://","https://")
-                	$fFileName = $fURL -ireplace [regex]::Escape("https://$fSCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG$f/$fDriverGUID/"), ""
+                	$fFileName = $fURL -ireplace [regex]::Escape("https://$fSCCMDistributionPoint/NOCERT_SMS_DP_SMSPKG$/$fDriverGUID/"), ""
                 }
 				Else
 				{
-                	$fFileName = $fURL -ireplace [regex]::Escape("http://$fSCCMDistributionPoint/SMS_DP_SMSPKG$f/$fDriverGUID/"), ""
+                	$fFileName = $fURL -ireplace [regex]::Escape("http://$fSCCMDistributionPoint/SMS_DP_SMSPKG$/$fDriverGUID/"), ""
 				}
 
 				$foutfilepath = Join-Path -Path $fdriverpath -ChildPath $fFileName
