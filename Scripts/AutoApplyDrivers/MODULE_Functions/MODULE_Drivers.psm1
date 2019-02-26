@@ -18,7 +18,7 @@ function Install-Drivers
             If ($fRestart)
             {
                 LogIt -message ("Installing drivers with restart") -component "MODULE_Drivers" -type "Verbose"
-                pnputil /add-driver "$Path\*.inf" /subdirs /install | Out-File -FilePath (Join-Path -Path $Path -ChildPath "pnputil.log") -Append
+                pnputil /add-driver "$Path\*.inf" /subdirs /install /reboot | Out-File -FilePath (Join-Path -Path $Path -ChildPath "pnputil.log") -Append
             }
             Else
             {
