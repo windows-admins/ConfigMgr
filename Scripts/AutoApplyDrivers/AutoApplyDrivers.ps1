@@ -78,14 +78,6 @@ Catch
     Exit 1
 }
 
-
-# __________________________________________________________________________________
-#
-# Get passed in parameters and recreate command line.
-# __________________________________________________________________________________
-Try
-{
-
 # __________________________________________________________________________________
 #
 # Handle $Path and make sure it's not missing, if it is set to the script directory.
@@ -545,5 +537,6 @@ Catch
 LogIt -message ("Script Execution Complete") -component "Main()" -type "Info"
 LogIt -message (" ") -component "Main()" -type "Info"
 LogIt -message (" ") -component "Main()" -type "Info"
+
 
 # :beer:
