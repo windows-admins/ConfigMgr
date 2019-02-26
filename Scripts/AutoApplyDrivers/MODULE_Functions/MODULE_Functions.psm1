@@ -150,19 +150,19 @@ function Query-IfAdministrator
     }
     catch
     {
-        Handle-Error -Message "Critical error checking for administrative permissions." -Exception $_
+        Invoke-ErrorHandler -Message "Critical error checking for administrative permissions." -Exception $_
     }
 
 }
 
-function Handle-Error
+function Invoke-ErrorHandler
 {
 	<#
 	    .SYNOPSIS 
 	      Handles an error outputting standard information and optionally exiting.
 	    .DESCRIPTION
 	    .EXAMPLE
-		    Handle-Error -Message "This is an error" -LogFile "C:\Logfile.log" -ExitCode "666"
+		    Invoke-ErrorHandler -Message "This is an error" -LogFile "C:\Logfile.log" -ExitCode "666"
 	#>
 
     param (
@@ -178,27 +178,51 @@ function Handle-Error
             LogIt -message ($Message) -component "MODULE_ErrorHandler" -type "Error"
         }
 
-        If ($_.Exception)
+        If ($Exception)
         {
-            LogIt -message ($_.Exception) -component "MODULE_ErrorHandler" -type "Error"
+            LogIt -message (" ") -component "MODULE_ErrorHandler" -type "Error"
+            LogIt -message ("Error information:") -component "MODULE_ErrorHandler" -type "Error"
+            
+            If ($Exception.Exception.Message)
+            {
+                LogIt -message ($Exception.Exception.Message) -component "MODULE_ErrorHandler" -type "Error"
+            }
+
+            if ($Exception.InvocationInfo.Line)
+            {
+                LogIt -message ("Invocation Info: "+$incomingError.InvocationInfo.Line) -component "MODULE_ErrorHandler" -type "Debug"
+            }
+
+            if ($Exception.TargetObject)
+            {
+                LogIt -message ("Target Object: "+$incomingError.TargetObject) -component "MODULE_ErrorHandler" -type "Debug"
+            }
+
+            If ($Exception.ErrorDetails)
+            {
+                LogIt -message ($Exception.ErrorDetails.ToSTring()) -component "MODULE_ErrorHandler" -type "Debug"
+            }
+
+            If ($Exception.Exception)
+            {
+                LogIt -message ($Exception.Exception) -component "MODULE_ErrorHandler" -type "Verbose"
+            }
         }
 
-        If ($_.ErrorDetails)
-        {
-            LogIt -message ($_.ErrorDetails.ToSTring()) -component "MODULE_ErrorHandler" -type "Debug"
-        }
-
+        
         If ($ExitCode)
         {
-            LogIt -message (" ") -component " " -type "Info"
+            LogIt -message ("Exiting with code: "+$ExitCode) -component " " -type "Warning"
             Exit $ExitCode
         }
     }
     Catch
     {
+        Write-Host -ForegroundColor Red "Error attempting to handle a passed in error."
+
         If ($Message)
         {
-            Write-Host -ForegroundColor Red "Critical error checking for administrative permissions."
+            Write-Host -ForegroundColor Red $Message
         }
 
         If ($_.Exception)

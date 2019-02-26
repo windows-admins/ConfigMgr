@@ -70,9 +70,7 @@ function New-SqlConnectionString
 		}
 		catch
 		{
-            LogIt -message ("Failed to create SQL connection string") -component "MODULE_SQL" -type "ERROR"
-            LogIt -message ($_) -component "MODULE_SQL" -type "ERROR"
-			$PSCmdlet.ThrowTerminatingError($_)
+            Invoke-ErrorHandler -Message "Failed to create SQL connection string" -Exception $_
 		}
 	}
 }
@@ -101,9 +99,7 @@ function New-SqlConnection
 		}
 		catch
 		{
-            LogIt -message ("Failed to create SQL connection") -component "MODULE_SQL" -type "ERROR"
-            LogIt -message ($_) -component "MODULE_SQL" -type "ERROR"
-			$PSCmdlet.ThrowTerminatingError($_)
+            Invoke-ErrorHandler -Message "Failed to create SQL connection" -Exception $_
 		}
 	}
 }
@@ -177,10 +173,14 @@ function Invoke-SqlCommand
 		}
 		catch
 		{
-            LogIt -message ("Failed to execute SQL command: "+$Name) -component "MODULE_SQL" -type "ERROR"
-            LogIt -message ($_.Exception) -component "MODULE_SQL" -type "Error"
-            LogIt -message ($_.ErrorDetails.ToSTring()) -component "MODULE_SQL" -type "Error"
-            $PSCmdlet.ThrowTerminatingError($_)
+            If ($Name)
+            {
+                Invoke-ErrorHandler -Message "Failed to execute SQL command: "+$Name -Exception $_
+            }
+            Else
+            {
+                Invoke-ErrorHandler -Message "Failed to execute SQL command." -Exception $_
+            }
 		}
 	}
 }

@@ -31,7 +31,9 @@
     .PARAMETER UpdateOnlyDatedDrivers
         Enabling this will only download and install drivers that are newer than what is currently installed on the operating system.
     .PARAMETER HTTPS
-        Enable to force the site to use HTTPS connections.  Default is HTTP.
+        Enable to force the site to use HTTPS connections.  Default is HTTPS.
+    .PARAMETER Restart
+        Enable to allow pnputil to reboot if necessary.
     .INPUTS
         None. You cannot pipe objects in.
     .OUTPUTS
@@ -58,8 +60,9 @@ Param(
     [bool]$HardwareMustBePresent = $True,
     [bool]$UpdateOnlyDatedDrivers = $True, # Use this to exclude any drivers we already have updated on the system
     [bool]$HTTPS = $True,
-    [string]$SCCMDistributionPoint
-)
+    [string]$SCCMDistributionPoint,
+    [bool]$Restart = $False
+)`
 
 # _SMSTSSiteCode = CHQ
 
@@ -74,6 +77,14 @@ Catch
     Write-Host -ForegroundColor Red "Unable to import modules.  Check that the source files exist."
     Exit 1
 }
+
+
+# __________________________________________________________________________________
+#
+# Get passed in parameters and recreate command line.
+# __________________________________________________________________________________
+Try
+{
 
 # __________________________________________________________________________________
 #
@@ -97,7 +108,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error handling the Path variable." -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error handling the Path variable." -Exception $_ -ExitCode 1
 } 
 
 LogIt -message (" ") -component "Main()" -type "Info"
@@ -161,7 +172,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error getting the task sequence environment and variables." -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error getting the task sequence environment and variables." -Exception $_ -ExitCode 1
 }
 
 
@@ -206,7 +217,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error validating required parameters and credentials." -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error validating required parameters and credentials." -Exception $_ -ExitCode 1
 }
 
 
@@ -259,7 +270,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error Getting local drivers and formatting XML to send to SQL." -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error Getting local drivers and formatting XML to send to SQL." -Exception $_ -ExitCode 1
 }
 
 
@@ -310,7 +321,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error quering SQL Stored Procedure to get list of drivers from SCCM" -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error quering SQL Stored Procedure to get list of drivers from SCCM" -Exception $_ -ExitCode 1
 }
 
 
@@ -399,7 +410,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error getting additional driver information and creating list of drivers to download/install." -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error getting additional driver information and creating list of drivers to download/install." -Exception $_ -ExitCode 1
 }
 
 
@@ -433,7 +444,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error parsing CI_ID against v_DriverContentToPackage to get the Content_UniqueID." -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error parsing CI_ID against v_DriverContentToPackage to get the Content_UniqueID." -Exception $_ -ExitCode 1
 }
 
 
@@ -496,7 +507,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error downloading drivers" -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error downloading drivers" -Exception $_ -ExitCode 1
 }
 
  
@@ -514,7 +525,7 @@ Try
 
             LogIt -message ("Apply downloaded drivers to online operating system.") -component "Main()" -type "Verbose"
 
-            Install-Drivers
+            Install-Drivers -fRestart $Restart
         }
         Else
         {
@@ -528,7 +539,7 @@ Try
 }
 Catch
 {
-    Handle-Error -Message "Critical error Inject the drivers into the OS" -Exception $_ -ExitCode 1
+    Invoke-ErrorHandler -Message "Critical error Inject the drivers into the OS" -Exception $_ -ExitCode 1
 }
 
 LogIt -message ("Script Execution Complete") -component "Main()" -type "Info"

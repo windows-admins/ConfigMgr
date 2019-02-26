@@ -5,22 +5,30 @@ function Install-Drivers
 	[CmdletBinding()]
 	param
 	(
+        $fRestart = $false
 	)
 	begin
 	{
 		$fErrorActionPreference = 'Stop'
 	}
 	process
-	{
-        LogIt -message ("Installing drivers") -component "MODULE_Drivers" -type "Debug"
-		
+	{		
         try
 		{
-            pnputil /add-driver "$Path\*.inf" /subdirs /install | Out-File -FilePath (Join-Path -Path $Path -ChildPath "pnputil.log") -Append
+            If ($fRestart)
+            {
+                LogIt -message ("Installing drivers with restart") -component "MODULE_Drivers" -type "Verbose"
+                pnputil /add-driver "$Path\*.inf" /subdirs /install | Out-File -FilePath (Join-Path -Path $Path -ChildPath "pnputil.log") -Append
+            }
+            Else
+            {
+                LogIt -message ("Installing drivers without restart") -component "MODULE_Drivers" -type "Verbose"
+                pnputil /add-driver "$Path\*.inf" /subdirs /install | Out-File -FilePath (Join-Path -Path $Path -ChildPath "pnputil.log") -Append
+            }
         }
         Catch
         {
-            Handle-Error -Message "Critical error installing drivers." -Exception $_
+            Invoke-ErrorHandler -Message "Critical error installing drivers." -Exception $_
         }
     }
 }
@@ -156,7 +164,7 @@ function Download-Drivers
         }
         Catch
         {
-            Handle-Error -Message "Critical error downloading drivers." -Exception $_
+            Invoke-ErrorHandler -Message "Critical error downloading drivers." -Exception $_
         }
     }
 }
@@ -214,7 +222,7 @@ function Query-DriverListAgainstOnlineOS
     catch
     {
         $fMessage = "Critical error checking driver list against online oeprating system."
-        Handle-Error -Message $fMessage -Exception $_
+        Invoke-ErrorHandler -Message $fMessage -Exception $_
         Return $fMessage
     }
 }
@@ -358,7 +366,7 @@ function Query-XMLCategory
     }
     Catch
     {
-        Handle-Error -Message "Critical error getting category information." -Exception $_
+        Invoke-ErrorHandler -Message "Critical error getting category information." -Exception $_
         Return ""
     }
 }
