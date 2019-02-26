@@ -8,13 +8,17 @@ This is ideally used in one of two difference scenarios:
 ## To Run:
 .\AutoApplyDrivers.ps1 -Path "c:\Temp\Drivers\" -SCCMServer cm1.corp.contoso.com -SCCMServerDB "ConfigMgr_CHQ" -Credential (Get-Credential -UserName "CORP\Drivers" -Message "Enter password")
 
+##Requirements
+## What's *IS* required:
+1) SCCM
+2) Driver database populated with drivers
+
 ## What's *NOT* required:
-1) New creation of anything (assuming you use standard SCCM functionality). 
+1) New creation of driver packages
 2) Web services
 3) Expensive consulting engagements (unless you want to...) 
 
-## To setup:
-
+## To setup
 ### Active Directory:
 1) Create a domain service account.
 (Basic service account security principles apply)
@@ -37,3 +41,9 @@ Note: Unsure as to which of these made this work (user group or folder perms).
 4) Security -> Edit -> Add
 5) Add the domain service account
 6) Default permissions should suffice.  Do not check Full Control, Modify, or Write
+
+
+
+### Potential Gotchas
+1) If the context the script executes under has no local administrator access, the script will be unable to compare the drivers found in SCCM to the local drivers, and will not be able to identify which drivers are newer.  Thus all possible matching drivers will be downloaded.
+2) If the context the script executes under has no local administrator access, the script will be unable to install drivers and installation must be handled outside of the script execution.
