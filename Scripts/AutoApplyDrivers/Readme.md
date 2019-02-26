@@ -8,6 +8,11 @@ This is ideally used in one of two difference scenarios:
 ## To Run:
 .\AutoApplyDrivers.ps1 -Path "c:\Temp\Drivers\" -SCCMServer cm1.corp.contoso.com -SCCMServerDB "ConfigMgr_CHQ" -Credential (Get-Credential -UserName "CORP\Drivers" -Message "Enter password")
 
+## What's *NOT* required:
+1) New creation of anything (assuming you use standard SCCM functionality). 
+2) Web services
+3) Expensive consulting engagements (unless you want to...) 
+
 ## To setup:
 
 ### Active Directory:
