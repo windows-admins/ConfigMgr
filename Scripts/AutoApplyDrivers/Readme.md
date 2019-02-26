@@ -26,6 +26,7 @@ This is ideally used in one of two difference scenarios:
 4) Select User Mapping
 5) Check the box under Map for the ConfigMgr_ database
 6) In the Database role membership, check the box for db_datareader
+7) Execute the following command: `GRANT EXECUTE ON dbo.MP_MatchDrivers TO [CORP\Drivers];`
 
 ### IIS:
 Note: Unsure as to which of these made this work (user group or folder perms).
