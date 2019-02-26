@@ -19,6 +19,12 @@ This is ideally used in one of two difference scenarios:
 3) Expensive consulting engagements (unless you want to...) 
 
 ## To setup
+#### SCCM
+1) Create a package for the PoSh files.
+2) Import the example task sequence.
+3) Fix references in the task sequence.
+4) Use inside a UIP TS or stand alone.
+
 #### Active Directory:
 1) Create a domain service account.
 (Basic service account security principles apply)
