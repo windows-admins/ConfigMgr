@@ -64,7 +64,12 @@ function Download-Drivers
         LogIt -message ("Path: "+$Path) -component "MODULE_Drivers" -type "Debug"
         LogIt -message ("DriverGUID: "+$fDriverGUID) -component "MODULE_Drivers" -type "Debug"
         LogIt -message ("SCCMDistributionPoint: "+$fSCCMDistributionPoint) -component "MODULE_Drivers" -type "Debug"
-        LogIt -message ("Credential: "+($fCredential.UserName.ToString())) -component "MODULE_Drivers" -type "Debug"
+
+        if ($fCredential)
+        {
+            LogIt -message ("Credential: "+($fCredential.UserName.ToString())) -component "MODULE_Drivers" -type "Debug"
+        }
+
 		try
 		{
             if (-not (Test-Path -Path $Path))
