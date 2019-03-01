@@ -234,7 +234,7 @@ function Query-DriverListAgainstOnlineOS
     }
     catch
     {
-        $fMessage = "Critical error checking driver list against online operating system."
+        $fMessage = "Critical error checking driver list against online operating system. Likely not running a version of Windows that supports the Get-WindowsDriver function."
         Invoke-ErrorHandler -Message $fMessage -Exception $_
         Return $fMessage
     }
