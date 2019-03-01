@@ -391,7 +391,7 @@ Try
     }
     Else
     {
-        $DriverListFinal = "Not running as administrator or doesn't support.  Unable to check SCCM drivers against local drivers to see if the local drivers are newer than targetted drivers."
+        $DriverListFinal = "Not running as administrator.  Unable to check SCCM drivers against local drivers to see if the local drivers are newer than targetted drivers."
         LogIt -message ($DriverListFinal) -component "Main()" -type "Warning"
         $UpdateOnlyDatedDrivers = $False # Force this to false so we don't try and do this.
     }
