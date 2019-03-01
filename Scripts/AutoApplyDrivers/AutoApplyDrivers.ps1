@@ -231,8 +231,20 @@ Try
 
     $xmlCategories = Query-XMLCategory -fCategories $Categories
 
-    $Devices = Get-PnpDevice
-    $Devices | Sort-Object | Format-Table -Wrap -AutoSize -Property Class, FriendlyName, InstanceId | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log")
+    Try
+    {
+        $Devices = Get-PnPDevice
+        $Devices  | Select-Object Class, FriendlyName, InstanceID, Present | Sort-Object -Property FriendlyName | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log") 
+    }
+    Catch
+    {
+        $Devices = Gwmi win32_pnpentity
+        $Devices  | Select-Object PNPClass, Name, PNPDeviceID, Present | Sort-Object -Property Name | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log")
+        # Hard set these to be false because in a Win7 scenario (most likely reason why we fell back to WMI) we can't run either of these properly.
+        $HardwareMustBePresent = $False
+        $UpdateOnlyDatedDrivers = $False
+    }
+
     If ($HardwareMustBePresent)
     {
         $Devices = $Devices | Where-Object {$_.Present}
