@@ -240,6 +240,7 @@ Try
     {
         $Devices = Gwmi win32_pnpentity
         $Devices  | Select-Object PNPClass, Name, PNPDeviceID, Present | Sort-Object -Property Name | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log")
+        # Hard set these to be false because in a Win7 scenario (most likely reason why we fell back to WMI) we can't run either of these properly.
         $HardwareMustBePresent = $False
         $UpdateOnlyDatedDrivers = $False
     }
