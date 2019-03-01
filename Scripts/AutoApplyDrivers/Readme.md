@@ -53,3 +53,8 @@ Note: Unsure as to which of these made this work (user group or folder perms).
 ## Potential Gotchas
 1) If the context the script executes under has no local administrator access, the script will be unable to compare the drivers found in SCCM to the local drivers, and will not be able to identify which drivers are newer.  Thus all possible matching drivers will be downloaded.
 2) If the context the script executes under has no local administrator access, the script will be unable to install drivers and installation must be handled outside of the script execution.
+3) For an Upgrade in Place (UIP/IPU) scenario it's recommended you set the following to `$False`.  If either is set to `$True` you have a much higher likelyhood of missing important/critical drivers as part of the upgrade.
+```
+[bool]$HardwareMustBePresent = $False,
+[bool]$UpdateOnlyDatedDrivers = $False,
+```
