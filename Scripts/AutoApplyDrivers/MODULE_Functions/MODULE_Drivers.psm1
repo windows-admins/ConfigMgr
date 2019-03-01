@@ -200,8 +200,8 @@ function Query-DriverListAgainstOnlineOS
         $fOnlineDrivers = Get-WindowsDriver -Online -All
         }
         catch{
-        $fMessage = "Not running a version of Windows that supports Get-WindowsDriver."
-        Invoke-ErrorHandler -Message $fMessage -Exception $_
+        $fMessage = "Not running a version of Windows that supports the Get-WindowsDriver function for checking the driver list against the Online OS."
+        Invoke-ErrorHandler -Message $fMessage
         Return $fMessage
         }
         $fDriverListFinal = @()
