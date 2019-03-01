@@ -195,15 +195,7 @@ function Query-DriverListAgainstOnlineOS
 
     try
     {
-        try
-        {
         $fOnlineDrivers = Get-WindowsDriver -Online -All
-        }
-        catch{
-        $fMessage = "Not running a version of Windows that supports the Get-WindowsDriver function for checking the driver list against the Online OS."
-        Invoke-ErrorHandler -Message $fMessage
-        Return $fMessage
-        }
         $fDriverListFinal = @()
 
         # Remove drivers that don't need to be updated
