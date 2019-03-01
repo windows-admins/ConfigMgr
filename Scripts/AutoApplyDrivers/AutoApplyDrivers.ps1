@@ -385,13 +385,13 @@ Try
     }
 
 
-    If ((Query-IfAdministrator) -and ((GWMI Win32_OperatingSystem).Version -match "10*"))
+    If (Query-IfAdministrator)
     {
         $DriverListFinal = Query-DriverListAgainstOnlineOS -fDriverList $DriverList
     }
     Else
     {
-        $DriverListFinal = "Not running as administrator or not Windows 10.  Unable to check SCCM drivers against local drivers to see if the local drivers are newer than targetted drivers."
+        $DriverListFinal = "Not running as administrator or doesn't support.  Unable to check SCCM drivers against local drivers to see if the local drivers are newer than targetted drivers."
         LogIt -message ($DriverListFinal) -component "Main()" -type "Warning"
         $UpdateOnlyDatedDrivers = $False # Force this to false so we don't try and do this.
     }
