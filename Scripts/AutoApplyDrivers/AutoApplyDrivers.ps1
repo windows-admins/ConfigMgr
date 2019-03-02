@@ -123,6 +123,7 @@ If ($AutoDiscover)
         Try
         {
             $SCCMServer = (Get-CimInstance -namespace ROOT\ccm -Class SMS_LookupMP).Name
+            Write-Verbose "Found MP in WMI."
         }
         Catch
         {
@@ -134,10 +135,12 @@ If ($AutoDiscover)
             If ($tsenv._SMSTSMP)
             {
                 $SCCMServer = $tsenv._SMSTSMP
+                Write-Verbose "Found MP in TSVar _SMSTSMP"
             }
             ElseIf ($tsenv.SMSTSMP)
             {
                 $SCCMServer = $tsenv.SMSTSMP
+                Write-Verbose "Found MP in TSVar SMSTSMP"
             }
         }
 
@@ -149,6 +152,7 @@ If ($AutoDiscover)
         Try
         {
             $SCCMServerDB = "ConfigMgr_"+(([wmiclass]'ROOT\ccm:SMS_Client').GetAssignedSite()).sSiteCode
+            Write-Verbose "Successfully queried WMI for site code"
         }
         Catch
         {
@@ -158,6 +162,7 @@ If ($AutoDiscover)
         If(-not $SCCMServerDB -and $tsenv._SMSTSAssignedSiteCode)
         {
             $SCCMServerDB = "ConfigMgr_"+$tsenv._SMSTSAssignedSiteCode
+            Write-Verbose "Set database from TSVar _SMSTSAssignedSiteCode"
         }
 
         Write-Verbose "Auto discovering SCCMServerDB: ConfigMgr_"$tsenv._SMSTSAssignedSiteCode
@@ -168,14 +173,17 @@ If ($AutoDiscover)
         If ($tsenv._SMSTSHTTP)
         {
             $SCCMDistributionPoint = $tsenv._SMSTSHTTP
+            Write-Verbose "Set SCCMDistributionPoint from TSVar _SMSTSHTTP"
         }
         ELseIf ($tsenv._SMSTSHTTPS)
         {
             $SCCMDistributionPoint = $tsenv._SMSTSHTTPS
+            Write-Verbose "Set SCCMDistributionPoint from TSVar _SMSTSHTTPS"
         }
         Else
         {
             $SCCMDistributionPoint = $SCCMServer
+            Write-Verbose "Set SCCMDistributionPoint from SCCMServer"
         }
         Write-Verbose "Auto discovering SCCMDistributionPoint: $SCCMDistributionPoint"
     }

@@ -1,4 +1,4 @@
-Write-Host "Loading: MODULE_Drivers"
+Write-Debug "Loading: MODULE_Drivers"
 
 function Install-Drivers
 {

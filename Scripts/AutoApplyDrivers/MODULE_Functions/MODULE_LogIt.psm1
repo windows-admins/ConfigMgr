@@ -1,4 +1,4 @@
-﻿Write-Host "Loading: MODULE_LogIt"
+﻿Write-Debug "Loading: MODULE_LogIt"
 
 function LogIt
 {

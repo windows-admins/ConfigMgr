@@ -1,4 +1,4 @@
-Write-Host "Loading: MODULE_Functions"
+Write-Debug "Loading: MODULE_Functions"
 
 function Get-TSEnvironment
 {

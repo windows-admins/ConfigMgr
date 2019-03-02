@@ -1,4 +1,4 @@
-﻿Write-Host "Loading: MODULE_SQL"
+﻿Write-Debug "Loading: MODULE_SQL"
 
 function New-SqlConnectionString
 {
