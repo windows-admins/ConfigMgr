@@ -4,21 +4,22 @@
         This is ideally used in one of two difference scenarios:
         1) To stage drivers for an Upgrade in Place (UIP) scenario.  You can use this to download just the drivers required by the OS, either to prestage or directly as part of the UIP task sequence.
         2) To update online workstations (keeping drivers up to date).
-    .PARAMETER $Path
+    .PARAMETER Path
         Path to the desired location to download drivers to.
-    .PARAMETER $SCCMServer
+    .PARAMETER SCCMServer
         SCCM server to connect to. Note that this is where the SQL database lives (typically on the MP).
-    .PARAMETER $SCCMDistributionPoint
+    .PARAMETER SCCMDistributionPoint
         IIS server to connect to. Note that this is typically the Distribution Point.
+    .PARAMETER SCCMServerDB
+        The database name.  Standard format is "ConfigMgr_" followed by the site code 
     .PARAMETER Credential
         Credentials to use for querying SQL and IIS.
+        Use to prompt for credentials: (Get-Credential -UserName 'CORP\Drivers' -Message "Enter password")
     .PARAMETER Categories
         An array of categories to use for searching for drivers. Categories are inclusive not exclusive.
         Format must be as follows: @("9370","Test")
     .PARAMETER CategoryWildCard
         If set will search for categories using wild cards.  Thus "9370" would match both "Dell XPS 13 9370" and "Contoso 9370 Performance Pro Plus" 
-    .PARAMETER SCCMServerDB
-        The database name.  Standard format is "ConfigMgr_" followed by the site code 
     .PARAMETER InstallDrivers
         Enable installation of drivers.  Disable for use in testing or prestage scenarios.
     .PARAMETER DownloadDrivers
@@ -34,6 +35,8 @@
         Enable to force the site to use HTTPS connections.  Default is HTTPS.
     .PARAMETER Restart
         Enable to allow pnputil to reboot if necessary.
+    .PARAMETER AutoDiscover
+        Attempts to discover information required to run the task sequence from WMI and task sequence variables.
     .INPUTS
         None. You cannot pipe objects in.
     .OUTPUTS
@@ -44,27 +47,36 @@
     .EXAMPLE
         .\AutoApplyDrivers.ps1
         Uses default configuration and runs under the current session
+    .LINK
+        https://github.com/winadminsdotorg/SystemCenterConfigMgr/
 #>
 
 Param(
-    $Path = (Get-ChildItem env:SystemDrive).Value+"\Drivers\",
-    [string]$SCCMServer = "cm1.corp.contoso.com",
-    $Credential,
-    # $Credential = (Get-Credential -UserName 'CORP\Drivers' -Message "Enter password"),
-    [System.Array]$Categories = @(), # @("9370","Test")
+    # Required variables
+    [string]$Path,
+    [string]$SCCMServer,
+    [string]$SCCMDistributionPoint,
+    [string]$SCCMServerDB,
+
+    # Credentials. Must be a PSCredential
+    [System.Management.Automation.PSCredential]$Credential,
+
+    #Categories used for filtering
+    [System.Array]$Categories = @(),
     [bool]$CategoryWildCard = $False,
-    [string]$SCCMServerDB = "ConfigMgr_CHQ",
-    [bool]$InstallDrivers = $False,
-    [bool]$DownloadDrivers = $True,
+
+    # Control which drivers are found, downloaded, and installed.
     [bool]$FindAllDrivers = $False,
     [bool]$HardwareMustBePresent = $True,
-    [bool]$UpdateOnlyDatedDrivers = $True, # Use this to exclude any drivers we already have updated on the system
-    [bool]$HTTPS = $True,
-    [string]$SCCMDistributionPoint,
-    [bool]$Restart = $False
-)`
+    [bool]$UpdateOnlyDatedDrivers = $True,
+    [bool]$DownloadDrivers = $True,
+    [bool]$InstallDrivers = $False,
+    [bool]$Restart = $False,
 
-# _SMSTSSiteCode = CHQ
+    # Misc
+    [bool]$HTTPS = $True,
+    [bool]$AutoDiscover = $True
+)`
 
 Try
 {
@@ -78,30 +90,104 @@ Catch
     Exit 1
 }
 
+
 # __________________________________________________________________________________
 #
-# Handle $Path and make sure it's not missing, if it is set to the script directory.
+LogIt -message ("Getting environment variables") -component "Main()" -type "Info"
 # __________________________________________________________________________________
-Try
+$tsenv = Get-TSEnvironment
+
+If ($tsenv)
+{
+    LogIt -message ("Running in a task sequence.") -component "Main()" -type "Info"
+}
+Else
+{
+    LogIt -message ("Not running in a task sequence.") -component "Main()" -type "Verbose"
+}
+
+
+If ($AutoDiscover)
 {
     If (-not $Path)
     {
-        Write-Host -ForegroundColor Red "Path is missing, defaulting to script execution directory."
-        $Path = $PSScriptRoot
+        $Path = $env:TEMP+"\Drivers"
+        Write-Verbose "Auto discovering Path: $Path"
     }
 
-    If(-not (test-path $Path))
+    If (-not $SCCMServer)
     {
-          New-Item -ItemType Directory -Force -Path $Path
+        # TODO:
+        # Crazy thought, can we query the MP directly instead of SQL? :thinking:
+
+        Try
+        {
+            $SCCMServer = (Get-CimInstance -namespace ROOT\ccm -Class SMS_LookupMP).Name
+        }
+        Catch
+        {
+            Write-Verbose "Unable to get the current MP from WMI."
+        }
+
+        If (-not $SCCMServer)
+        {
+            If ($tsenv._SMSTSMP)
+            {
+                $SCCMServer = $tsenv._SMSTSMP
+            }
+            ElseIf ($tsenv.SMSTSMP)
+            {
+                $SCCMServer = $tsenv.SMSTSMP
+            }
+        }
+
+        Write-Verbose "Auto discovering SCCMServer: $SCCMServer"
     }
 
-    $Global:Path = $Path
-    $Global:LogFile = Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log"
+    If (-not $SCCMServerDB)
+    {
+        Try
+        {
+            $SCCMServerDB = "ConfigMgr_"+(([wmiclass]'ROOT\ccm:SMS_Client').GetAssignedSite()).sSiteCode
+        }
+        Catch
+        {
+            Write-Verbose "Unable to get the current site code from WMI."
+        }
+        
+        If(-not $SCCMServerDB -and $tsenv._SMSTSAssignedSiteCode)
+        {
+            $SCCMServerDB = "ConfigMgr_"+$tsenv._SMSTSAssignedSiteCode
+        }
+
+        Write-Verbose "Auto discovering SCCMServerDB: ConfigMgr_"$tsenv._SMSTSAssignedSiteCode
+    }
+
+    If (-not $SCCMDistributionPoint)
+    {
+        If ($tsenv._SMSTSHTTP)
+        {
+            $SCCMDistributionPoint = $tsenv._SMSTSHTTP
+        }
+        ELseIf ($tsenv._SMSTSHTTPS)
+        {
+            $SCCMDistributionPoint = $tsenv._SMSTSHTTPS
+        }
+        Else
+        {
+            $SCCMDistributionPoint = $SCCMServer
+        }
+        Write-Verbose "Auto discovering SCCMDistributionPoint: $SCCMDistributionPoint"
+    }
 }
-Catch
+
+If(-not (test-path $Path))
 {
-    Invoke-ErrorHandler -Message "Critical error handling the Path variable." -Exception $_ -ExitCode 1
-} 
+        New-Item -ItemType Directory -Force -Path $Path
+}
+
+$Global:Path = $Path
+$Global:LogFile = Join-Path -Path $Path -ChildPath "AutoApplyDrivers.log"
 
 LogIt -message (" ") -component "Main()" -type "Info"
 LogIt -message (" ") -component "Main()" -type "Info"
@@ -109,77 +195,11 @@ LogIt -message ("_______________________________________________________________
 
 # __________________________________________________________________________________
 #
-LogIt -message ("Getting Task Squence environment and variables") -component "Main()" -type "Info"
-# __________________________________________________________________________________
-Try
-{
-    $tsenv = Get-TSEnvironment
-
-    If ($tsenv)
-    {
-        LogIt -message ("Running in a task sequence.") -component "Main()" -type "Info"
-
-        If ($tsenv.TSVar_Path)
-        {
-            $Path = $tsenv.TSVar_Path
-        }
-        If ($tsenv.TSVar_SCCMServerDB)
-        {
-            $SCCMServerDB = $tsenv.TSVar_SCCMServerDB
-        }
-        If ($tsenv.TSVar_Categories)
-        {
-            $Categories = $tsenv.TSVar_Categories
-        }
-        If ($tsenv.TSVar_InstallDrivers)
-        {
-           $InstallDrivers = [bool]$tsenv.TSVar_InstallDrivers
-        }
-        If ($tsenv.TSVar_DownloadDrivers)
-        {
-           $DownloadDrivers = [bool]$tsenv.TSVar_DownloadDrivers
-        }
-        If ($tsenv.TSVar_FindAllDrivers)
-        {
-           $FindAllDrivers = [bool]$tsenv.TSVar_FindAllDrivers
-        }
-        If ($tsenv.TSVar_HardwareMustBePresent)
-        {
-           $HardwareMustBePresent = [bool]$tsenv.TSVar_HardwareMustBePresent
-        }
-        If ($tsenv.TSVar_UpdateOnlyDatedDrivers)
-        {
-           $UpdateOnlyDatedDrivers = [bool]$tsenv.TSVar_UpdateOnlyDatedDrivers
-        }
-        If ($tsenv.TSVar_UpdateOnlyDatedDrivers)
-        {
-           $UpdateOnlyDatedDrivers = [bool]$tsenv.TSVar_UpdateOnlyDatedDrivers
-        }
-    }
-    Else
-    {
-        LogIt -message ("Not running in a task sequence.") -component "Main()" -type "Verbose"
-    }
-
-}
-Catch
-{
-    Invoke-ErrorHandler -Message "Critical error getting the task sequence environment and variables." -Exception $_ -ExitCode 1
-}
-
-
-# __________________________________________________________________________________
-#
 LogIt -message ("Validate required parameters and what context this is being run under") -component "Main()" -type "Info"
 # __________________________________________________________________________________
 Try
 {
-    If (-not $SCCMDistributionPoint)
-    {
-        $SCCMDistributionPoint = $SCCMServer
-    }
-
-    $_ = Validate-CriticalParameters -Parameters @($Path,$SCCMServer,$SCCMServerDB)
+    $_ = Validate-CriticalParameters -Parameters @($Path,$SCCMServer,$SCCMServerDB, $SCCMDistributionPoint)
 
     If ($_ -gt 0)
     {
@@ -187,24 +207,27 @@ Try
         LogIt -message ("Path: "+$Path) -component "Main()" -type "Error"
         LogIt -message ("SCCMServer: "+$SCCMServer) -component "Main()" -type "Error"
         LogIt -message ("SCCMServerDB: "+$SCCMServerDB) -component "Main()" -type "Error"
+        LogIt -message ("SCCMDistributionPoint: "+$SCCMDistributionPoint) -component "Main()" -type "Error"
         LogIt -message ("Exiting....") -component "Main()" -type "Error"
         Exit 1
     }
 
     If (-not $Credential -and $tsenv.TSVar_Username -and $tsenv.TSVar_Password)
     {
+        # This doesn't work right.  We can get the variables but passing it in breaks when trying to connect to SQL :(
+        # Leaving here in case we ever come back to fix it.
         LogIt -message ("Running as: "+$tsenv.TSVar_Username) -component "Main()" -type "Info"
 
         $Credential = New-Object System.Management.Automation.PSCredential($tsenv.TSVar_Username,$tsenv.TSVar_Password)
         $Credential | Add-Member -name "ClearTextPassword" -type NoteProperty -value $tsenv.Value($tsenv.TSVar_Password)
     }
-    ElseIf(-not $Credential)
+    ElseIf($Credential)
     {
-        LogIt -message ("Running under current credentials.") -component "Main()" -type "Info"
+        LogIt -message ("Running as: "+$Credential.UserName.ToString()) -component "Main()" -type "Info"
     }
     Else
     {
-        LogIt -message ("Running as: "+$Credential.UserName.ToString()) -component "Main()" -type "Info"
+        LogIt -message ("Running under current credentials.") -component "Main()" -type "Info"
     }
 }
 Catch
@@ -234,7 +257,10 @@ Try
     Try
     {
         $Devices = Get-PnPDevice
-        $Devices  | Select-Object Class, FriendlyName, InstanceID, Present | Sort-Object -Property FriendlyName | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log") 
+        If ($DebugPreference -ne "SilentlyContinue")
+        {
+            $Devices  | Select-Object Class, FriendlyName, InstanceID, Present | Sort-Object -Property FriendlyName | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log") 
+        }
     }
     Catch
     {
@@ -335,6 +361,8 @@ LogIt -message ("Getting additional driver information and creating list of driv
 # __________________________________________________________________________________
 Try
 {
+    # TODO: We can probably query the MP directly using: Get-CimInstance -namespace ROOT\SMS\Site_CHQ -Class SMS_Driver
+
     LogIt -message ("Querying additional driver information for matching drivers.") -component "Main()" -type "Verbose"
 
     $SqlQuery = "SELECT CI_ID, DriverType, DriverINFFile, DriverDate, DriverVersion, DriverClass, DriverProvider, DriverSigned, DriverBootCritical FROM v_CI_DriversCIs WHERE CI_ID IN $CI_ID_list"

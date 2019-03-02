@@ -25,25 +25,43 @@ function Get-TSEnvironment
         $tsenv.TSVariableList = $tsenv.TSEnvironment.GetVariables()
 
         # Get TS Variable Values
+
         $tsenv._SMSTSMP = $tsenv.TSEnvironment.Value("_SMSTSMP")
-        $tsenv.TSVar_Path = $tsenv.TSEnvironment.Value("TSVar_Path")
-        $tsenv.TSVar_SCCMServerDB = $tsenv.TSEnvironment.Value("TSVar_SCCMServerDB")
-        $tsenv.TSVar_InstallDrivers = $tsenv.TSEnvironment.Value("TSVar_InstallDrivers")
-        $tsenv.TSVar_Categories = $tsenv.TSEnvironment.Value("TSVar_Categories")
-        $tsenv.TSVar_DownloadDrivers = $tsenv.TSEnvironment.Value("TSVar_DownloadDrivers")
-        $tsenv.TSVar_FindAllDrivers = $tsenv.TSEnvironment.Value("TSVar_FindAllDrivers")
-        $tsenv.TSVar_HardwareMustBePresent = $tsenv.TSEnvironment.Value("TSVar_HardwareMustBePresent")
-        $tsenv.TSVar_UpdateOnlyDatedDrivers = $tsenv.TSEnvironment.Value("TSVar_UpdateOnlyDatedDrivers")
-        # $tsenv.XXXX = $tsenv.TSEnvironment.Value("XXXXX")
+        $tsenv._SMSTSMP = $tsenv._SMSTSMP.replace("http://","")
+        $tsenv._SMSTSMP = $tsenv._SMSTSMP.replace("https://","")
+        $tsenv.SMSTSMP = $tsenv.TSEnvironment.Value("SMSTSMP")
+        $tsenv.SMSTSMP = $tsenv.SMSTSMP.replace("http://","")
+        $tsenv.SMSTSMP = $tsenv.SMSTSMP.replace("https://","")
 
-        # _SMSTSCHQ00005 = http://cm1.corp.contoso.com/sms_dp_smspkg$/chq00005 
-        # Maybe use this for the DP?
 
-        $TSUsernameVar = $tsvars | Where-Object {$_ -like "_SMSTSReserved1*"}
-        $TSPasswordVar = $tsvars | Where-Object {$_ -like "_SMSTSReserved2*"}
+        $tsenv._SMSTSAssignedSiteCode = $tsenv.TSEnvironment.Value("_SMSTSAssignedSiteCode")
 
-        $tsenv.TSVar_Username = $tsenv.Value($TSUsernameVar)
-        $tsenv.TSVar_Password = $tsenv.Value($TSPasswordVar) | ConvertTo-SecureString -asPlainText -Force
+        # This doesn't work right.  We can get the variables but passing it in breaks when trying to connect to SQL :(
+        # Leaving here in case we ever come back to fix it.
+        # $TSUsernameVar = $tsvars | Where-Object {$_ -like "_SMSTSReserved1*"}
+        # $TSPasswordVar = $tsvars | Where-Object {$_ -like "_SMSTSReserved2*"}
+
+        # $tsenv.TSVar_Username = $tsenv.Value($TSUsernameVar)
+        # $tsenv.TSVar_Password = $tsenv.Value($TSPasswordVar) | ConvertTo-SecureString -asPlainText -Force
+
+        $HttpDpVar = $tsvars | Where-Object {$_ -like "_SMSTSHTTP$tsenv._SMSTSAssignedSiteCode*"}
+        $HttpsDpVar = $tsvars | Where-Object {$_ -like "_SMSTSHTTPS$tsenv._SMSTSAssignedSiteCode*"}
+
+        ForEach ($_ in $HttpDpVar)
+        {
+            $tsenv._SMSTSHTTP = $tsenv.Value($HttpDpVar)
+            $tsenv._SMSTSHTTP = ($tsenv._SMSTSHTTP.Split("/"))[2]
+            # Only need first one so break out
+            Break
+        }
+
+        ForEach ($_ in $HttpsDpVar)
+        {
+            $tsenv._SMSTSHTTPS = $tsenv.Value($HttpsDpVar)
+            $tsenv._SMSTSHTTPS = ($tsenv._SMSTSHTTPS.Split("/"))[2]
+            # Only need first one so break out
+            Break
+        }
 
         Return $tsenv
     }
