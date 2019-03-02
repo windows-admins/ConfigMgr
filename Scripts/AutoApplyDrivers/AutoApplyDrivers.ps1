@@ -78,18 +78,9 @@ Param(
     [bool]$AutoDiscover = $True
 )`
 
-Try
-{
-    #Import Modules
-    Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-    Import-Module $PSScriptRoot\MODULE_Functions -Force -WarningAction SilentlyContinue
-}
-Catch
-{
-    Write-Host -ForegroundColor Red "Unable to import modules.  Check that the source files exist."
-    Exit 1
-}
-
+Write-Verbose "Import Modules"
+Remove-Module $PSScriptRoot\MODULE_Functions -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+Import-Module $PSScriptRoot\MODULE_Functions -Force -NoClobber -ErrorAction Stop
 
 # __________________________________________________________________________________
 #
