@@ -1,0 +1,28 @@
+<job id="ztiRunCommandHidden">
+	<script language="VBScript" src="ZTIUtility.vbs"/>
+	<script language="VBScript">
+
+' // ***************************************************************************
+' // 
+' // Copyright (c) Microsoft Corporation.  All rights reserved.
+' // 
+' // Microsoft Deployment Toolkit Solution Accelerator
+' //
+' // File:      ztiRunCommandHidden.wsf
+' // 
+' // Version:   6.3.8443.1000
+' // 
+' // Purpose:   oUtility.RunWithConsoleLogging is useful when trying to 
+' //     capture console output. However WshShell.exec can't run commands
+' //     minimized. This script will capture output to bdd.log.
+' // 
+' // Usage:     cscript.exe [//nologo] ztiRunCommandHidden.wsf [/debug:true]  <Command>
+' // 
+' // ***************************************************************************
+
+Option Explicit
+
+wscript.quit oUtility.RunWithConsoleLogging( wscript.arguments.UnNamed(0) )
+
+	</script>
+</job>

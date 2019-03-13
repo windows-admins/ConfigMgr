@@ -1,0 +1,5 @@
+Windows Registry Editor Version 5.00
+
+;Disables OneDrive advertising that shows up in file explorer
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ShowSyncProviderNotifications"=dword:00000000
