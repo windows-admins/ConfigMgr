@@ -1,4 +1,0 @@
-Basic provisioning package
-
-Local Admin Account: Administrator:password
-Computer Name: %SERIAL%
