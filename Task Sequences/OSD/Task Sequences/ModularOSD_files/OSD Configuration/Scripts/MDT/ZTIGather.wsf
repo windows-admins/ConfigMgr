@@ -1,0 +1,2208 @@
+<job id="ZTIGather">
+	<script language="VBScript" src="ZTIUtility.vbs"/>
+	<script language="VBScript" src="ZTIDataAccess.vbs"/>
+	<script language="VBScript">
+
+' // ***************************************************************************
+' // 
+' // Copyright (c) Microsoft Corporation.  All rights reserved.
+' // 
+' // Microsoft Deployment Toolkit Solution Accelerator
+' //
+' // File:      ZTIGather.wsf
+' // 
+' // Version:   6.3.8443.1000
+' // 
+' // Purpose:   Gather information and process rules controlling deployment
+' //            process.
+' // 
+' // Usage:     cscript.exe [//nologo] ZTIGather.wsf [/debug:true] [/localonly]
+' // 
+' // ***************************************************************************
+
+Option Explicit
+RunNewInstance
+
+
+'//----------------------------------------------------------------------------
+'//  Global Constants
+'//----------------------------------------------------------------------------
+
+Public Const iDRVariant = 200
+Public Const iDRMaxChar = 255
+
+Public Const sSectionSettings = "Settings"
+Public Const sSectionDefaultGateway = "DefaultGateway"
+
+
+'//----------------------------------------------------------------------------
+'//  Main Class
+'//----------------------------------------------------------------------------
+
+Class ZTIGather
+
+	Dim iRetVal
+	Dim bSkip
+	Dim sIniFile
+	Dim dicProperties, dicLists, dicOverwrite
+	Dim bLocalOnly
+
+
+	'//----------------------------------------------------------------------------
+	'//  Constructor to initialize needed objects
+	'//----------------------------------------------------------------------------
+
+	Private Sub Class_Initialize
+
+
+		'//----------------------------------------------------------------------------
+		'//  Create dictionary objects
+		'//----------------------------------------------------------------------------
+
+		oLogging.CreateEntry "------------------------- Object Initialization -------------------------", LogTypeInfo
+
+		Set dicProperties = CreateObject("Scripting.Dictionary")
+		dicProperties.CompareMode = TextCompare
+
+		Set dicLists = CreateObject("Scripting.Dictionary")
+		dicLists.CompareMode = TextCompare
+
+		Set dicOverwrite = CreateObject("Scripting.Dictionary")
+		dicOverwrite.CompareMode = TextCompare
+
+	End Sub
+
+
+	'//----------------------------------------------------------------------------
+	'//  Main routine
+	'//----------------------------------------------------------------------------
+
+	Function Main
+
+		oLogging.CreateEntry "------------------------- Initialization -------------------------", LogTypeInfo
+
+		oLogging.ReportProgress "Initializing.", 1
+
+		'//----------------------------------------------------------------------------
+		'//  Make sure the environment is in sync
+		'//----------------------------------------------------------------------------
+	
+		SyncEnvironment
+
+
+		'//----------------------------------------------------------------------------
+		'//  Get information about the machine and OS (unless skipped)
+		'//----------------------------------------------------------------------------
+
+		If not oUtility.Arguments.Exists("nolocalonly") then
+
+			oLogging.ReportProgress "Getting local computer information: Operating system", 10
+			iRetVal = GetOSVersion
+			TestAndLog iRetVal, "GetOSVersion for Gather process"
+
+			oLogging.ReportProgress "Getting local computer information: HAL", 15
+			iRetVal = GetHAL
+			TestAndLog iRetVal , "GetHAL for Gather process"
+
+			oLogging.ReportProgress "Getting local computer information: Networking", 20
+			iRetVal = GetNetworkInfo
+			TestAndLog iRetVal , "GetNetworkInfo for Gather process"
+
+			oLogging.ReportProgress "Getting local computer information: Distribution point", 25
+			iRetVal = GetDP
+			TestAndLog iRetVal , "GetDP for Gather process"
+
+			oLogging.ReportProgress "Getting local computer information: Windows Deployment Services", 30
+			iRetVal = GetWDS
+			TestAndLog iRetVal ,"GetWDS for Gather process"
+
+			oLogging.ReportProgress "Getting local computer information: Host name", 30
+			iRetVal = GetHostName
+			TestAndLog iRetVal , "GetHostName for Gather process"
+
+			oLogging.ReportProgress "Getting local computer information: Asset information", 30
+			iRetVal = GetAssetInfo
+			TestAndLog iRetVal ,"GetAssetInfo for Gather process"
+
+			oLogging.ReportProgress "Getting local computer information: Operating system", 35
+			iRetVal = GetOSSKU
+			TestAndLog iRetVal ,"GetOSSKU for Gather process"
+			
+			oLogging.ReportProgress "Getting local computer information: Operating system", 40
+			iRetVal = GetCurrentOSInfo
+			TestAndLog iRetVal ,"GetCurrentOSInfo for Gather process"
+			
+			oLogging.ReportProgress "Getting local computer information: Virtualization", 45
+			On Error Resume Next
+			iRetVal = GetVirtualizationInfo
+			TestAndLog iRetVal ,"GetVirtualizationInfo for Gather process"
+			On Error Goto 0
+
+			oLogging.ReportProgress "Getting local computer information: BitLocker", 48
+			On Error Resume Next
+			iRetVal = GetBitLockerInfo
+			TestAndLog iRetVal ,"GetBitLockerInfo for Gather process"
+			On Error Goto 0
+
+		Else
+			oLogging.CreateEntry "Skipping local settings gathering because it has already been done.", LogTypeInfo
+		End if
+
+
+		'//----------------------------------------------------------------------------
+		'//  Send a discovery event
+		'//----------------------------------------------------------------------------
+
+		oLogging.CreateEvent 41000, LogTypeInfo, "Processing the " & oEnvironment.Item("Phase") & " phase.", oLogging.GetDiscoveryArray
+
+
+		'//----------------------------------------------------------------------------
+		'//  Check if localonly was specified
+		'//----------------------------------------------------------------------------
+
+		If oUtility.Arguments.Exists("localonly") or UCase(oEnvironment.Item("GatherLocalOnly")) = "TRUE" then
+
+			oLogging.CreateEntry "Only gathering local settings (no rules processing).", LogTypeInfo
+			bLocalOnly = true
+
+		Else
+			bLocalOnly = false
+		End if
+
+
+		'//----------------------------------------------------------------------------
+		'//  Determine what INI file to use
+		'//----------------------------------------------------------------------------
+
+		sIniFile = LocateIni
+		If sIniFile = "" and (not bLocalOnly) then
+			oLogging.ReportProgress "Gathering complete, but no INI file found.", 100
+			If oUtility.Arguments.Exists("optional") then
+				oLogging.CreateEntry "Unable to find optional rules INI file, rc = " & iRetVal & ", exiting", LogTypeInfo
+				Main = 0
+			Else
+				oLogging.CreateEntry "Unable to find rules INI file, rc = " & iRetVal, LogTypeError
+				Main = 8000
+			End if
+			EXIT FUNCTION
+		End if
+
+
+		'//----------------------------------------------------------------------------
+		'//  Process rules and save results
+		'//----------------------------------------------------------------------------
+
+
+		If not bLocalOnly then
+
+			oLogging.ReportProgress "Processing rules.", 50
+
+
+			' Gather properties
+
+			iRetVal = GetProperties(sIniFile, sSectionSettings)
+
+
+			' Process rules
+
+			iRetVal = ProcessRules(sIniFile, sSectionSettings)
+			If iRetVal <> Success then
+				oLogging.CreateEntry "ERROR processing Ini settings.  No further processing.", LogTypeError
+				Main = iRetVal
+				EXIT FUNCTION
+			End if
+
+
+			' If an event service was specified ask for settings
+
+			If oEnvironment.Item("EventService") <> "" then
+				If oEnvironment.Item("LTIGUID") = "" then
+					oLogging.CreateEvent 41000, LogTypeInfo, "Identifying the client.", oLogging.GetDiscoveryArray
+				End if
+				QueryWebService ""
+			End if
+
+		Else
+
+			oLogging.CreateEntry "Skipping rules processing.", LogTypeInfo
+			iRetVal = Success
+
+		End if
+
+
+		'//----------------------------------------------------------------------------
+		'//  Verify OSDComputerName is set for ConfigMgr deployments
+		'//----------------------------------------------------------------------------
+
+		If oEnvironment.Item("DeploymentMethod") = "SCCM" and oEnvironment.Item("OSDComputerName") = "" Then
+			oEnvironment.Item("OSDComputerName") = oEnvironment.Item("_SMSTSMACHINENAME")
+		End If
+
+
+		'//----------------------------------------------------------------------------
+		'//  Remap variables
+		'//----------------------------------------------------------------------------
+
+		RemapVariables
+
+
+		' All done
+
+		oLogging.ReportProgress "Gathering complete.", 100
+
+		Main = Success
+
+
+	End Function
+
+
+	'//----------------------------------------------------------------------------
+	'//  Routines for getting information about the local machine
+	'//----------------------------------------------------------------------------
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetOSVersion()
+	'//  Purpose:	Determine what OS is being used
+	'//---------------------------------------------------------------------------
+	Function GetOSVersion
+
+		Dim iRetVal, sOSCurrentVersion, sOSCurrentBuild, sCurrentBuildNumber, sProductType, sOSVersion
+		Dim bIsServerOS, bIsServerCoreOS, oInstances, oInstance
+
+
+		oLogging.CreateEntry "Getting OS info", LogTypeInfo
+
+
+		' Initialization
+
+		iRetVal = Success
+		bIsServerOS = False
+		bIsServerCoreOS = False
+
+
+		' Make sure WMI is available
+
+		If objWMI is Nothing then
+			oLogging.CreateEntry "Unable to obtain OS details since WMI is unavailable.", LogTypeError
+			GetOSVersion = 8001
+			Exit Function
+		End if
+
+
+		' Get the current OS version and build from WMI
+
+		Set oInstances = objWMI.ExecQuery("select * from Win32_OperatingSystem")
+		For Each oInstance In oInstances
+			sOSCurrentVersion = oInstance.Version
+			sOSCurrentBuild = oInstance.BuildNumber
+		Next
+		oEnvironment.Item("OSCurrentVersion") = sOSCurrentVersion 
+		oEnvironment.Item("OSCurrentBuild") = sOSCurrentBuild
+
+
+		' For WinPE (which reports itself as "XP"), look for a registry key
+
+		If KeyExists("HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\MiniNT\") then
+			sOSVersion = "WinPE"
+		End if
+
+
+		' Check the version we are running
+
+		If sOSVersion = "WinPE" then
+			bIsServerOS = False
+			bIsServerCoreOS = False
+		Else
+
+			' Check for server core by seeing if Explorer.exe is missing
+
+			If not oFSO.FileExists(oEnv("WINDIR") & "\Explorer.exe") and sOSVersion <> "WinPE" then
+				bIsServerCoreOS = true
+			End if
+
+
+			' Get the current build number from the registry
+
+			sCurrentBuildNumber = oShell.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CurrentBuildNumber")
+
+
+			' Check the product type
+
+			sProductType = oShell.RegRead("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\ProductOptions\ProductType")
+			If Err then
+				oLogging.CreateEntry "WARNING - Unexpected error checking ProductType registry key: " & Err.Description & " (" & Err.Number & ")", LogTypeWarning
+			ElseIf sProductType = "ServerNT" or sProductType = "LanmanNT" then
+				bIsServerOS = True
+			End if
+			Err.Clear
+
+
+			Select Case sCurrentBuildNumber
+			Case "1381"
+				sOSVersion = "NT"
+			Case "2195"
+				sOSVersion = "2000"
+			Case "2600"
+				sOSVersion = "XP"
+			Case "3790"
+				sOSVersion = "2003"
+			Case Else
+				
+				oUtility.GetMajorMinorVersion(sOSCurrentVersion)
+				If oUtility.VersionMajor = 6 and oUtility.VersionMinor = 1  Then
+					If bIsServerOS then
+						sOSVersion = "2008R2"
+					Else
+						sOSVersion = "Win7Client"
+					End if
+				ElseIf oUtility.VersionMajor = 6 and oUtility.VersionMinor = 0  Then
+					If bIsServerOS then
+						sOSVersion = "2008"
+					Else
+						sOSVersion = "Vista"
+					End if
+				Else
+					oLogging.CreateEntry "Unknown operating system build number " & sCurrentBuildNumber & " found, setting OSVersion to 'Other'.", LogTypeInfo
+					sOSVersion = "Other"
+				End if
+			End Select
+
+		End if
+
+		oEnvironment.Item("OSVersion") = sOSVersion
+		oEnvironment.Item("IsServerOS") = oUtility.ConvertBooleanToString(bIsServerOS)
+		oEnvironment.Item("IsServerCoreOS") = oUtility.ConvertBooleanToString(bIsServerCoreOS)
+
+		oLogging.CreateEntry "Finished getting OS info", LogTypeInfo
+
+		GetOSVersion = iRetVal
+
+	End function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetAssetInfo()
+	'//  Purpose:	Get asset information using WMI
+	'//---------------------------------------------------------------------------
+	Function GetAssetInfo
+
+	 	Dim bIsLaptop, bIsDesktop, bIsServer, bOnBattery, bFoundBattery, bFoundAC
+		Dim sAssetTag, sSerialNumber, sMake, sModel, sProduct, sUUID, sMemory, sArchitecture, sProcessorSpeed, sCapableArchitecture
+
+		Dim objResults, objInstance
+		Dim i
+		Dim bisX64, bIsUEFI, bSupportsSLAT, bSupportsX64, bSupportsX86
+
+
+		oLogging.CreateEntry "Getting asset info", LogTypeInfo
+
+
+		' Get the SMBIOS asset tag from the Win32_SystemEnclosure class
+
+		Set objResults = objWMI.InstancesOf("Win32_SystemEnclosure")
+		bIsLaptop = false
+		bIsDesktop = false
+		bIsServer = false
+		For each objInstance in objResults
+
+			If objInstance.ChassisTypes(0) = 12 or objInstance.ChassisTypes(0) = 21 then
+				' Ignore docking stations
+			Else
+
+				If not IsNull(objInstance.SMBIOSAssetTag) then
+					sAssetTag = Trim(objInstance.SMBIOSAssetTag)
+				End if
+				Select Case objInstance.ChassisTypes(0)
+				Case "8", "9", "10", "11", "12", "14", "18", "21"
+					bIsLaptop = true
+				Case "3", "4", "5", "6", "7", "15", "16"
+					bIsDesktop = true
+				Case "23"
+					bIsServer = true
+				Case Else
+					' Do nothing
+				End Select
+
+			End if
+
+		Next
+		If sAssetTag = "" then
+			oLogging.CreateEntry "Unable to determine asset tag via WMI.", LogTypeInfo
+		End if
+
+
+		' Get the serial number from the Win32_BIOS class.
+
+		Set objResults = objWMI.InstancesOf("Win32_BIOS")
+		For each objInstance in objResults
+
+	                ' Get the serial number
+
+			If not IsNull(objInstance.SerialNumber) then
+				sSerialNumber = Trim(objInstance.SerialNumber)
+			End if
+
+		Next
+		If sSerialNumber = "" then
+			oLogging.CreateEntry "Unable to determine serial number via WMI.", LogTypeInfo
+		End if
+
+
+		' Figure out the architecture from the environment
+
+		If oEnv("PROCESSOR_ARCHITEW6432") <> "" then
+			If UCase(oEnv("PROCESSOR_ARCHITEW6432")) = "AMD64" then
+				sArchitecture = "X64"
+			Else
+				sArchitecture = UCase(oEnv("PROCESSOR_ARCHITEW6432"))
+			End if
+		ElseIf UCase(oEnv("PROCESSOR_ARCHITECTURE")) = "AMD64" then
+			sArchitecture = "X64"
+		Else
+			sArchitecture = UCase(oEnv("PROCESSOR_ARCHITECTURE"))
+		End if
+		
+		
+
+		' Get the processor speed from the Win32_Processor class.
+
+		bSupportsX86 = false
+		bSupportsX64 = false
+		bSupportsSLAT = false
+		Set objResults = objWMI.InstancesOf("Win32_Processor")
+		For each objInstance in objResults
+
+			' Get the processor speed
+
+			If not IsNull(objInstance.MaxClockSpeed) then
+				sProcessorSpeed = Trim(objInstance.MaxClockSpeed)
+			End if
+
+
+			' Determine if the machine supports SLAT (only supported with Windows 8)
+
+			On Error Resume Next
+			bSupportsSLAT = objInstance.SecondLevelAddressTranslationExtensions
+			On Error Goto 0
+			
+
+			' Get the capable architecture
+
+			If not IsNull(objInstance.Architecture) then
+				Select Case objInstance.Architecture
+				Case 0
+			
+					' If the processor is running a x86 OS, then there is *Still* the possibility that it can 
+					' support a x64 OS. We need to run a quick processor check to see if it supports x64.
+
+					bisX64 = FALSE
+					On Error Resume Next
+					bisX64 = oUtility.BDDUtility.Is64Bit
+					On Error Goto 0
+
+					If bisX64 = TRUE then
+						sCapableArchitecture = "AMD64 X64 X86"
+						bSupportsX86 = true
+						bSupportsX64 = true
+					Else
+						sCapableArchitecture = "X86"
+						bSupportsX86 = true
+					End if
+
+				Case 6
+					sCapableArchitecture = "IA64"
+				Case 9
+					sCapableArchitecture = "AMD64 X64 X86"
+					bSupportsX86 = true
+					bSupportsX64 = true
+				Case Else
+					SCapableArchitecture = "Unknown"
+				End Select
+			End if
+
+
+			' Stop after first processor since all should match
+
+			Exit For
+
+		Next
+		If sProcessorSpeed = "" then
+			oLogging.CreateEntry "Unable to determine processor speed via WMI.", LogTypeInfo
+		End if
+		If sCapableArchitecture = "" then
+			oLogging.CreateEntry "Unable to determine capable architecture via WMI.", LogTypeInfo
+		End if
+
+
+		' Get the make, model, and memory from the Win32_ComputerSystem class
+
+		Set objResults = objWMI.InstancesOf("Win32_ComputerSystem")
+		For each objInstance in objResults
+
+			If not IsNull(objInstance.Manufacturer) then
+				sMake = Trim(objInstance.Manufacturer)
+			End if
+			If not IsNull(objInstance.Model) then
+				sModel = Trim(objInstance.Model)
+			End if
+			If not IsNull(objInstance.TotalPhysicalMemory) then
+				sMemory = Trim(Int(objInstance.TotalPhysicalMemory / 1024 / 1024))
+			End if
+
+		Next
+		If sMake = "" then
+			oLogging.CreateEntry "Unable to determine make via WMI.", LogTypeInfo
+		End if
+		If sModel = "" then
+			oLogging.CreateEntry "Unable to determine model via WMI.", LogTypeInfo
+		End if
+
+
+		' Get the UUID from the Win32_ComputerSystemProduct class
+
+		Set objResults = objWMI.InstancesOf("Win32_ComputerSystemProduct")
+		For each objInstance in objResults
+
+			If not IsNull(objInstance.UUID) then
+				sUUID = Trim(objInstance.UUID)
+			End if
+
+		Next
+		If sUUID = "" then
+			oLogging.CreateEntry "Unable to determine UUID via WMI.", LogTypeInfo
+		End if
+
+
+		' Get the product from the Win32_BaseBoard class
+
+		Set objResults = objWMI.InstancesOf("Win32_BaseBoard")
+		For each objInstance in objResults
+
+			If not IsNull(objInstance.Product) then
+				sProduct = Trim(objInstance.Product)
+			End if
+
+		Next
+		If sProduct = "" then
+			oLogging.CreateEntry "Unable to determine product via WMI.", LogTypeInfo
+		End if
+
+
+		' Determine if we are running UEFI
+
+		bIsUEFI = FALSE
+		On Error Resume Next
+		bIsUEFI = oUtility.BDDUtility.IsUEFI
+		On Error Goto 0
+
+
+		' See if we are running on battery
+
+		If oEnv("SystemDrive") = "X:" and oFSO.FileExists("X:\Windows\Inf\Battery.inf") then
+			
+			' Load the battery driver
+
+			oShell.Run "drvload X:\Windows\Inf\Battery.inf", 0, true
+			
+		End if
+
+		bFoundAC = False
+		bFoundBattery = False
+		Set objResults = objWMI.InstancesOf("Win32_Battery")
+		For each objInstance in objResults
+			bFoundBattery = True
+			If objInstance.BatteryStatus = 2 then
+				bFoundAC = True
+			End if 
+		Next
+		If bFoundBattery and (not bFoundAC) then
+			bOnBattery = True
+		Else
+			bOnBattery = False
+		End if
+
+		oEnvironment.Item("AssetTag") = sAssetTag
+		oEnvironment.Item("SerialNumber") = sSerialNumber
+		oEnvironment.Item("Make") = sMake
+		oEnvironment.Item("Model") = sModel
+		oEnvironment.Item("Product") = sProduct
+		oEnvironment.Item("UUID") = sUUID
+		oEnvironment.Item("Memory") = sMemory
+		oEnvironment.Item("Architecture") = sArchitecture
+		oEnvironment.Item("ProcessorSpeed") = sProcessorSpeed
+		oEnvironment.Item("CapableArchitecture") = sCapableArchitecture
+		oEnvironment.Item("IsLaptop") = oUtility.ConvertBooleanToString(bIsLaptop)
+		oEnvironment.Item("IsDesktop") = oUtility.ConvertBooleanToString(bIsDesktop)
+		oEnvironment.Item("IsServer") = oUtility.ConvertBooleanToString(bIsServer)
+		oEnvironment.Item("IsUEFI") = oUtility.ConvertBooleanToString(bIsUEFI)
+		oEnvironment.Item("IsOnBattery") = oUtility.ConvertBooleanToString(bOnBattery)
+		oEnvironment.Item("SupportsX86") = oUtility.ConvertBooleanToString(bSupportsX86)
+		oEnvironment.Item("SupportsX64") = oUtility.ConvertBooleanToString(bSupportsX64)
+		If bSupportsSLAT or oEnvironment.Item("SupportsSLAT") = "" then
+			oEnvironment.Item("SupportsSLAT") = oUtility.ConvertBooleanToString(bSupportsSLAT)
+		Else
+			oLogging.CreateEntry "Property SupportsSLAT = " & oEnvironment.Item("SupportsSLAT"), LogTypeInfo
+		End if
+
+		oLogging.CreateEntry "Finished getting asset info", LogTypeInfo
+
+		GetAssetInfo = Success
+
+	End Function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetOSSKU()
+	'//  Purpose:	Get OS SKU details using WMI
+	'//---------------------------------------------------------------------------
+	Function GetOSSKU ()
+		Dim oInstance, oInstances,sOSVersion,sOperatingSystemSKU,sOSProductSuite,sSKU
+
+
+		oLogging.CreateEntry "Getting OS SKU info", LogTypeInfo
+
+
+		' If in Windows PE then just exit
+
+		If oEnvironment.Item("OSVERSION") = "WinPE" Then
+			oLogging.CreateEntry "Unable to determine Windows SKU while in Windows PE.", LogTypeInfo
+			exit function
+		End If
+
+		If not (objWMI is Nothing) then
+
+			Set oInstances = objWMI.ExecQuery("select * from Win32_OperatingSystem")
+			For Each oInstance In oInstances
+				sOSVersion = oInstance.Version				
+				oUtility.GetMajorMinorVersion(sOSVersion)
+				If(oUtility.VersionMajor >= 6 ) Then
+					sOperatingSystemSKU = oInstance.OperatingSystemSKU
+				ElseIf oUtility.VersionMajor < 6  Then				
+					sOSProductSuite = ""
+					on error resume next
+					sOSProductSuite = Cint(oInstance.OSProductSuite)
+					on error goto 0
+				Else
+					sOperatingSystemSKU = oInstance.OperatingSystemSKU
+				End If 
+			Next	
+		Else
+			oLogging.CreateEntry "Unable to obtain OS details since WMI is unavailable.", LogTypeInfo
+		End if
+
+		If sOperatingSystemSKU <> "" Then
+
+			Select Case sOperatingSystemSKU
+			
+			Case "1"
+				sSKU = "ULTIMATE"
+			Case "2"
+				sSKU = "HOMEBASIC"
+			Case "3"
+				sSKU = "HOMEBASICPREMIUM"
+			Case "4"
+				sSKU = "ENTERPRISE"
+			Case "5"
+				sSKU = "HOMEBASICN"
+			Case "6"
+				sSKU = "BUSINESS"
+			Case "7"
+				sSKU = "SERVERSTANDARD"
+			Case "8"
+				sSKU = "SERVERDATACENTER"
+			Case "9"
+				sSKU = "SERVERSMALLBUSINESS"
+			Case "10"
+				sSKU = "SERVERENTERPRISE"
+			Case "11"
+				sSKU = "STARTER"
+			Case "12"
+				sSKU = "SERVERDATACENTERCORE"
+			Case "13"
+				sSKU = "SERVERSTANDARDCORE"
+			Case "14"
+				sSKU = "SERVERENTERPRISECORE"
+			Case "15"
+				sSKU = "SERVERENTERPRISEITANIUM"
+			Case "16"
+				sSKU = "BUSINESSN"
+			Case "17"
+				sSKU = "SERVERWEB"
+			Case "18"
+				sSKU = "SERVERCLUSTER"
+			Case "19"
+				sSKU = "SERVERHOME"
+			Case "20"
+				sSKU = "SERVERSTORAGEEXPRESS"
+			Case "21"
+				sSKU = "SERVERSTORAGESTANDARD"
+			Case "22"
+				sSKU = "SERVERSTORAGEWORKGROUP"
+			Case "23"
+				sSKU = "SERVERSTORAGEENTERPRISE"
+			Case "24"
+				sSKU = "SERVERFORSMALLBUSINESS"
+			Case "25"
+				sSKU = "SERVERSMALLBUSINESSPREMIUM"
+			Case "26"
+				sSKU = "HOMEPREMIUMN"
+			Case "27"
+				sSKU = "ENTERPRISEN"
+			Case "28"
+				sSKU = "ULTIMATEN"
+			Case "29"
+				sSKU = "SERVERWEBCORE"
+			Case "30"
+				sSKU = "MEDIUMBUSINESSSERVERMANAGEMENT"
+			Case "31"
+				sSKU = "MEDIUMBUSINESSSERVERSECURITY"
+			Case "32"
+				sSKU = "MEDIUMBUSINESSSERVERMESSAGING"
+			Case "33"
+				sSKU = "SERVERFOUNDATION"
+			Case "34"
+				sSKU = "SERVERHOMEPREMIUM"
+			Case "35"
+				sSKU = "SERVERFORSMALLBUSINESSV"
+			Case "36"
+				sSKU = "STANDARDSERVERV"
+			Case "37"
+				sSKU = "DATACENTERSERVERV"
+			Case "38"
+				sSKU = "ENTERPRISESERVERV"
+			Case "39"
+				sSKU = "DATACENTERSERVERCOREV"
+			Case "40"
+				sSKU = "STANDARDSERVERCOREV"
+			Case "41"
+				sSKU = "ENTERPRISESERVERCOREV"
+			Case "42"
+				sSKU = "HYPERV"
+			Case "43"
+				sSKU = "SERVERSTORAGEEXPRESSCORE"
+			Case "44"
+				sSKU = "SERVERSTORAGESTANDARDCORE"
+			Case "45"
+				sSKU = "SERVERSTORAGEWORKGROUPCORE"
+			Case "46"
+				sSKU = "SERVERSTORAGEENTERPRISECORE"
+			Case "47"
+				sSKU = "STARTERN"
+			Case "48"
+				sSKU = "PROFESSIONAL"
+			Case "49"
+				sSKU = "PROFESSIONALN"
+			Case "50"
+				sSKU = "SERVERSBSOLUTION"
+			Case "51"
+				sSKU = "SERVERFORSBSOLUTIONS"
+			Case "52"
+				sSKU = "STANDARDSERVERSOLUTIONS"
+			Case "53"
+				sSKU = "STANDARDSERVERSOLUTIONSCORE"
+			Case "54"
+				sSKU = "SBSOLUTIONSERVEREM"
+			Case "55"
+				sSKU = "SERVERFORSBSOLUTIONSEM"
+			Case "56"
+				sSKU = "SERVERSOLUTIONEMBEDDED"
+			Case "57"
+				sSKU = "SERVERSOLUTIONEMBEDDEDCORE"
+			Case "59"
+				sSKU = "ESSENTIALBUSINESSSERVERMGMT"
+			Case "60"
+				sSKU = "ESSENTIALBUSINESSSERVERADDL"
+			Case "61"
+				sSKU = "ESSENTIALBUSINESSSERVERMGMTSVC"
+			Case "62"
+				sSKU = "ESSENTIALBUSINESSSERVERADDLSVC"
+			Case "63"
+				sSKU = "SMALLBUSINESSSERVERPREMIUMCORE"
+			Case "64"
+				sSKU = "CLUSTERSERVERV"
+			Case "65"
+				sSKU = "EMBEDDED"
+			Case "66"
+				sSKU = "STARTERE"
+			Case "67"
+				sSKU = "HOMEBASICE"
+			Case "68"
+				sSKU = "HOMEPREMIUME"
+			Case "69"
+				sSKU = "PROFESSIONALE"
+			Case "70"
+				sSKU = "ENTERPRISEE"
+			Case "71"
+				sSKU = "ULTIMATEE"
+			Case "74"
+				sSKU = "PRERELEASE"
+			Case "78"
+				sSKU = "ENTERPRISEEVAL"
+			Case "121"
+				sSKU = "EDUCATION"
+			Case "122"
+				sSKU = "EDUCATIONN"
+			Case "125"
+				sSKU = "ENTERPRISES"
+			Case "126"
+				sSKU = "ENTERPRISESN"
+			Case "129"
+				sSKU = "ENTERPRISESEVAL"
+			Case else
+				oLogging.CreateEntry "Unknown OS SKU = " & sOperatingSystemSKU, LogTypeInfo
+			End Select
+		End If
+	
+		If sOSProductSuite <> "" Then
+
+			If sOSProductSuite AND 1 Then
+				sSKU = "SERVERSMALLBUSINESS"
+			ElseIF sOSProductSuite AND 2 Then
+				sSKU = "SERVERENTERPRISE"
+			ElseIF sOSProductSuite AND 4 Then
+				sSKU = "SERVERBACKOFFICE"
+			ElseIF sOSProductSuite AND 8 Then
+				sSKU = "SERVERCOMMUNICATIONSERVER"
+			ElseIF sOSProductSuite AND 32 Then
+				sSKU = "SERVERSMALLBUSINESS"
+			ElseIF sOSProductSuite AND 64 Then
+				sSKU = "EMBEDDED"
+			ElseIF sOSProductSuite AND 128 Then
+				sSKU = "SERVERDATACENTER"
+			ElseIF sOSProductSuite AND 512 Then
+				sSKU = "HOME"
+			ElseIF sOSProductSuite AND 1024 Then
+				sSKU = "SERVERWEB"
+			ElseIF sOSProductSuite AND 8192 Then
+				sSKU = "SERVERSTORAGESTANDARD"
+			ElseIF sOSProductSuite AND 16384 Then
+				sSKU = "SERVERCLUSTER"
+			Else
+				If oEnvironment.Item("IsServerOS") Then
+					sSKU = "SERVERSTANDARD"
+				Else
+					sSKU = "PROFESSIONAL"
+				End if
+			End IF
+
+		End If
+
+		oEnvironment.Item("OSSKU") = sSKU
+
+		oLogging.CreateEntry "Finished getting OS info", LogTypeInfo
+				
+		GetOSSKU = Success
+
+	End Function
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetCurrentOSInfo()
+	'//  Purpose:	Get Original OS  details using WMI
+	'//  Figure out the Original architecture of the environment, this is needed if you upgrade
+	'//  from X86 to X64 to ensure the correct drivers is added/ deleted when ZTIDrivers run
+	'//---------------------------------------------------------------------------
+	Function GetCurrentOSInfo
+		Dim oAssocs
+		Dim Assoc
+
+		oLogging.CreateEntry "Determining the Disk and Partition Number from the Logical Drive " & oEnv("WinDir"), logTypeInfo
+
+		If oEnvironment.Item("OriginalArchitecture") = "" and oEnvironment.Item("OSVersion") <> "WinPE"  Then
+			On Error Resume Next
+			oEnvironment.Item("OriginalArchitecture") = oEnvironment.Item("Architecture")
+
+			oUtility.SetTagForDrive oEnv("SystemDrive"), "OriginalPartitionIdentifier"
+
+			If oEnvironment.Item("OriginalWindir") = "" then
+				oEnvironment.Item("OriginalWindir") = oEnv("WinDir")
+				oLogging.CreateEntry "Note: OriginalWindir May change in the new OS, use OriginalDiskIndex and OriginalDiskPartition to determine real drive", logTypeInfo
+			End if
+		ElseIf oEnvironment.Item("OriginalArchitecture") = "" and oEnvironment.Item("OSVersion") = "WinPE" Then
+			For each oDrive in oFSO.Drives
+				If oDrive.DriveType = 2 then
+					If oDrive.IsReady Then
+						If oFSO.FolderExists(oDrive.DriveLetter & ":\Program Files (x86)") and oDrive.DriveLetter<>"X" then
+
+							oEnvironment.Item("OriginalArchitecture") = "X64"
+							Exit For
+						Else
+							If oFSO.FolderExists(oDrive.DriveLetter & ":\Program Files") and oDrive.DriveLetter<>"X" then
+								oEnvironment.Item("OriginalArchitecture") = "X86"
+								Exit For
+							Else
+								oEnvironment.Item("OriginalArchitecture") = ""
+							End If
+	
+						End if
+					End If
+				End if
+			Next
+
+			
+		End if
+
+		GetCurrentOSInfo = SUCCESS
+	End function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetNetworkInfo()
+	'//  Purpose:	Get network details using WMI
+	'//---------------------------------------------------------------------------
+	Function GetNetworkInfo
+
+		Dim iRetVal, objNetworkAdapters, objAdapter, sElement, sTmp1, arrTmp
+		Dim dicIPAddresses, dicMacAddresses, dicDefaultGateways
+
+
+		oLogging.CreateEntry "Getting network info", LogTypeInfo
+
+
+		' Initialization
+
+		Set dicIPAddresses = CreateObject("Scripting.Dictionary")
+		Set dicMacAddresses = CreateObject("Scripting.Dictionary")
+		Set dicDefaultGateways = CreateObject("Scripting.Dictionary")
+
+		iRetVal = Success
+
+
+		' Get a list of IP-enabled adapters
+
+		Set objNetworkAdapters = objWMI.ExecQuery("select * from Win32_NetworkAdapterConfiguration where IPEnabled = 1")
+
+		For Each objAdapter In objNetworkAdapters
+
+			oLogging.CreateEntry "Checking network adapter: " & objAdapter.Caption, LogTypeInfo
+
+			' Get the MAC address
+
+			If not dicMacAddresses.Exists(objAdapter.MacAddress) then
+				dicMacAddresses.Add objAdapter.MacAddress, ""
+			End if
+			oLogging.CreateEntry "MAC address = " & objAdapter.MacAddress, LogTypeInfo
+
+			' Get the IP addresses
+
+			If not (IsNull(objAdapter.IPAddress)) then
+				For each sElement in objAdapter.IPAddress
+					If sElement = "0.0.0.0" or Left(sElement, 7) = "169.254" or sElement = "" then
+						oLogging.CreateEntry "Ignoring IP Address " & sElement, LogTypeInfo
+					Else
+						If not dicIPAddresses.Exists(sElement) then
+							dicIPAddresses.Add sElement, ""
+						End if
+						oLogging.CreateEntry "IP Address = " & sElement, LogTypeInfo
+					End if
+				Next
+			End if
+
+			' Get the default gateway values
+
+			If not (IsNull(objAdapter.DefaultIPGateway)) then
+				For each sElement in objAdapter.DefaultIPGateway
+					If sElement <> "" then
+						If not dicDefaultGateways.Exists(sElement) then
+							dicDefaultGateways.Add sElement, ""
+						End if
+						oLogging.CreateEntry "Default Gateway = " & sElement, LogTypeInfo
+					End if
+				Next
+			End if
+
+		Next  
+
+		oEnvironment.ListItem("IPAddress") = dicIPAddresses
+		oEnvironment.ListItem("MacAddress") = dicMacAddresses
+		oEnvironment.ListItem("DefaultGateway") = dicDefaultGateways
+
+		GetNetworkInfo = iRetVal
+		oLogging.CreateEntry "Finished getting network info", LogTypeInfo
+
+	End Function
+
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetHAL
+	'//  Purpose:	Get HAL details using WMI
+	'//---------------------------------------------------------------------------
+	Function GetHAL
+
+		Dim sHALName, sQueryString, objEntity, objEntities, oHAL
+		Dim i
+
+
+		oLogging.CreateEntry "Getting HAL information", LogTypeInfo
+
+
+		' First try to get the HAL name from WMI
+
+		sQueryString = "SELECT * FROM Win32_PnPEntity WHERE ClassGUID = '{4D36E966-E325-11CE-BFC1-08002BE10318}' or DeviceID LIKE 'ROOT\\%HAL%' "
+
+		On Error Resume Next
+		Set objEntities = objWMI.ExecQuery( sQueryString )
+		If Err then
+			oLogging.CreateEntry "Unable to retrieve HAL via WMI: " & Err.Description & " (" & Err.Number & ")", LogTypeInfo
+		Else
+
+			For each objEntity in objEntities
+
+				On Error Resume Next
+				oHAL = oShell.RegRead( "HKLM\SYSTEM\CurrentControlSet\Enum\" & objEntity.DeviceID & "\HardwareID" )      
+				On error goto 0
+
+				sHALName = oHAL
+				If IsArray(oHAL) then 
+					sHALName = oHAL(0) 
+				End if
+
+				Exit for 
+
+			Next
+
+		End if
+		On Error Goto 0
+
+
+		' If the HAL name is still blank, try to get it from the registry
+
+		If sHALName = "" then
+
+			For i = 0 to 9999
+				On Error Resume Next
+				sHALName = oShell.RegRead("HKLM\System\CurrentControlSet\Control\Class\{4D36E966-E325-11CE-BFC1-08002BE10318}\" & Right("000" & CStr(i), 4) & "\MatchingDeviceID")
+				If Err then
+					Exit For  ' Found the last one
+				End if
+				On Error Goto 0
+			Next
+		End if
+
+		oEnvironment.Item("HALName") = sHALName
+
+		oLogging.CreateEntry "Finished getting HAL information", LogTypeInfo
+
+	End Function
+
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetDP
+	'//  Purpose:	Get the name of the distribution share being used
+	'//---------------------------------------------------------------------------
+	Function GetDP
+
+		Dim sSMSDP
+
+
+		oLogging.CreateEntry "Getting DP info", LogTypeInfo
+
+
+		' If OSD, get the DP server
+
+		sSMSDP = ""
+		If oEnvironment.Item("_SMSTSBootImageID") <> "" and oEnvironment.Item("_SMSTSMediaType")<> "FullMedia" then
+			Dim arrSMSDP,aSMSDP
+
+			' Get the first path from the comma-delimited list
+
+			arrSMSDP = Split(oEnvironment.Item("_SMSTS" & oEnvironment.Item("_SMSTSBootImageID")),",")
+			For Each aSMSDP in arrSMSDP
+				If Instr(aSMSDP,"SMSPXEIMAGES$") = 0 Then
+					sSMSDP = aSMSDP
+					Exit For
+				End If
+			Next
+
+
+			' Figure out if it is a UNC or a URL, and extract the server name as appropriate
+
+			If Left(sSMSDP, 2) = "\\" then
+				sSMSDP = Mid(sSMSDP, 3)
+				sSMSDP = Left(sSMSDP, InStr(sSMSDP,"\")-1)
+			ElseIf Left(sSMSDP, 7) = "http://" then
+				sSMSDP = Mid(sSMSDP, 8)
+				sSMSDP = Left(sSMSDP, InStr(sSMSDP,"/")-1)
+			ElseIf Left(sSMSDP, 8) = "https://" then
+				sSMSDP = Mid(sSMSDP, 9)
+				sSMSDP = Left(sSMSDP, InStr(sSMSDP,"/")-1)
+			End If
+		End if
+		If sSMSDP = "" and Left(oUtility.ScriptDir,2) = "\\" then
+
+			' Assume we are running from a DP (maybe not always accurate, e.g. NewComputer phase)
+
+			sSMSDP = Mid(oUtility.ScriptDir,3)
+			sSMSDP = Left(sSMSDP, InStr(sSMSDP,"\")-1)
+
+		End if
+
+		If sSMSDP = "" then
+			oLogging.CreateEntry "Unable to determine ConfigMgr distribution point", LogTypeInfo
+		Else
+			oLogging.CreateEntry "ConfigMgr distribution point = " & sSMSDP, LogTypeInfo
+			oEnvironment.Item("SMSDP") = sSMSDP
+		End if
+
+		oLogging.CreateEntry "Finished getting DP info", LogTypeInfo
+	
+	End function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetWDS
+	'//  Purpose:	Get the name of the WDS server we may have booted from
+	'//---------------------------------------------------------------------------
+	Function GetWDS
+
+		Dim sCmd, sWDSServer
+
+
+		oLogging.CreateEntry "Getting WDS server info", LogTypeInfo
+
+
+		' See if we can discover the WDS server name that we may have booted from
+
+		If oEnvironment.Item("OSVersion") = "WinPE" then
+			On Error Resume Next
+			sCmd = "wpeutil.exe UpdateBootInfo"
+			oShell.Run sCmd, 0, true
+			On Error Goto 0	
+		End if
+
+		sWDSServer = ""
+		On Error Resume Next
+		sWDSServer = oShell.RegRead("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PEBootServerName")
+		If Err then
+			oLogging.CreateEntry "Unable to determine WDS server name, probably not booted from WDS.", LogTypeInfo
+		Else
+			oEnvironment.Item("WDSServer") = sWDSServer
+		End if
+		On Error Goto 0
+
+		oLogging.CreateEntry "Finished getting WDS server info", LogTypeInfo
+
+	End function
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetVirtualizationInfo()
+	'//  Purpose:	Get virtualization details
+	'//---------------------------------------------------------------------------
+	Function GetVirtualizationInfo
+
+		Dim oInstance, oInstances
+		Dim sVersionString
+		Dim bIsVM, sVMPlatform
+		Dim sVMHost, sVMName
+
+		oLogging.CreateEntry "Getting virtualization info", LogTypeInfo
+
+
+		' Set variables based on the capabilities of the hardware
+
+		oEnvironment.Item("IsHypervisorRunning") = oUtility.ConvertBooleanToString(oUtility.BDDUtility.IsHypervisorRunning)
+		oEnvironment.Item("SupportsVT") = oUtility.ConvertBooleanToString(oUtility.BDDUtility.SupportsVT)
+		oEnvironment.Item("SupportsNX") = oUtility.ConvertBooleanToString(oUtility.BDDUtility.SupportsNX)
+		oEnvironment.Item("Supports64Bit") = oUtility.ConvertBooleanToString(oUtility.BDDUtility.Supports64Bit)
+		If oUtility.BDDUtility.SupportsVT and oUtility.BDDUtility.SupportsNX and oUtility.BDDUtility.Supports64Bit then
+			oEnvironment.Item("SupportsHyperVRole") = "True"
+		Else
+			oEnvironment.Item("SupportsHyperVRole") = "False"
+		End if
+
+
+		' Determine what virtual machine environment this might be.  Get the BIOS version information
+
+		Set oInstances = objWMI.ExecQuery("Select * from Win32_BIOS")
+		For each oInstance in oInstances
+			sVersionString = oInstance.Version
+		Next
+
+
+		' Check the BIOS version information against known values
+
+		bIsVM = false
+		sVMPlatform = ""
+
+		If oEnvironment.Item("Model") = "Virtual Machine" then
+
+			' Microsoft virtualization technology detected, assign defaults
+
+			sVMPlatform = "Hyper-V"
+			bIsVM = true
+
+
+			' Try to determine more specific values
+
+			Select Case sVersionString
+			Case "VRTUAL - 1000831"
+				bIsVM = true
+				sVMPlatform = "Hyper-V Beta or RC0"
+			Case "VRTUAL - 5000805", "BIOS Date: 05/05/08 20:35:56  Ver: 08.00.02"
+				bIsVM = true
+				sVMPlatform = "Hyper-V"
+			Case "A M I  - 2000622"
+				bIsVM = true
+				sVMPlatform = "VS2005R2SP1 or VPC2007"
+			Case "A M I  - 9000520"
+				bIsVM = true
+				sVMPlatform = "VS2005R2"
+			Case "A M I  - 9000816", "A M I  - 6000901"
+				bIsVM = true
+				sVMPlatform = "Windows Virtual PC"
+			Case "A M I  - 8000314"
+				bIsVM = true
+				sVMPlatform = "VS2005 or VPC2004"
+			End Select
+
+
+			' Try to get the VM host from the integration components
+
+			sVMHost = ""
+			On Error Resume Next
+			sVMHost = oShell.RegRead("HKEY_LOCAL_MACHINE\Software\Microsoft\Virtual Machine\Guest\Parameters\PhysicalHostNameFullyQualified")
+			If Err then
+				oLogging.CreateEntry "The VM physical host name was not found.", LogTypeVerbose
+			Else
+				oEnvironment.Item("VMHost") = sVMHost
+			End if
+			On Error Goto 0
+
+
+			' Try to get the VM namefrom the integration components
+
+			sVMName = ""
+			On Error Resume Next
+			sVMName = oShell.RegRead("HKEY_LOCAL_MACHINE\Software\Microsoft\Virtual Machine\Guest\Parameters\VirtualMachineName")
+			If Err then
+				oLogging.CreateEntry "The VM name was not found.", LogTypeVerbose
+			Else
+				oEnvironment.Item("VMName") = sVMName
+			End if
+			On Error Goto 0
+
+		ElseIf oEnvironment.Item("Model") = "VMware Virtual Platform" then
+
+			' VMware detected
+
+			sVMPlatform = "VMware"
+			bIsVM = true
+
+		ElseIf oEnvironment.Item("Model")  = "VirtualBox" then
+
+			' VirtualBox detected
+
+			bIsVM = true
+			sVMPlatform = "VirtualBox"
+
+		ElseIf oEnvironment.Item("Make")  = "Xen" then
+
+			' Xen server detected
+
+			bIsVM = true
+			sVMPlatform = "Xen"
+
+		Else 
+			oLogging.CreateEntry "This computer does not appear to be a virtual machine (BIOS is '" & sVersionString & "').", LogTypeInfo
+		End if
+
+
+		' Set the appropriate variables
+
+		oEnvironment.Item("IsVM") = oUtility.ConvertBooleanToString(bIsVM)
+		If sVMPlatform <> "" then
+			oEnvironment.Item("VMPlatform") = sVMPlatform
+		End if
+
+		oLogging.CreateEntry "Finished getting virtualization info", LogTypeInfo
+
+	End function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetBitLockerInfo()
+	'//  Purpose:	Get BitLocker details
+	'//---------------------------------------------------------------------------
+	Function GetBitLockerInfo
+
+		Dim bIsBDE, objWMIBDE, colEnVol, objVol
+		Dim iStatus, iPercent
+
+		bIsBDE = False
+		
+		oUtility.GetMajorMinorVersion(oEnvironment.Item("OSCurrentVersion"))		
+		If oUtility.BuildNumber >= 6000 then
+
+			' Connect to the Bitlocker WMI object
+
+			On Error Resume Next
+			Set objWMIBDE = GetObject("winmgmts:{impersonationLevel=impersonate,authenticationLevel=pktPrivacy}!root\cimv2\Security\MicrosoftVolumeEncryption" )
+			If Err then 
+				oLogging.CreateEntry "MicrosoftVolumeEncryption namespace does not exist.  BitLocker is not installed", LogTypeInfo
+			Else 
+				oLogging.CreateEntry "Connection succeeded to MicrosoftVolumeEncryption", LogTypeInfo
+
+				On Error Goto 0
+				Err.Clear
+
+
+				' Get the encryptable volumes.  Check the conversion status on each
+
+				Set colEnVol = objWMIBDE.ExecQuery("Select * from Win32_EncryptableVolume")
+				For each objVol in colEnVol
+					objVol.GetConversionStatus iStatus, iPercent
+					If iStatus <> 0 then
+						If IsNull(objVol.DriveLetter) then
+							oLogging.CreateEntry "Encrypted drive found: " & objVol.DeviceID & ", status = " & iStatus, LogTypeInfo
+						Else
+							oLogging.CreateEntry "Encrypted drive found: " & objVol.DriveLetter & ", status = " & iStatus, LogTypeInfo
+						End if
+						bIsBde = true
+					End if
+				Next
+				If not bIsBde then
+					oLogging.CreateEntry "There are no encrypted drives", LogTypeInfo
+				End if
+
+			End if
+		End if
+
+
+		' Set the IsBDE variable
+
+		oEnvironment.Item("IsBDE") = oUtility.ConvertBooleanToString(bIsBDE)
+
+	End function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetHostName
+	'//  Purpose:	Record the current computer name
+	'//---------------------------------------------------------------------------
+	Function GetHostName
+
+		' Get machine name
+
+		oEnvironment.Item("HostName") = oNetwork.ComputerName
+
+	End function
+
+
+	'//----------------------------------------------------------------------------
+	'//  Rule processing routines
+	'//----------------------------------------------------------------------------
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	ProcessRules()
+	'//  Purpose:	Get all settings that apply to the current workstation
+	'//---------------------------------------------------------------------------
+	Function ProcessRules(sIniFile, sSectionSettings)
+
+		Dim sRulePriority, arrRules
+		Dim sElement, sNewSection, sRule
+		Dim iRuleCount, iTotalRules
+
+
+		' Determine the rule priority
+
+		sRulePriority = oUtility.ReadIni(sIniFile, sSectionSettings, "Priority")
+		If Len(sRulePriority) = 0 then
+			oLogging.CreateEntry "ERROR - rule Priority key not set in section [" & sSectionSettings & "]", LogTypeError
+			ProcessRules = Failure
+			Exit Function
+		End if
+
+		sRulePriority = UCase(sRulePriority)
+		oLogging.CreateEntry "Using from [" & sSectionSettings & "]: Rule Priority = " & sRulePriority, LogTypeInfo
+		arrRules = split(sRulePriority, ",", -1, 1) 
+
+
+		' Process each search until all the required values are found
+
+		iTotalRules = UBound(arrRules) + 1
+		For each sRule in arrRules
+
+			sRule = UCase(trim(sRule))
+
+			iRuleCount = iRuleCount + 1
+			oLogging.ReportProgress "Processing rule: " & sRule, 50 + CInt(iRuleCount * 40.0 / iTotalRules)
+
+			If sRule = "DEFAULTGATEWAY" then
+
+				oLogging.CreateEntry "------ Processing the [" & sRule & "] section ------", LogTypeInfo
+
+				' Check each default gateway value to see if a match can be found
+				For each sElement in oEnvironment.ListItem(sRule)
+
+					sNewSection = oUtility.ReadIni(sIniFile, sSectionDefaultGateway, sElement)
+					If sNewSection = "" then
+						oLogging.CreateEntry "No match found for default gateway " & sElement & ".", LogTypeInfo
+					Else
+						oLogging.CreateEntry "Match found for default gateway " & sElement & ", retrieving settings.", LogTypeInfo
+						iRetVal = GetIniGenericSettings(sIniFile, sNewSection)
+						If iRetVal <> Success then
+							oLogging.CreateEntry "ERROR trying to obtain ini settings for default gateway section " & sElement & ".", LogTypeError
+							WScript.Quit iRetVal
+						End if
+					End if
+
+				Next
+
+			ElseIf dicLists.Exists(sRule) or oEnvironment.ListItem(sRule).Count > 0 then 
+
+				For each sElement in oEnvironment.ListItem(sRule)
+
+					iRetVal = GetIniGenericSettings(sIniFile, sElement)
+					If iRetVal <> Success then
+						oLogging.CreateEntry "ERROR trying to obtain ini settings.  No further processing.", LogTypeError
+						WScript.Quit iRetVal
+					End if
+
+				Next
+
+			ElseIf oEnvironment.Item(sRule) <> "" then
+
+				iRetVal = GetIniGenericSettings(sIniFile, CStr(oEnvironment.Item(sRule)))
+				If iRetVal <> Success then
+					oLogging.CreateEntry "ERROR trying to obtain ini settings.  No further processing.", LogTypeError
+					WScript.Quit iRetVal
+				End if
+
+
+			Else
+
+				iRetVal = GetIniGenericSettings(sIniFile, sRule)
+				If iRetVal <> Success then
+					oLogging.CreateEntry "ERROR trying to obtain ini settings.  No further processing.", LogTypeError
+					WScript.Quit iRetVal
+				End if
+
+			End if
+
+		Next
+
+		oLogging.CreateEntry "------ Done processing " & sIniFile & " ------", LogTypeInfo
+
+	End Function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetProperties()
+	'//  Purpose:	Get property names from rules INI file and gather XML file
+	'//---------------------------------------------------------------------------
+	Function GetProperties(sIniFile, sSectionSettings)
+
+		Dim iRetVal
+
+		Dim sGatherXML, oGatherXML, iRc
+		Dim oNode, sElement, sType, sOverwrite
+
+		Dim bOEM, sSection
+		Dim oEntries, sEntry
+		Dim dicTmp, i
+		Dim arrTmp
+		Dim sProperty, oTmp, sTmp
+
+
+		iRetVal = Success
+
+
+		' Check to see if this is an OEM scenario
+
+		If oFSO.FileExists(Left(oUtility.LogPath,1) & ":\MININT\OEM.VBS") then
+			bOEM = true
+			oEnvironment.Item("ZTISettings") = ""
+		End if
+
+
+		' Read the XML file for a list of properties
+
+		iRc = oUtility.FindFile("ZTIGather.xml", sGatherXML)
+		If iRc <> Success then
+			oLogging.CreateEntry "Unable to locate ZTIGather.xml, skipping", LogTypeInfo
+		Else
+
+			Set oGatherXML = oUtility.GetMSXMLDOMDocument
+			oGatherXML.load sGatherXML
+
+
+			' Process each node
+
+			For each oNode in oGatherXML.documentElement.selectNodes("property")
+
+				sElement = UCase(oNode.getAttribute("id"))
+				sType = UCase(oNode.getAttribute("type"))
+				sOverwrite = UCase(oNode.getAttribute("overwrite"))
+
+				If not dicProperties.Exists(sElement) then
+					dicProperties.Add sElement, ""
+				End if
+
+				If sType = "LIST" then
+					If not dicLists.Exists(sElement) then
+						dicLists.Add sElement, ""
+					End if
+				End if
+
+				If sOverwrite = "TRUE" then
+					If not dicOverwrite.Exists(sElement) then
+						dicOverwrite.Add sElement, ""
+					End if
+				End if
+
+			Next
+
+		End if
+
+
+		' Read the INI file for a list of properties
+
+		If oFSO.FileExists(sIniFile) then
+
+			Set oEntries = oUtility.SectionContents(sIniFile, sSectionSettings)
+			For each sEntry in oEntries.Keys
+
+				Select Case sEntry
+				Case "CustomKeysUserData", "CustomKeysSysprep", "OSDVariableKeys", "Properties"
+
+					' Place each into the dictionary object (with its value, if available)
+
+					arrTmp = split(oEntries(sEntry), ",", -1, 1)
+					For each sElement in arrTmp
+
+		 				sElement = uCase(trim(sElement))
+
+						If Right(sElement,3) = "(*)" then
+							sElement = Left(sElement, Len(sElement)-3)
+							If not dicLists.Exists(sElement) then
+								dicLists.Add sElement, ""
+								oLogging.CreateEntry "Added new custom list property " & sElement, LogTypeInfo
+							End if
+						End if
+
+						If not dicProperties.Exists(sElement) then
+							dicProperties.Add sElement, ""
+							oLogging.CreateEntry "Added new custom property " & sElement, LogTypeInfo
+						End if
+
+					Next
+
+				End Select
+
+			Next
+
+		End if
+
+
+		' Check each property to make sure values exist in all environments (sync).  ZTIUtility
+		' does the real work (see Public Property Get Item, Function GetDAT).
+
+		For each sProperty in dicProperties.Keys
+
+			If dicLists.Exists(sProperty) then
+				Set oTmp = oEnvironment.ListItem(sProperty)
+			Else
+				sTmp = oEnvironment.Item(sProperty)
+			End if
+			
+		Next
+
+		GetProperties = iRetVal
+
+	End Function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	QuerySQL
+	'//  Purpose:	Query SQL Server to obtain data for a particular rule
+	'//---------------------------------------------------------------------------
+	Function QuerySQL(sSection)
+
+		Dim oDatabase
+
+		Dim iRetVal, sElement, sColumn, objTmp, bFoundColumn, bFirst
+		Dim objErr
+		Dim oRS
+
+
+		iRetVal = Success
+
+
+		' Create a database object
+
+		Set oDatabase = New Database
+		oDatabase.IniFile = LocateINI
+		oDatabase.SectionName = sSection
+		If (oDatabase.Connect is Nothing) then
+			oLogging.CreateEvent 41038, LogTypeError, "Unable to establish database connection using [" & sSection & "] properties.", Array()
+			QuerySQL = Failure
+			Exit Function
+		End if
+
+
+		' Issue the SQL statement
+
+		Set oRS = oDatabase.Query
+		If oRS is nothing then
+			oLogging.CreateEvent 41039, LogTypeWarning, "Unable to execute database query.", Array()
+			QuerySQL = Failure
+			Exit Function
+		ElseIf oRS.RecordCount = 0 then
+			oRS.Close
+			iRetVal = Success
+			oLogging.CreateEntry "Record count from SQL = 0.", LogTypeInfo
+			QuerySQL = iRetVal
+			EXIT FUNCTION
+		End if
+
+
+		' Process the results
+
+		oLogging.CreateEntry "Records returned from SQL = " & oRS.RecordCount, LogTypeInfo
+		On Error Resume Next
+		oRS.MoveFirst
+		If Err then
+			oLogging.CreateEntry "ERROR - Moving to first row (Error Number = " & Err.Number & ") (Error Description: " & Err.Description & ").", LogTypeError
+			For each objErr in oDatabase.Connection.Errors
+				oLogging.CreateEntry "  ADO error: " & objErr.Description & " (Error #" & objErr.Number & "; Source: " & objErr.Source & "; SQL State: " & objErr.SQLState & "; NativeError: " & objErr.NativeError & ")", LogTypeError
+			Next
+			oRS.Close
+			iRetVal = Failure
+			Err.Clear
+			QuerySQL = iRetVal
+			EXIT FUNCTION
+		End if
+		On Error Goto 0
+
+		While not oRS.EOF
+
+			For each sElement in dicProperties.Keys
+
+				sColumn = oDatabase.TranslateToColumnID(sElement)
+
+
+				'  Make sure the column exists in the recordset
+
+				bFoundColumn = False
+				For each objTmp in oRS.Fields
+					If Ucase(objTmp.Name) = Ucase(sColumn) then
+						bFoundColumn = true
+						Exit For
+					End if
+				Next
+
+				On Error Resume Next
+
+				If not bFoundColumn then
+					' oLogging.CreateEntry sColumn & " not found in the SQL table.", LogTypeInfo
+				ElseIf IsNull(oRS.Fields(cStr(sColumn))) then
+					' oLogging.CreateEntry sColumn & " = NULL in SQL", LogTypeInfo
+				ElseIf Len(oRS.Fields(cStr(sColumn))) = 0 then
+					' oLogging.CreateEntry sColumn & " = blank in SQL", LogTypeInfo
+				Elseif dicLists.Exists(sElement) then  ' Handle array
+					Set objTmp = oEnvironment.ListItem(sElement)
+					If not objTmp.Exists(oEnvironment.Substitute(oRS.Fields(cStr(sColumn)).Value)) then
+						objTmp.Add oEnvironment.Substitute(oRS.Fields(cStr(sColumn)).Value), ""
+						oEnvironment.ListItem(sElement) = objTmp
+						oLogging.CreateEntry "Added " & sElement & " value from SQL:  " & sColumn & " = " & oEnvironment.Substitute(oRS.Fields(cStr(sColumn)).Value), LogTypeInfo
+					Else
+						' oLogging.CreateEntry "Value " & oRS.Fields(cStr(sColumn)).Value & " already found for " & sElement, LogTypeInfo
+					End if
+				ElseIf oEnvironment.Item(sElement) = "" or dicOverwrite.Exists(sElement) then
+					oEnvironment.Item(sElement) = oEnvironment.Substitute(oRS.Fields(cStr(sColumn)).Value)
+					oLogging.CreateEntry "Obtained " & sElement & " value from SQL:  " & sColumn & " = " & oEnvironment.Item(sElement), LogTypeInfo
+				ElseIf oEnvironment.Item(sElement) <> oEnvironment.Substitute(oRS.Fields(CStr(sColumn)).value) then
+					oLogging.CreateEntry "Value for " & sElement & " is already set to " & oEnvironment.Item(sElement) & " so database value of " & oRS.Fields(cStr(sColumn)).Value & " will be ignored.", LogTypeInfo
+				Else  ' len(oEnvironment.Item(sElement) > 0
+					' oLogging.CreateEntry "Value for " & sElement & " is unchanged, database value of " & oRS.Fields(cStr(sColumn)).Value & " will be ignored.", LogTypeInfo
+				End if
+		
+				If Err then
+					oRS.Close
+					iRetVal = Failure
+					oLogging.CreateEntry "ERROR obtaining " & sElement & " from recordset (Error Number = " & Err.Number & ") (Error Description: " & Err.Description & ").", LogTypeError
+					Err.Clear
+					QuerySQL = iRetVal
+					EXIT FUNCTION
+		 		End if
+
+				On Error Goto 0
+
+			Next
+
+			oRS.MoveNext
+
+		Wend	
+
+
+		oRS.Close
+
+		iRetVal = Success
+		QuerySQL = iRetVal
+
+	End Function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	QueryWebService()
+	'//  Purpose:	Query web service to obtain data
+	'//---------------------------------------------------------------------------
+	Function QueryWebService(sSection)
+
+		Dim oWebService
+		Dim oResults
+		Dim oNode
+		Dim iRetVal, sElement, sColumn, objTmp
+
+
+		iRetVal = Success
+
+
+		' Create a web service object
+
+		Set oWebService = New WebService
+		If sSection <> "" then
+			oWebService.IniFile = LocateINI
+			oWebService.SectionName = sSection
+		Else
+			' Handle the EventService special case
+			oWebService.WebService = oEnvironment.Item("EventService") & "/MDTMonitorEvent/GetSettings?uniqueID=" & oEnvironment.Item("LTIGUID")
+			oWebService.Method = "GET"
+			oWebService.Quiet = True
+		End if
+
+
+		' Make the web service call
+
+		On Error Resume Next
+		Set oResults = oWebService.Query
+		If oResults is Nothing then
+			oLogging.CreateEntry "Web service returned no data.", LogTypeInfo
+			QueryWebService = false
+			Exit Function
+		End if
+		If oResults.DocumentElement is Nothing then
+			oLogging.CreateEntry "Web service did not return a document element.", LogTypeInfo
+			QueryWebService = false
+			Exit Function
+		End if
+		On Error Goto 0
+
+
+		' Process the results
+
+		For each sElement in dicProperties.Keys
+
+			sColumn = oWebService.TranslateToColumnID(sElement)
+
+
+			' Make sure the column exists in the XML result
+
+			For each oNode in oResults.DocumentElement.SelectNodes("//*[translate(local-name(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='" & LCase(sColumn) & "']")
+
+				If oNode.childNodes.length = 1 then
+					If (oNode.childNodes(0).nodeType = 3 or oNode.childNodes(0).nodeType = 4) then
+
+						If Len(oNode.Text) = 0 then
+							' oLogging.CreateEntry sColumn & " = blank, ignoring", LogTypeInfo
+						Elseif dicLists.Exists(sElement) then  ' Handle array
+							Set objTmp = oEnvironment.ListItem(sElement)
+							If not objTmp.Exists(oEnvironment.Substitute(oNode.Text)) then
+								objTmp.Add oEnvironment.Substitute(oNode.Text), ""
+								oEnvironment.ListItem(sElement) = objTmp
+								oLogging.CreateEntry "Added " & sElement & " value from web service:  " & sColumn & " = " & oEnvironment.Substitute(oNode.Text), LogTypeInfo
+							Else
+								' oLogging.CreateEntry "Value " & oNode.Text & " already found for " & sElement, LogTypeInfo
+							End if
+						ElseIf oEnvironment.Item(sElement) = "" or dicOverwrite.Exists(sElement) then
+							oEnvironment.Item(sElement) = oEnvironment.Substitute(oNode.Text)
+							oLogging.CreateEntry "Obtained " & sElement & " value from web service:  " & sColumn & " = " & oEnvironment.Item(sElement), LogTypeInfo
+						ElseIf oEnvironment.Item(sElement) <> oEnvironment.Substitute(oNode.Text) then
+							oLogging.CreateEntry "Value for " & sElement & " is already set to " & oEnvironment.Item(sElement) & " so database value of " & oNode.Text & " will be ignored.", LogTypeInfo
+						Else  ' len(oEnvironment.Item(sElement) > 0
+							' oLogging.CreateEntry "Value for " & sElement & " is unchanged, web service value of " & oNode.Text & " will be ignored.", LogTypeInfo
+						End if
+		
+					End if
+				End if
+
+			Next
+
+		Next
+
+		QueryWebService = iRetVal
+
+	End Function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	GetIniGenericSettings()
+	'//  Purpose:	Get data from the INI section specified
+	'//---------------------------------------------------------------------------
+	Function GetIniGenericSettings(sIniFile, sSection)
+
+		Dim iRetVal, sSectionExit, sSQLDefaultSection, sElement
+		Dim sSQLDefault, sSQLServer, sDatabase, sTable
+		Dim sSubsection, sValue, i, bSkipProperties
+		Dim objTmp, sWebService
+
+
+		iRetVal = Failure
+
+		bSkipProperties = false
+
+		oLogging.CreateEntry "------ Processing the [" & sSection & "] section ------", LogTypeInfo
+
+
+		' See if a user exit has been specified.  If so, execute it.
+
+		sSectionExit = oUtility.ReadIni(sIniFile, sSection, "UserExit")
+		If sSectionExit <> "" then
+
+			iRetVal = ProcessUserExit(sSectionExit, "SECTION", "BEFORE", sSection, bSkip)
+			If iRetVal <> Success then
+				oLogging.CreateEntry "ERROR returned from user exit.  No further processing.", LogTypeError
+				GetIniGenericSettings = Failure
+				EXIT FUNCTION
+			End if
+			If bSkip then
+				oLogging.CreateEntry "User exit requested to skip processing this section, exiting.", LogTypeInfo
+				GetIniGenericSettings = Success
+				EXIT FUNCTION
+			End if
+
+		End if
+
+
+		' See if this is a database section.  If so, process it.
+
+		sSqlServer = oUtility.ReadIni(sIniFile, sSection, "SQLServer")
+		If sSqlServer <> "" then
+
+			bSkipProperties = true
+			iRetVal = QuerySQL(sSection)
+
+		End if
+
+
+		' See if this is a web service section.  If so, process it.
+
+		sWebService = oUtility.ReadIni(sIniFile, sSection, "WebService")
+		If sWebService <> "" then
+
+			bSkipProperties = true
+			iRetVal = QueryWebService(sSection)
+
+		End if
+
+	
+		' See if a subsection has been specified.  If so, recursively process it before doing the rest of this
+		' section.
+
+		sSubsection = oUtility.ReadIni(sIniFile, sSection, "Subsection")
+		If sSubsection <> "" then
+
+			sSubsection = oEnvironment.Substitute(sSubsection)
+			iRetVal = GetIniGenericSettings(sIniFile, sSubsection)
+			If iRetVal <> Success then
+				oLogging.CreateEntry "ERROR trying to obtain ini settings.  No further processing.", LogTypeError
+				WSCRIPT.QUIT iRetVal
+			End if
+
+		End if
+		sSqlDefault = oUtility.ReadIni(sIniFile, sSection, "SQLDefault")
+		If sSqlDefault <> "" then
+			sSubsection = oEnvironment.Substitute(sSqlDefault)
+			iRetVal = GetIniGenericSettings(sIniFile, sSubsection)
+			If iRetVal <> Success then
+				oLogging.CreateEntry "ERROR trying to obtain ini settings.  No further processing.", LogTypeError
+				WSCRIPT.QUIT iRetVal
+			End if
+		End if
+
+	
+		' Finally, process the entries in this section
+
+		If not bSkipProperties then
+	
+			For each sElement in dicProperties.Keys
+				If dicLists.Exists(sElement) then
+					For i = 1 to 100
+						sValue = oUtility.ReadIni(sIniFile, sSection, sElement & CStr(i))
+						If Len(sValue) = 0 then
+							sValue = oUtility.ReadIni(sIniFile, sSection, sElement & Right("000" & CStr(i), 3))
+						End if
+						If Len(sValue) = 0 then
+							Exit For
+						End if
+						sValue = oEnvironment.Substitute(sValue)
+						Set objTmp = oEnvironment.ListItem(sElement)
+						If not objTmp.Exists(sValue) then
+							objTmp.Add sValue, ""
+							oEnvironment.ListItem(sElement) = objTmp
+							oLogging.CreateEntry "Added value from [" & sSection & "]: " & sElement & " = " & sValue, LogTypeInfo
+						End if
+					Next
+				Else
+					sValue = oUtility.ReadIni(sIniFile, sSection, sElement)
+					If Len(sValue) = 0 then
+						' oLogging.CreateEntry sElement & " value not defined in the section [" & sSection & "]", LogTypeInfo
+					ElseIf Len(oEnvironment.Item(sElement)) = 0 or dicOverwrite.Exists(sElement) then
+						oEnvironment.Item(sElement) = oEnvironment.Substitute(sValue)
+						oLogging.CreateEntry "Using from [" & sSection & "]: " & sElement & " = " & oEnvironment.Item(sElement), LogTypeInfo
+					End if
+				End if
+			Next
+
+		End if
+
+
+		' See if a user exit has been specified.  If so, execute it.
+
+		sSectionExit = oUtility.ReadIni(sIniFile, sSection, "UserExit")
+		If sSectionExit <> "" then
+
+			iRetVal = ProcessUserExit(sSectionExit, "SECTION", "AFTER", sSection, bSkip)
+			If iRetVal <> Success then
+				oLogging.CreateEntry "ERROR returned from user exit.  No further processing.", LogTypeError
+				GetIniGenericSettings = Failure
+				EXIT FUNCTION
+			End if
+
+		End if
+
+
+		iRetVal = Success
+		GetIniGenericSettings = iRetVal
+
+	End Function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	ProcessUserExit()
+	'//  Purpose:	Call the specified user exit routine
+	'//---------------------------------------------------------------------------
+	Function ProcessUserExit(sFile, sType, sWhen, sDetail, bSkip)
+
+		Dim sFullFile, iRetVal
+		Dim objExitScript, sExitScript
+
+
+		On Error Resume Next
+
+		' Make sure the specified exit file exists.  If not, report an error.
+
+		iRetVal = oUtility.FindFile(sFile, sFullFile)
+		If iRetVal <> Success then
+			oLogging.CreateEntry "ERROR - User exit script file """ & sFile & """ not found.", LogTypeError
+			ProcessUserExit = Failure
+			EXIT FUNCTION
+		End if
+
+
+		' Read the file
+
+		Set objExitScript = oFSO.OpenTextFile(sFullFile, 1, false)
+		sExitScript = objExitScript.ReadAll
+
+
+		' Execute the text to dynamically add the function.
+
+		ExecuteGlobal sExitScript
+		If Err then
+			oLogging.CreateEntry "ERROR - Unable to parse the user exit script file:  " & Err.Description & " (" & Err.Number & ")", LogTypeError
+			ProcessUserExit = Failure
+			EXIT FUNCTION
+		End if
+
+
+		' Call the exit
+
+		bSkip = False
+		iRetVal = UserExit(sType, sWhen, sDetail, bSkip)
+		If Err then
+			oLogging.CreateEntry "ERROR raised in User Exit:  " & Err.Description & " (" & Err.Number & ")", LogTypeError
+			ProcessUserExit = Failure
+			EXIT FUNCTION
+		ElseIf iRetVal <> Success then
+			oLogging.CreateEntry "ERROR - User exit returned failure return value.", LogTypeError
+			ProcessUserExit = Failure
+			EXIT FUNCTION
+		End if
+
+		oLogging.CreateEntry "User exit """ & sFullFile & """ called successfully, skip = " & bSkip & ".", LogTypeInfo
+		ProcessUserExit = Success
+
+	End Function
+
+
+	'//----------------------------------------------------------------------------
+	'//  Utility routines
+	'//----------------------------------------------------------------------------
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	SyncEnvironment
+	'//  Purpose:	Make sure the task sequence environment has current values
+	'//---------------------------------------------------------------------------
+	Sub SyncEnvironment
+
+		'//  Make sure the environment is in sync (VARIABLES.DAT vs. TS/OSD env)
+
+		oLogging.CreateEntry "Synchronizing the environments.", LogTypeInfo
+
+		If oEnvironment.GetDAT("DeployRoot") <> "" then
+			oEnvironment.Item("DeployRoot") = oEnvironment.GetDAT("DeployRoot")
+		End if
+		If oEnvironment.GetDAT("DeployDrive") <> "" then
+			oEnvironment.Item("DeployDrive") = oEnvironment.GetDAT("DeployDrive")
+		End if
+		If oEnvironment.GetDAT("ResourceRoot") <> "" then
+			oEnvironment.Item("ResourceRoot") = oEnvironment.GetDAT("ResourceRoot")
+		End if
+		If oEnvironment.GetDAT("ResourceDrive") <> "" then
+			oEnvironment.Item("ResourceDrive") = oEnvironment.GetDAT("ResourceDrive")
+		End if
+		If oEnvironment.GetDAT("OSDTargetDriveCache") <> "" then
+			oEnvironment.Item("OSDTargetDriveCache") = oEnvironment.GetDAT("OSDTargetDriveCache")
+		End if
+
+		oLogging.CreateEntry "Finished synchronizing the environments.", LogTypeInfo
+
+	End Sub
+
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	RemapVariables
+	'//  Purpose:	Remap old variable names to new variable names
+	'//---------------------------------------------------------------------------
+	Function RemapVariables
+
+		oLogging.CreateEntry "Remapping variables.", LogTypeInfo
+
+
+	 	'Provide mapping between BuildID and TaskSequenceID
+
+		If oEnvironment.Item("TaskSequenceID") = "" and oEnvironment.Item("BuildID")<>"" then
+			oEnvironment.Item("TaskSequenceID") = Ucase(oEnvironment.Item("BuildID"))
+		End if
+	
+		If oEnvironment.Item("SkipTaskSequence") = "" and oEnvironment.Item("SkipBuild")<>"" then
+			oEnvironment.Item("SkipTaskSequence") = oEnvironment.Item("SkipBuild")
+		End if
+		oEnvironment.Item("TaskSequenceID") = Ucase(oEnvironment.Item("TaskSequenceID"))
+		oEnvironment.Item("DeploymentType") = Ucase(oEnvironment.Item("DeploymentType"))
+		If UCase(oEnvironment.Item("BdeInstall")) = "NO" then
+			oEnvironment.Item("BdeInstallSuppress") = "YES"
+		End if
+
+		If oEnvironment.Item("JoinDomain") <> "" Then
+			oEnvironment.Item("OSDNetworkJoinType") = "0"
+			oEnvironment.Item("OSDDomainName") = oEnvironment.Item("JoinDomain")
+
+			If oEnvironment.Item("DomainAdmin") <> "" Then
+				oEnvironment.Item("OSDJoinAccount") = oEnvironment.Item("DomainAdminDomain") & "\" & oEnvironment.Item("DomainAdmin")
+				oEnvironment.Item("OSDJoinPassword") = oEnvironment.Item("DomainAdminPassword")	
+			End if
+			If oEnvironment.Item("MachineObjectOU") <> "" Then
+				oEnvironment.Item("OSDDomainOUName") = oEnvironment.Item("MachineObjectOU")
+			End if
+		
+		End if
+
+		If oEnvironment.Item("JoinWorkgroup") <> "" Then
+			oEnvironment.Item("OSDNetworkJoinType") = "1"
+			oEnvironment.Item("OSDWorkGroupName") = oEnvironment.Item("JoinWorkGroup")
+		End if
+
+
+		oLogging.CreateEntry "Finished remapping variables.", LogTypeInfo
+
+	End Function
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	LocateIni
+	'//  Purpose:	Find the rules INI file specified or a default
+	'//---------------------------------------------------------------------------
+	Function LocateIni
+
+		Dim sIniFile
+		Dim sFoundIniFile
+
+		oLogging.CreateEntry "Determining the INI file to use.", LogTypeInfo
+
+
+		' Get the command line values.  If not specified, they will be blank.
+	
+		If oEnvironment.Item("RulesFile") <> "" then
+			sIniFile = oEnvironment.Item("RulesFile")
+		Else
+			sIniFile = oUtility.Arguments("inifile")
+		End if
+
+
+		' Determine the INI file path and name
+
+		If Len(sIniFile) = 0 then
+			iRetVal = oUtility.FindFile("CustomSettings.ini", sIniFile)
+			If iRetVal = Success then
+				oLogging.CreateEntry "Using DEFAULT VALUE: Ini file = " & sIniFile, LogTypeInfo
+			End if
+		Else
+			If not oFSO.FileExists(sIniFile) then
+				iRetVal = oUtility.FindFile(sIniFile, sFoundIniFile)
+				If iRetVal = Success then
+					sIniFile = sFoundIniFile
+				Else
+					oLogging.CreateEntry "Unable to locate " & sIniFile, LogTypeInfo
+					sIniFile = ""
+				End if
+			Else
+				oLogging.CreateEntry "Using COMMAND LINE ARG: Ini file = " & sIniFile, LogTypeInfo
+			End if
+		End if
+
+
+		oLogging.CreateEntry "Finished determining the INI file to use.", LogTypeInfo
+
+
+		' Return the located file (this will be blank of none was found)
+
+		LocateIni = sIniFile
+
+	End Function
+
+
+	'//---------------------------------------------------------------------------
+	'//  Function:	KeyExists()
+	'//  Purpose:	Tests to see if the specified registry key exists
+	'//---------------------------------------------------------------------------
+	Function KeyExists(sRegKey)
+
+		Dim ErrDesc(1)
+
+
+		KeyExists = True
+
+		On Error Resume Next
+
+		oShell.RegRead(vbCR)
+		ErrDesc(0) = Replace(Err.Description,vbCR,"")
+		Err.Clear
+
+		oShell.RegRead(sRegKey)
+		ErrDesc(1) = Replace(Err.Description,sRegKey,"")
+		Err.Clear
+
+		If ErrDesc(0) = ErrDesc(1) Then KeyExists = False
+
+	End Function
+
+End Class
+
+	</script>
+</job>
