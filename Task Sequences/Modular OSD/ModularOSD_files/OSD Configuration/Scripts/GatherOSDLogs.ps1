@@ -17,7 +17,17 @@ ForEach ($Log in $DesiredLogs)
     if (Test-Path $Log)
     {
         Write-host "Copying: $Log"
-        Copy-Item -Recurse -Path $Log -Destination $SMSTSLogPath -Force
+
+        if ($Log -like "*BT~.Windows*")
+        {
+            $Destination = "$SMSTSLogPath\BT~.Windows"
+        }
+        Else
+        {
+            $Destination = $SMSTSLogPath
+        }
+
+        Copy-Item -Recurse -Path $Log -Destination $Destination -Force
     }
     Else
     {
