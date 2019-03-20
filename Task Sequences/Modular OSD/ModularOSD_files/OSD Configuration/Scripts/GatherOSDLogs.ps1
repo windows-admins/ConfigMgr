@@ -5,7 +5,11 @@ $DesiredLogs = @(
 "$env:SystemRoot\INF\setupapi.setup.log",
 "$env:SystemRoot\Logs\CBS",
 "$env:SystemRoot\Logs\DISM",
-"$env:SystemRoot\Panther"
+"$env:SystemRoot\Panther",
+"$env:SystemDrive\BT~.Windows\INF\setupapi.setup.log",
+"$env:SystemDrive\BT~.Windows\Logs\CBS",
+"$env:SystemDrive\BT~.Windows\Logs\DISM",
+"$env:SystemDrive\BT~.Windows\Panther"
 )
 
 ForEach ($Log in $DesiredLogs)
