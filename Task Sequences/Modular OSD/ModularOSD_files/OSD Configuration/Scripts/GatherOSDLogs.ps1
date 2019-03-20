@@ -21,6 +21,11 @@ ForEach ($Log in $DesiredLogs)
         if ($Log -like "*BT~.Windows*")
         {
             $Destination = "$SMSTSLogPath\BT~.Windows"
+
+            If (-not (Test-Path $Destination))
+            {
+                New-Item $Destination -ItemType Directory -Force
+            }
         }
         Else
         {
