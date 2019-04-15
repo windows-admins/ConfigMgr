@@ -1,0 +1,26 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<policyComments xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/CommentDefinitions">
+  <policyNamespaces>
+    <using prefix="ns0" namespace="Microsoft.Policies.CredentialProviders"></using>
+    <using prefix="ns1" namespace="Microsoft.Policies.CredentialsSSP"></using>
+    <using prefix="ns2" namespace="Microsoft.Policies.GameDVR"></using>
+    <using prefix="ns3" namespace="Microsoft.Policies.InternetCommunicationManagement"></using>
+    <using prefix="ns4" namespace="Microsoft.Policies.NetworkConnections"></using>
+    <using prefix="ns5" namespace="Microsoft.Policies.NetworkProvider"></using>
+    <using prefix="ns6" namespace="Microsoft.Policies.PowerShell"></using>
+    <using prefix="ns7" namespace="Microsoft.Policies.RemoteAssistance"></using>
+    <using prefix="ns8" namespace="Microsoft.Policies.TerminalServer"></using>
+    <using prefix="ns9" namespace="Microsoft.Policies.WindowsConnectionManager"></using>
+    <using prefix="ns10" namespace="Microsoft.Policies.WindowsDefenderSecurityCenter"></using>
+    <using prefix="ns11" namespace="Microsoft.Policies.WindowsExplorer2"></using>
+    <using prefix="ns12" namespace="Microsoft.Policies.WindowsRemoteManagement"></using>
+    <using prefix="ns13" namespace="Microsoft.Policies.WlanSvc"></using>
+    <using prefix="ns14" namespace="Microsoft.Windows.DeviceGuard"></using>
+  </policyNamespaces>
+  <comments>
+    <admTemplate></admTemplate>
+  </comments>
+  <resources minRequiredRevision="1.0">
+    <stringTable></stringTable>
+  </resources>
+</policyComments>
