@@ -1,0 +1,736 @@
+{
+    "@odata.type":  "#microsoft.graph.windows10CustomConfiguration",
+    "id":  "5c159f31-4b14-4fde-8acb-bdb82492e0fd",
+    "lastModifiedDateTime":  "2019-04-23T20:39:23.6884377Z",
+    "roleScopeTagIds":  [
+
+                        ],
+    "supportsScopeTags":  true,
+    "createdDateTime":  "2019-04-22T22:58:34.5773582Z",
+    "description":  "Requires Windows 10 - Office 365 Security Baseline - ADMX Ingestion",
+    "displayName":  "Windows 10 - Office 365 Security Baseline - User",
+    "version":  15,
+    "omaSettings":  [
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow Trusted Locations on the network - Disabled",
+                            "description":  "Access 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeaccess~L_ApplicationSettings~L_Security~L_TrustCenter~L_TrustedLocations/L_AllowTrustedLocationsOnTheNetwork",
+                            "value":  "\u003cdisabled/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable Trust Bar Notification for unsigned application add-ins and block them",
+                            "description":  "Access 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeaccess~L_ApplicationSettings~L_Security~L_TrustCenter/L_DisableTrustBarNotificationforunsigned",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable all except digitally signed macros",
+                            "description":  "Access 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeaccess~L_ApplicationSettings~L_Security~L_TrustCenter/L_VBAWarningsPolicy",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Empty\" value=\"3\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not show data extraction options when opening corrupt workbooks",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_DataRecovery/L_Donotshowdataextractionoptionswhenopeningcorruptworkbooks",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Ask to Update Links",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Advanced/L_Asktoupdateautomaticlinks",
+                            "value":  "\u003cenabled/\u003e\n\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Load pictures from Web pages not created in Excel - Disabled",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Advanced~L_WebOptions~L_General/L_LoadpicturesfromWebpagesnotcreatedinExcel",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable AutoRepublish",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Save/L_DisableAutoRepublish",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not show AutoRepublish warning alert",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Save/L_DoNotShowAutoRepublishWarningAlert",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Force file extension to match file type",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security/L_Forcefileextenstionstomatch",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Empty\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Scan encrypted macros in Excel Open XML workbooks",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security/L_DeterminewhethertoforceencryptedExcel",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_DeterminewhethertoforceencryptedExcelDropID\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Turn off file validation - Disabled",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security/L_TurnOffFileValidation",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "WEBSERVICE Function Notification Settings",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security/L_WebContentWarningLevel",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_WebContentWarningLevelValue\" value=\"1\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Block macros from running in Office files from the Internet",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter/L_BlockMacroExecutionFromInternet",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable Trust Bar Notification for unsigned application add-ins and block them - Excel",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter/L_DisableTrustBarNotificationforunsigned",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "VBA Macro Notification Settings",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter/L_VBAWarningsPolicy",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_empty4\" value=\"3\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "dBase III / IV files",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_DBaseIIIANDIVFiles",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_DBaseIIIANDIVFilesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Dif and Sylk files",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_DifAndSylkFiles",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_DifAndSylkFilesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 2 macrosheets and add-in files",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel2MacrosheetsAndAddInFiles",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel2MacrosheetsAndAddInFilesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 2 worksheets",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel2Worksheets",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel2WorksheetsDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 3 macrosheets and add-in files",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel3MacrosheetsAndAddInFiles",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel3MacrosheetsAndAddInFilesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 3 worksheets",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel3Worksheets",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel3WorksheetsDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 4 macrosheets and add-in files",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel4MacrosheetsAndAddInFiles",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel4MacrosheetsAndAddInFilesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 4 workbooks",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel4Workbooks",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel4WorkbooksDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 4 worksheets",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel4Worksheets",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel4WorksheetsDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 95 workbooks",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel95Workbooks",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel95WorkbooksDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Excel 95-97 workbooks and templates",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Excel9597WorkbooksAndTemplates",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Excel9597WorkbooksAndTemplatesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Set default file block behavior",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_SetDefaultFileBlockBehavior",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_SetDefaultFileBlockBehaviorDropID\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Web pages and Excel 2003 XML spreadsheets",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_WebPagesAndExcel2003XMLSpreadsheets",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_WebPagesAndExcel2003XMLSpreadsheetsDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not open files from the Internet zone in Protected View",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_ProtectedView/L_DoNotOpenFilesFromTheInternetZoneInProtectedView",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not open files in unsafe locations in Protected View",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_ProtectedView/L_DoNotOpenFilesInUnsafeLocationsInProtectedView",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Set document behavior if file validation fails",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_ProtectedView/L_SetDocumentBehaviorIfFileValidationFails",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_SetDocumentBehaviorIfFileValidationFailsDropID\" value=\"1\"/\u003e\u003cdata id=\"L_SetDocumentBehaviorIfFileValidationFailsStr3\" value=\"false\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Turn off Protected View for attachments opened from Outlook",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_ProtectedView/L_TurnOffProtectedViewForAttachmentsOpenedFromOutlook",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow Trusted Locations on the network - Excel",
+                            "description":  "Excel 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeExcel~L_ExcelOptions~L_Security~L_TrustCenter~L_TrustedLocations/L_AllowTrustedLocationsOnTheNetwork",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable UI extending from documents and templates",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_GloablOptions~L_Customize/L_NoExtensibilityCustomizationFromDocumentPolicy",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyWord\" value=\"true\"/\u003e\u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyExcel\" value=\"true\"/\u003e\u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyPowerPoint\" value=\"true\"/\u003e\u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyAccess\" value=\"true\"/\u003e\u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyOutlook\" value=\"true\"/\u003e\u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyPublisher\" value=\"true\"/\u003e\u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyProject\" value=\"true\"/\u003e\u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyVisio\" value=\"true\"/\u003e\u003cdata id=\"L_NoExtensibilityCustomizationFromDocumentPolicyInfoPath\" value=\"true\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "ActiveX Control Initialization",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SecuritySettings/L_ActiveXControlInitialization",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Automation Security",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SecuritySettings/L_AutomationSecurity",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_SettheAutomationSecuritylevel\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable all Trust Bar notifications for security issues",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SecuritySettings/L_DisableallTrustBarnotificationsfor",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Encryption type for password protected Office 97-2003 files",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SecuritySettings/L_Encryptiontypeforpasswordprotectedoffice972003",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_encryptiontypecolon318\" value=\"Microsoft Enhanced RSA and AES Cryptographic Provider,AES 256,256\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Encryption type for password protected Office Open XML files",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SecuritySettings/L_Encryptiontypeforpasswordprotectedofficeopen",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Encryptiontypecolon\" value=\"Microsoft Enhanced RSA and AES Cryptographic Provider,AES 256,256\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Load Controls in Forms3",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SecuritySettings/L_LoadControlsinForms3",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Protect document metadata for rights managed Office Open XML Files",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SecuritySettings/L_Protectdocumentmetadataforrightsmanaged",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow mix of policy and user locations",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SecuritySettings~L_trustcenter241/L_Allowmixofpolicyanduserlocations",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable the Office client from polling the SharePoint Server for published links",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_ServerSettings/L_DisabletheOfficeclientfrompolling",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable Smart Document\u0027s use of manifests",
+                            "description":  "Office 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeSystem~L_SmartDocumentsWordExcel/L_DisableSmartDocumentsuseofmanifests",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Authentication with Exchange Server",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_ToolsAccounts~L_Exchangesettings/L_AuthenticationwithExchangeServer",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_SelecttheauthenticationwithExchangeserver\" value=\"16\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Enable RPC encryption",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_ToolsAccounts~L_Exchangesettings/L_EnableRPCEncryption",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not allow Outlook object model scripts to run for public folders",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_OutlookOptions~L_Other~L_Advanced/L_DisableOutlookobjectmodelscriptsforpublicfolders",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not allow Outlook object model scripts to run for shared folders",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_OutlookOptions~L_Other~L_Advanced/L_DisableOutlookobjectmodelscripts",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Use Unicode format when dragging e-mail message to file system",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_OutlookOptions~L_Other~L_Advanced/L_MSGUnicodeformatwhendraggingtofilesystem",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow Active X One Off Forms",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security/L_AllowActiveXOneOffForms",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_empty29\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Prevent users from customizing attachment security settings",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security/L_Preventusersfromcustomizingattachmentsecuritysettings",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Include Internet in Safe Zones for Automatic Picture Download",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_AutomaticPictureDownloadSettings/L_BlockInternet",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Minimum encryption settings",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_Cryptography/L_Minimumencryptionsettings",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Minimumkeysizeinbits\" value=\"168\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Signature Warning",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_Cryptography/L_SignatureWarning",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_signaturewarning30\" value=\"1\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Retrieving CRLs (Certificate Revocation Lists)",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_Cryptography~L_SignatureStatusDialog/L_RetrievingCRLsCertificateRevocationLists",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_empty31\" value=\"1\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Outlook Security Mode",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings/L_OutlookSecurityMode",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_OutlookSecurityPolicy\" value=\"3\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow users to demote attachments to Level 2",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_MiscAttachmentSettings/L_AllowUsersToLowerAttachments",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Display Level 1 attachments",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_MiscAttachmentSettings/L_Level1Attachments",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Remove file extensions blocked as Level 1",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_MiscAttachmentSettings/L_Level1RemoveFilePolicy",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Remove file extensions blocked as Level 2",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_MiscAttachmentSettings/L_Level2RemoveFilePolicy",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow scripts in one-off Outlook forms",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_MiscCustomFormSettings/L_EnableScriptsInOneOffForms",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Set Outlook object model custom actions execution prompt",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_MiscCustomFormSettings/L_OnExecuteCustomActionOOM",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_OnExecuteCustomActionOOM_Setting\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Configure Outlook object model prompt when accessing an address book",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_ProgrammaticSettings/L_OOMAddressBook",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_OOMAddressBook_Setting\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Configure Outlook object model prompt When accessing the Formula property of a UserProperty object",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_ProgrammaticSettings/L_OOMFormula",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_OOMFormula_Setting\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Configure Outlook object model prompt when executing Save As",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_ProgrammaticSettings/L_OOMSaveAs",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_OOMSaveAs_Setting\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Configure Outlook object model prompt when reading address information",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_ProgrammaticSettings/L_OOMAddressAccess",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_OOMAddressAccess_Setting\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Configure Outlook object model prompt when responding to meeting and task requests",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_ProgrammaticSettings/L_OOMMeetingTaskRequest",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_OOMMeetingTaskRequest_Setting\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Configure Outlook object model prompt when sending mail",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_ProgrammaticSettings/L_OOMSend",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_OOMSend_Setting\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Configure trusted add-ins",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_SecurityFormsettings~L_ProgrammaticSettings~L_TrustedAddins/L_SetTrustedAddins",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow hyperlinks in suspected phishing e-mail messages",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_TrustCenter/L_Enablelinksinemailmessages",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Security setting for macros",
+                            "description":  "Outlook 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeOutlook~L_Security~L_TrustCenter/L_SecurityLevelOutlook",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_SecurityLevel\" value=\"3\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Run Programs",
+                            "description":  "PowerPoint 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePowerPoint~L_PowerPointOptions~L_Security/L_RunPrograms",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Empty\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Scan encrypted macros in PowerPoint Open XML presentations",
+                            "description":  "PowerPoint 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePowerPoint~L_PowerPointOptions~L_Security/L_Determinewhethertoforceencryptedppt",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_DeterminewhethertoforceencryptedpptDropID\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Turn off file validation",
+                            "description":  "PowerPoint 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePowerPoint~L_PowerPointOptions~L_Security/L_TurnOffFileValidation",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not open files from the Internet zone in Protected View - PowerPoint",
+                            "description":  "PowerPoint 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePowerPoint~L_PowerPointOptions~L_Security~L_TrustCenter~L_ProtectedView/L_DoNotOpenFilesFromTheInternetZoneInProtectedView",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not open files in unsafe locations in Protected View - PowerPoint",
+                            "description":  "PowerPoint 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePowerPoint~L_PowerPointOptions~L_Security~L_TrustCenter~L_ProtectedView/L_DoNotOpenFilesInUnsafeLocationsInProtectedView",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Set document behavior if file validation fails - PowerPoint 2016",
+                            "description":  "PowerPoint 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePowerPoint~L_PowerPointOptions~L_Security~L_TrustCenter~L_ProtectedView/L_SetDocumentBehaviorIfFileValidationFails",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_SetDocumentBehaviorIfFileValidationFailsDropID\" value=\"1\"/\u003e\u003cdata id=\"L_SetDocumentBehaviorIfFileValidationFailsStr3\" value=\"false\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Turn off Protected View for attachments opened from Outlook - PowerPoint",
+                            "description":  "PowerPoint 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePowerPoint~L_PowerPointOptions~L_Security~L_TrustCenter~L_ProtectedView/L_TurnOffProtectedViewForAttachmentsOpenedFromOutlook",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow Trusted Locations on the network - PowerPoint 2016",
+                            "description":  "PowerPoint 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePowerPoint~L_PowerPointOptions~L_Security~L_TrustCenter~L_TrustedLocations/L_AllowTrustedLocationsOnTheNetwork",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow Trusted Locations on the network - Project",
+                            "description":  "Projec 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_Proj~L_ProjectOptions~L_Security~L_TrustCenter/L_AllowTrustedLocationsOnTheNetwork",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable Trust Bar Notification for unsigned application add-ins and block them - Project",
+                            "description":  "Project 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_Proj~L_ProjectOptions~L_Security~L_TrustCenter/L_DisableTrustBarNotificationforunsigned",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "VBA Macro Notification Settings - Project",
+                            "description":  "Project 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_Proj~L_ProjectOptions~L_Security~L_TrustCenter/L_VBAWarningsPolicy",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Empty\" value=\"3\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Publisher Automation Security Level",
+                            "description":  "Publisher 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePublisher~L_Security/L_PublisherAutomationSecurityLevel",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Empty\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable Trust Bar Notification for unsigned application add-ins",
+                            "description":  "Publisher 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePublisher~L_Security~L_TrustCenter/L_DisableTrustBarNotificationforunsigned",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "VBA Macro Notification Settings - Publisher",
+                            "description":  "Publisher 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficePublisher~L_Security~L_TrustCenter/L_VBAWarningsPolicy",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_empty0\" value=\"3\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow Trusted Locations on the network - Visio",
+                            "description":  "Visio 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftVisio~L_VisioOptions~L_Security~L_TrustCenter/L_AllowTrustedLocationsOnTheNetwork",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Block macros from running in Office files from the Internet - Visio",
+                            "description":  "Visio 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftVisio~L_VisioOptions~L_Security~L_TrustCenter/L_BlockMacroExecutionFromInternet",
+                            "value":  "\u003cenabled/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable Trust Bar Notification for unsigned application add-ins and block them - Visio",
+                            "description":  "Visio 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftVisio~L_VisioOptions~L_Security~L_TrustCenter/L_DisableTrustBarNotificationforunsigned",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "VBA Macro Notification Settings - Visio",
+                            "description":  "Visio 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftVisio~L_VisioOptions~L_Security~L_TrustCenter/L_VBAWarningsPolicy",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Empty\" value=\"3\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Turn off file validation - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security/L_TurnOffFileValidation",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Block macros from running in Office files from the Internet - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter/L_DisableTrustBarNotificationforunsigned",
+                            "value":  "\u003cenabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Scan encrypted macros in Word Open XML documents",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter/L_DeterminewhethertoforceencryptedWord",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_DeterminewhethertoforceencryptedWordDropID\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "VBA Macro Notification Settings - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter/L_VBAWarningsPolicy",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_empty19\" value=\"3\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Set default file block behavior - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_SetDefaultFileBlockBehavior",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_SetDefaultFileBlockBehaviorDropID\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Word 2 and earlier binary documents and templates",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Word2AndEarlierBinaryDocumentsAndTemplates",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Word2AndEarlierBinaryDocumentsAndTemplatesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Word 6.0 binary documents and templates",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Word6Pt0BinaryDocumentsAndTemplates",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Word6Pt0BinaryDocumentsAndTemplatesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Word 95 binary documents and templates",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Word95BinaryDocumentsAndTemplates",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Word95BinaryDocumentsAndTemplatesDropID\" value=\"2\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Word 97 binary documents and templates",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_FileBlockSettings/L_Word97BinaryDocumentsAndTemplates",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_Word97BinaryDocumentsAndTemplatesDropID\" value=\"0\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not open files from the Internet zone in Protected View - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_ProtectedView/L_DoNotOpenFilesFromTheInternetZoneInProtectedView",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Do not open files in unsafe locations in Protected View - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_ProtectedView/L_DoNotOpenFilesInUnsafeLocationsInProtectedView",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Set document behavior if file validation fails - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_ProtectedView/L_SetDocumentBehaviorIfFileValidationFails",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_SetDocumentBehaviorIfFileValidationFailsDropID\" value=\"1\"/\u003e\u003cdata id=\"L_SetDocumentBehaviorIfFileValidationFailsStr3\" value=\"false\"/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Turn off Protected View for attachments opened from Outlook - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_ProtectedView/L_TurnOffProtectedViewForAttachmentsOpenedFromOutlook",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Allow Trusted Locations on the network - Word",
+                            "description":  "Word 2016",
+                            "omaUri":  "./User/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficeWord~L_WordOptions~L_Security~L_TrustCenter~L_TrustedLocations/L_AllowTrustedLocationsOnTheNetwork",
+                            "value":  "\u003cdisabled/\u003e\n"
+                        }
+                    ]
+}
