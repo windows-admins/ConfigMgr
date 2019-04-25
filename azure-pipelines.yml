@@ -83,17 +83,10 @@ jobs:
       script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
 
   - task: PowerShell@2
-    displayName: 'Run PSScriptAnalyzer'
-    inputs:
-      targetType: 'inline'
-      script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory)'
-      workingDirectory: '$(Build.SourcesDirectory)'
-
-  - task: PowerShell@2
     displayName: 'Run PSScriptAnalyzer 2'
     inputs:
       targetType: 'inline'
-      script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory) -EnableExit -IncludeDefaultRules -ReportSummary'
+      script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory) -EnableExit -IncludeDefaultRules -ReportSummary -Recurse'
 
 # FROM OLD TEMPLATE
 - job: buildOldStuff2
