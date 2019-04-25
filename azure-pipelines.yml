@@ -84,3 +84,16 @@ jobs:
     inputs:
       targetType: 'inline'
       script: 'Invoke-ScriptAnalyzer -Path .\'
+
+  - task: PowerShell@2
+    displayName: 'Run PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Invoke-ScriptAnalyzer -Path .'
+
+
+  - task: PowerShell@2
+    displayName: 'Run PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-Location'
