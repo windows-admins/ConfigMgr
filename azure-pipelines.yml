@@ -7,7 +7,7 @@ jobs:
 # All tasks on Windows
 - job: build_all_windows
   displayName: Build all tasks (Windows)
-  condition: eq(variables.os, 'Windows_NT')
+  condition: succeeded()
   pool:
     vmImage: vs2017-win2016
   steps:
@@ -51,7 +51,7 @@ jobs:
 # Single task
 - job: buildSingle
   displayName: Build single task
-  condition: and(succeeded(), variables.task)
+  condition: and(succeeded())
   steps:
   - template: _CI/build-single-steps.yml
 
@@ -60,7 +60,7 @@ jobs:
 # FROM OLD TEMPLATE
 - job: buildOldStuff
   displayName: Old way of doing pester and PSScriptAnalyzer
-  condition: and(succeeded(), variables.task)
+  condition: succeeded()
   steps:
   - task: PowerShell@2
     displayName: 'Install Pester'
