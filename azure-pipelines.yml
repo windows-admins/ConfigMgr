@@ -63,6 +63,13 @@ jobs:
   displayName: Old way of doing pester and PSScriptAnalyzer
   condition: succeeded()
   steps:
+
+  - task: PowerShell@2
+    displayName: 'Dump SourcesDirectory'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-ChildItem -Path $(Build.Repository.LocalPath)'
+
   - task: PowerShell@2
     displayName: 'Install Pester'
     inputs:
@@ -75,38 +82,16 @@ jobs:
       targetType: 'inline'
       script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
 
-  - task: CmdLine@2
-    inputs:
-      script: 'ls'
-
   - task: PowerShell@2
     displayName: 'Run PSScriptAnalyzer'
     inputs:
       targetType: 'inline'
       script: 'Invoke-ScriptAnalyzer -Path .\'
+      workingDirectory: '$(Build.SourcesDirectory)'
 
   - task: PowerShell@2
-    displayName: 'Run PSScriptAnalyzer'
+    displayName: 'Run PSScriptAnalyzer 2'
     inputs:
       targetType: 'inline'
       script: 'Invoke-ScriptAnalyzer -Path .'
-
-
-  - task: PowerShell@2
-    displayName: 'Run PSScriptAnalyzer'
-    inputs:
-      targetType: 'inline'
-      script: 'Get-Location'
-
-  - task: PowerShell@2
-    displayName: 'Run PSScriptAnalyzer'
-    inputs:
-      targetType: 'inline'
-      script: 'Get-ChildItem -Path $(Build.Repository.LocalPath)'
-
-
-  - task: PowerShell@2
-    displayName: 'Run PSScriptAnalyzer'
-    inputs:
-      targetType: 'inline'
-      script: 'Get-ChildItem -Path $(Build.SourcesDirectory)'
+      workingDirectory: '$(Build.SourcesDirectory)'
