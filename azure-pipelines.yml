@@ -1,17 +1,64 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
+- releases/*
 
-pool:
-  vmImage: 'Ubuntu-16.04'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+jobs:
+
+# All tasks on Windows
+- job: build_all_windows
+  displayName: Build all tasks (Windows)
+  condition: and(succeeded(), not(variables.task), eq(variables.os, 'Windows_NT'))
+  pool:
+    vmImage: vs2017-win2016
+  steps:
+  - template: _ci/build-all-steps.yml
+    parameters:
+      os: Windows_NT
+
+# Publish on Windows
+#- job: publish_windows
+#  displayName: Publish
+#  dependsOn: 
+#  - build_all_windows
+#  condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), eq(variables.os, 'Windows_NT'))
+#  pool:
+#    vmImage: vs2017-win2016
+#  steps:
+#  - template: _ci/publish-steps.yml
+
+# All tasks on Linux
+- job: build_all_linux
+  displayName: Build all tasks (Linux)
+  condition: and(succeeded(), not(variables.task), eq(variables.os, 'Linux'))
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - template: _ci/build-all-steps.yml
+    parameters:
+      os: Linux
+
+# All tasks on macOS
+- job: build_all_darwin
+  displayName: Build all tasks (macOS)
+  condition: and(succeeded(), not(variables.task), eq(variables.os, 'Darwin'))
+  pool:
+    vmImage: macos-10.13
+  steps:
+  - template: _ci/build-all-steps.yml
+    parameters:
+      os: Darwin
+
+# Single task
+- job: buildSingle
+  displayName: Build single task
+  condition: and(succeeded(), variables.task)
+  steps:
+  - template: _ci/build-single-steps.yml
+
+
+
+# FROM OLD TEMPLATE
 
 - task: PowerShell@2
   displayName: 'Install Pester'
@@ -31,8 +78,3 @@ steps:
   inputs:
     targetType: 'inline'
     script: 'Invoke-ScriptAnalyzer -Path .\'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
