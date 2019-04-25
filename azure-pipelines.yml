@@ -1,6 +1,6 @@
-trigger:
-- master
-- releases/*
+#trigger:
+#- master
+#- releases/*
 
 
 jobs:
