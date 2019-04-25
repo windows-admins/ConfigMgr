@@ -8,11 +8,11 @@ jobs:
 # All tasks on Windows
 - job: build_all_windows
   displayName: Build all tasks (Windows)
-  condition: and(succeeded(), not(variables.task), eq(variables.os, 'Windows_NT'))
+  condition: succeeded()
   pool:
     vmImage: vs2017-win2016
   steps:
-  - template: _ci/build-all-steps.yml
+  - template: _CI/build-all-steps.yml
     parameters:
       os: Windows_NT
 
@@ -25,7 +25,7 @@ jobs:
 #  pool:
 #    vmImage: vs2017-win2016
 #  steps:
-#  - template: _ci/publish-steps.yml
+#  - template: _CI/publish-steps.yml
 
 # All tasks on Linux
 - job: build_all_linux
@@ -34,7 +34,7 @@ jobs:
   pool:
     vmImage: ubuntu-16.04
   steps:
-  - template: _ci/build-all-steps.yml
+  - template: _CI/build-all-steps.yml
     parameters:
       os: Linux
 
@@ -45,23 +45,23 @@ jobs:
   pool:
     vmImage: macos-10.13
   steps:
-  - template: _ci/build-all-steps.yml
+  - template: _CI/build-all-steps.yml
     parameters:
       os: Darwin
 
 # Single task
 - job: buildSingle
   displayName: Build single task
-  condition: and(succeeded(), variables.task)
+  condition: succeeded()
   steps:
-  - template: _ci/build-single-steps.yml
+  - template: _CI/build-single-steps.yml
 
 
 
 # FROM OLD TEMPLATE
-- job: buildSingle
-  displayName: Build single task
-  condition: and(succeeded(), variables.task)
+- job: buildOldStuff
+  displayName: Old way of doing pester and PSScriptAnalyzer
+  condition: succeeded()
   steps:
   - task: PowerShell@2
     displayName: 'Install Pester'
