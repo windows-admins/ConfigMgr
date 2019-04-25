@@ -15,7 +15,7 @@ steps:
     displayName: Start collect diagnostics
     condition: and(succeeded(), eq(variables.collect_diagnostics, 'true'))
 
-- task: PowerShell
+- task: PowerShell@2
   displayName: 'Install Pester'
   inputs:
     targetType: 'inline'
