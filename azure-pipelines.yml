@@ -95,17 +95,4 @@ jobs:
       targetType: 'inline'
       script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory) -EnableExit -IncludeDefaultRules -ReportSummary'
 
-  - task: CmdLine@2
-    inputs:
-      script: 'PowerShell -command Invoke-ScriptAnalyzer -Path .\'
-
-  - task: CmdLine@2
-    inputs:
-      script: 'PowerShell -command Invoke-ScriptAnalyzer -Path .\'
-      workingDirectory: '$(Build.SourcesDirectory)'
-
-  - task: CmdLine@2
-    inputs:
-      script: 'PowerShell -command Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory)'
-      workingDirectory: '$(Build.SourcesDirectory)'
     
