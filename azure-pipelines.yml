@@ -13,6 +13,22 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'Install-Module -Name Pester -SkipPublisherCheck; Import-Module -Name Pester'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck; Import-Module -Name PSScriptAnalyzer'
+
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'Invoke-ScriptAnalyzer -Path .\'
+
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
