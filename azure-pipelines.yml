@@ -102,10 +102,10 @@ jobs:
   steps:
 
   - task: PowerShell@2
-    displayName: 'Get-Content'
+    displayName: 'Get-ChildItem'
     inputs:
       targetType: 'inline'
-      script: 'Get-Content -Path $(Build.SourcesDirectory)'
+      script: 'Get-ChildItem -Path $(Build.SourcesDirectory)'
 
   - task: PowerShell@2
     displayName: 'Run PSScriptAnalyzer'
@@ -122,10 +122,10 @@ jobs:
   steps:
 
   - task: PowerShell@2
-    displayName: 'Get-Content'
+    displayName: 'Get-ChildItem'
     inputs:
       targetType: 'inline'
-      script: 'Get-Content -Path .\'
+      script: 'Get-ChildItem -Path .\'
       workingDirectory: '$(Build.SourcesDirectory)'
 
   - task: PowerShell@2
@@ -144,10 +144,10 @@ jobs:
   steps:
 
   - task: PowerShell@2
-    displayName: 'Get-Content'
+    displayName: 'Get-ChildItem'
     inputs:
       targetType: 'inline'
-      script: 'Get-Content -Path .\'
+      script: 'Get-ChildItem -Path .\'
 
   - task: PowerShell@2
     displayName: 'Run PSScriptAnalyzer'
