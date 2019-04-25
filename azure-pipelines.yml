@@ -50,11 +50,11 @@ jobs:
       os: Darwin
 
 # Single task
-- job: buildSingle
-  displayName: Build single task
-  condition: succeeded()
-  steps:
-  - template: _CI/build-single-steps.yml
+#- job: buildSingle
+#  displayName: Build single task
+#  condition: succeeded()
+#  steps:
+#  - template: _CI/build-single-steps.yml
 
 
 
