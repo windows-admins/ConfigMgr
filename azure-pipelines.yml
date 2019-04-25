@@ -23,7 +23,7 @@ steps:
   displayName: 'Install PSScriptAnalyzer'
   inputs:
     targetType: 'inline'
-    script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck-Force -Verbose -Scope CurrentUser'
+    script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
 
 
 - task: PowerShell@2
