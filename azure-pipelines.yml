@@ -14,17 +14,20 @@ steps:
   displayName: 'Run a one-line script'
 
 - task: PowerShell@2
+  displayName: 'Install Pester'
   inputs:
     targetType: 'inline'
-    script: 'Install-Module -Name Pester -SkipPublisherCheck; Import-Module -Name Pester'
+    script: 'Install-Module -Name Pester -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
 
 - task: PowerShell@2
+  displayName: 'Install PSScriptAnalyzer'
   inputs:
     targetType: 'inline'
-    script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck; Import-Module -Name PSScriptAnalyzer'
+    script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck-Force -Verbose -Scope CurrentUser'
 
 
 - task: PowerShell@2
+  displayName: 'Run PSScriptAnalyzer'
   inputs:
     targetType: 'inline'
     script: 'Invoke-ScriptAnalyzer -Path .\'
