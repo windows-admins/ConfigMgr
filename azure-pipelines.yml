@@ -108,12 +108,6 @@ jobs:
       script: 'Get-Content -Path $(Build.SourcesDirectory)'
 
   - task: PowerShell@2
-    displayName: 'Install PSScriptAnalyzer'
-    inputs:
-      targetType: 'inline'
-      script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
-
-  - task: PowerShell@2
     displayName: 'Run PSScriptAnalyzer'
     inputs:
       targetType: 'inline'
@@ -135,12 +129,6 @@ jobs:
       workingDirectory: '$(Build.SourcesDirectory)'
 
   - task: PowerShell@2
-    displayName: 'Install PSScriptAnalyzer'
-    inputs:
-      targetType: 'inline'
-      script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
-
-  - task: PowerShell@2
     displayName: 'Run PSScriptAnalyzer'
     inputs:
       targetType: 'inline'
@@ -160,12 +148,6 @@ jobs:
     inputs:
       targetType: 'inline'
       script: 'Get-Content -Path .\'
-
-  - task: PowerShell@2
-    displayName: 'Install PSScriptAnalyzer'
-    inputs:
-      targetType: 'inline'
-      script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
 
   - task: PowerShell@2
     displayName: 'Run PSScriptAnalyzer'
