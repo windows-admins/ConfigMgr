@@ -95,4 +95,80 @@ jobs:
       targetType: 'inline'
       script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory) -EnableExit -IncludeDefaultRules -ReportSummary'
 
-    
+# FROM OLD TEMPLATE
+- job: buildOldStuff2
+  displayName: Old way of doing pester and PSScriptAnalyzer
+  condition: succeeded()
+  steps:
+
+  - task: PowerShell@2
+    displayName: 'Install PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-Content -Path $(Build.SourcesDirectory)'
+
+  - task: PowerShell@2
+    displayName: 'Install PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
+
+  - task: PowerShell@2
+    displayName: 'Run PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory)'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+
+# FROM OLD TEMPLATE
+- job: buildOldStuff3
+  displayName: Old way of doing pester and PSScriptAnalyzer
+  condition: succeeded()
+  steps:
+
+  - task: PowerShell@2
+    displayName: 'Install PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-Content -Path .\'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+  - task: PowerShell@2
+    displayName: 'Install PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
+
+  - task: PowerShell@2
+    displayName: 'Run PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Invoke-ScriptAnalyzer -Path .\'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+
+
+# FROM OLD TEMPLATE
+- job: buildOldStuff4
+  displayName: Old way of doing pester and PSScriptAnalyzer
+  condition: succeeded()
+  steps:
+
+  - task: PowerShell@2
+    displayName: 'Install PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-Content -Path .\'
+
+  - task: PowerShell@2
+    displayName: 'Install PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
+
+  - task: PowerShell@2
+    displayName: 'Run PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Invoke-ScriptAnalyzer -Path .\'
