@@ -11,7 +11,7 @@ steps:
 - ${{ if eq(parameters.os, 'Windows_NT') }}:
 
   # Start collect diagnostics
-  - powershell: ./_ci/start-collect-diagnostics.ps1
+  - powershell: ./_CI/start-collect-diagnostics.ps1
     displayName: Start collect diagnostics
     condition: and(succeeded(), eq(variables.collect_diagnostics, 'true'))
 
@@ -29,7 +29,7 @@ steps:
   displayName: npm install
 
 # Filter out unchanged tasks
-- script: node ./_ci/filter-tasks.js
+- script: node ./_CI/filter-tasks.js
   displayName: Filter out unchanged tasks
   env:
     PACKAGE_ENDPOINT: $(Package.Endpoint)
@@ -44,7 +44,7 @@ steps:
 - ${{ if eq(parameters.os, 'Windows_NT') }}:
 
   # Stage packages
-  - script: node ./_ci/stage-package.js
+  - script: node ./_CI/stage-package.js
     displayName: Stage package
     condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), ne(variables['numTasks'], 0))
 
@@ -69,6 +69,6 @@ steps:
 - ${{ if eq(parameters.os, 'Windows_NT') }}:
 
   # Stop collect diagnostics
-  - powershell: ./_ci/stop-collect-diagnostics.ps1
+  - powershell: ./_CI/stop-collect-diagnostics.ps1
     displayName: Stop collect diagnostics
     condition: and(always(), eq(variables.collect_diagnostics, 'true'), ne(variables['numTasks'], 0))

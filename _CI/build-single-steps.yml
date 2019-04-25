@@ -5,7 +5,7 @@ steps:
   clean: true
 
 # Start collect diagnostics
-- powershell: ./_ci/start-collect-diagnostics.ps1
+- powershell: ./_CI/start-collect-diagnostics.ps1
   displayName: Start collect diagnostics
   condition: and(succeeded(), eq(variables.os, 'Windows_NT'), eq(variables.collect_diagnostics, 'true'))
 
@@ -24,7 +24,7 @@ steps:
   displayName: Build
 
 # Stage hotfix
-- script: node ./_ci/stage-hotfix.js
+- script: node ./_CI/stage-hotfix.js
   condition: and(succeeded(), eq(variables.os, 'Windows_NT'))
   displayName: Stage hotfix
 
@@ -65,6 +65,6 @@ steps:
     searchFolder: '$(System.DefaultWorkingDirectory)/testresults'
 
 # Stop collect diagnostics
-- powershell: ./_ci/stop-collect-diagnostics.ps1
+- powershell: ./_CI/stop-collect-diagnostics.ps1
   displayName: Stop collect diagnostics
   condition: and(always(), eq(variables.os, 'Windows_NT'), eq(variables.collect_diagnostics, 'true'))
