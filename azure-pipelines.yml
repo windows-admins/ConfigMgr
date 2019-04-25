@@ -58,8 +58,8 @@ jobs:
 
 
 # FROM OLD TEMPLATE
-- job: buildSingle
-  displayName: Build single task
+- job: buildOldStuff
+  displayName: Old way of doing pester and PSScriptAnalyzer
   condition: and(succeeded(), variables.task)
   steps:
   - task: PowerShell@2
