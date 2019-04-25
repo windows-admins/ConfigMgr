@@ -58,7 +58,7 @@ jobs:
 
 
 
-# FROM OLD TEMPLATE
+# Run directly
 - job: runNative
   displayName: Run PSScriptAnalyzer Natively
   condition: succeeded()
