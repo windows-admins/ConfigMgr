@@ -2,7 +2,6 @@ trigger:
 - master
 - releases/*
 
-
 jobs:
 
 # All tasks on Windows
