@@ -52,7 +52,7 @@ jobs:
 # Single task
 - job: buildSingle
   displayName: Build single task
-  condition: and(succeeded())
+  condition: succeeded()
   steps:
   - template: _CI/build-single-steps.yml
 
