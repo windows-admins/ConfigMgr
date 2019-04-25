@@ -75,6 +75,9 @@ jobs:
       targetType: 'inline'
       script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
 
+  - task: CmdLine@2
+    inputs:
+      script: 'ls'
 
   - task: PowerShell@2
     displayName: 'Run PSScriptAnalyzer'
