@@ -11,7 +11,7 @@
     .PARAMETER SCCMDistributionPoint
         IIS server to connect to. Note that this is typically the Distribution Point.
     .PARAMETER SCCMServerDB
-        The database name.  Standard format is "ConfigMgr_" followed by the site code 
+        The database name.  Standard format is "ConfigMgr_" followed by the site code
     .PARAMETER Credential
         Credentials to use for querying SQL and IIS.
         Use to prompt for credentials: (Get-Credential -UserName 'CORP\Drivers' -Message "Enter password")
@@ -19,7 +19,7 @@
         An array of categories to use for searching for drivers. Categories are inclusive not exclusive.
         Format must be as follows: @("9370","Test")
     .PARAMETER CategoryWildCard
-        If set will search for categories using wild cards.  Thus "9370" would match both "Dell XPS 13 9370" and "Contoso 9370 Performance Pro Plus" 
+        If set will search for categories using wild cards.  Thus "9370" would match both "Dell XPS 13 9370" and "Contoso 9370 Performance Pro Plus"
     .PARAMETER InstallDrivers
         Enable installation of drivers.  Disable for use in testing or prestage scenarios.
     .PARAMETER DownloadDrivers
@@ -149,7 +149,7 @@ If ($AutoDiscover)
         {
             Write-Verbose "Unable to get the current site code from WMI."
         }
-        
+
         If(-not $SCCMServerDB -and $tsenv._SMSTSAssignedSiteCode)
         {
             $SCCMServerDB = "ConfigMgr_"+$tsenv._SMSTSAssignedSiteCode
@@ -258,12 +258,12 @@ Try
         $Devices = Get-PnPDevice
         If ($DebugPreference -ne "SilentlyContinue")
         {
-            $Devices  | Select-Object Class, FriendlyName, InstanceID, Present | Sort-Object -Property FriendlyName | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log") 
+            $Devices  | Select-Object Class, FriendlyName, InstanceID, Present | Sort-Object -Property FriendlyName | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log")
         }
     }
     Catch
     {
-        $Devices = Gwmi win32_pnpentity
+        $Devices = Get-WmiObject win32_pnpentity
         $Devices  | Select-Object PNPClass, Name, PNPDeviceID, Present | Sort-Object -Property Name | Out-File -FilePath (Join-Path -Path $Path -ChildPath "PnPDevices.log")
         # Hard set these to be false because in a Win7 scenario (most likely reason why we fell back to WMI) we can't run either of these properly.
         $HardwareMustBePresent = $False
@@ -382,7 +382,7 @@ Try
 
     Try
     {
-        $DriverListAll = $return[1] | Sort-Object -Property @{Expression = "DriverINFFile"; Descending = $False}, @{Expression = "DriverDate"; Descending = $True}, @{Expression = "DriverVersion"; Descending = $True} 
+        $DriverListAll = $return[1] | Sort-Object -Property @{Expression = "DriverINFFile"; Descending = $False}, @{Expression = "DriverDate"; Descending = $True}, @{Expression = "DriverVersion"; Descending = $True}
         $DriverList = @()
     }
     Catch
@@ -447,7 +447,7 @@ Catch
 
 # __________________________________________________________________________________
 #
-# 
+#
 LogIt -message ("Maping drivers to content download location.") -component "Main()" -type "Info"
 LogIt -message ("Parse CI_ID against v_DriverContentToPackage to get the Content_UniqueID") -component "Main()" -type "Verbose"
 # __________________________________________________________________________________
@@ -541,7 +541,7 @@ Catch
     Invoke-ErrorHandler -Message "Critical error downloading drivers" -Exception $_ -ExitCode 1
 }
 
- 
+
 # __________________________________________________________________________________
 #
 LogIt -message ("Inject the drivers into the OS") -component "Main()" -type "Info"

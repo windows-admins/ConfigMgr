@@ -20,7 +20,7 @@ ForEach($Line in $Windows) {
     $CollectionID = $line.CollectionID.Trim() #The Unique collection ID
     $HourDuration = $line.HourDuration.Trim() #Number of hours to open the window.  24 limitation imposed by SCCM
     $MinuteDuration = $line.MinuteDuration.Trim() #Limited to 59 minutes. Anything over will add one hour and all else will be ignored. Ex: 61 = 1 hour, no minutes
-    $MaintenanceWindowName = $line.Patch_Bucket.Trim() #The name of the MW for ease of 
+    $MaintenanceWindowName = $line.Patch_Bucket.Trim() #The name of the MW for ease of
     $AddDays = $line.PlusDays.Trim() #Based on Patch Tuesday. E.g.: +6 = Monday, +11 = Saturday, etc… Negative values do work.  -1 = Monday before Patch Tuesday
     $StartHour = $line.StartHour.Trim() #24 hour format. Cannot exceed a value of 23. Must use "19", not "1900"
     $StartMinute = $line.StartMinute.Trim() #Limited to 59 minutes. Anything over will add one hour and all else will be ignored. Ex: 61 = 1 hour, no minutes

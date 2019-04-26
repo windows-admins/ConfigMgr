@@ -1,7 +1,7 @@
 ﻿$days = 90
 
 
-$ADComputers = Get-ADComputer -Filter 'PasswordLastSet -ge $days' 
+$ADComputers = Get-ADComputer -Filter 'PasswordLastSet -ge $days'
 
 # $resultsobj = new-object psobject
 $table = New-Object system.Data.DataTable “BLStatus”
@@ -44,8 +44,8 @@ ForEach ($_ in $ADComputers)
         # $row = [ordered]@{Name=$_.Name;Date=$BLStatus.Date;PasswordID=$BLStatus.PasswordID;RecoveryPassword=$BLStatus.RecoveryPassword}
     }
     Else
-    {   
-        # $resultsobj | Add-Member -MemberType NoteProperty -Name "Name" -Value $_.Name -PassThru 
+    {
+        # $resultsobj | Add-Member -MemberType NoteProperty -Name "Name" -Value $_.Name -PassThru
         # $row = [ordered]@{Name=$_.Name}
         $row.Name = $_.Name
     }

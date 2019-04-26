@@ -1,8 +1,8 @@
-########################################
+﻿########################################
 # Remove Windows 10 Modern Apps (System)
 ########################################
 
-# To find app names use: 
+# To find app names use:
 # Get-AppxProvisionedPackage -online  | Select DisplayName, PackageName
 
 
@@ -22,10 +22,10 @@ $appxpackages = (
 	'MicrosoftOfficeHub',
 	'MicrosoftSolitaireCollection',
 	'Office.Sway',
-	'OneConnect', 
+	'OneConnect',
 	'People',
 	'Print3D',
-	'SkypeApp', 
+	'SkypeApp',
 	'WindowsFeedbackHub',
 	'WindowsPhone',
 	'Xbox.TCUI',
@@ -34,12 +34,12 @@ $appxpackages = (
 	'ZuneVideo',
 	'windowscommunicationsapps'
 )
- 
+
 ForEach($package in $appxpackages)
 {
     try{
-	    $packagenames=(Get-AppxProvisionedPackage -online | ?{$_.DisplayName -like '*' + $package + '*'}).PackageName
-	    
+	    $packagenames=(Get-AppxProvisionedPackage -online | Where-Object{$_.DisplayName -like '*' + $package + '*'}).PackageName
+
 	    ForEach ($packagename in $packagenames)
 	    {
 		    DISM /online /remove-provisionedappxpackage /packagename:$packagename
@@ -52,4 +52,4 @@ ForEach($package in $appxpackages)
 	    Write-Host $package
     }
 }
- 
+

@@ -1,16 +1,16 @@
 ﻿function LogIt
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Creates a log file in the CMTrace format
 	    .DESCRIPTION
 	    .EXAMPLE
 		    Example LogIt function calls
-		    LogIt -message ("Starting Logging Example Script") -component "Main()" -type Info 
-		    LogIt -message ("Log Warning") -component "Main()" -type Warning 
+		    LogIt -message ("Starting Logging Example Script") -component "Main()" -type Info
+		    LogIt -message ("Log Warning") -component "Main()" -type Warning
 		    LogIt -message ("Log Error") -component "Main()" -type Error
 		    LogIt -message ("Log Verbose") -component "Main()" -type Verbose
-		    LogIt -message ("Script Status: " + $Global:ScriptStatus) -component "Main()" -type Info 
+		    LogIt -message ("Script Status: " + $Global:ScriptStatus) -component "Main()" -type Info
 		    LogIt -message ("Stopping Logging Example Script") -component "Main()" -type Info
 			LogIt -message ("Stopping Logging Example Script") -component "Main()" -type Info -LogFile a.log
 	#>
@@ -21,7 +21,7 @@
 	    [Parameter(Mandatory=$true)]
 	    [string]$component,
 	    [Parameter(Mandatory=$true)]
-		[ValidateSet("Info","Warning","Error","Verbose")] 
+		[ValidateSet("Info","Warning","Error","Verbose")]
 	    [string]$type,
 		[string]$LogFile = $PSScriptRoot + "\LogIt.log"
 	)
@@ -58,12 +58,12 @@
         $toLog | Out-File -Append -Encoding UTF8 -FilePath $LogFile
         Write-Host $message -foreground "white"
     }
-	
+
 #    if (($type -eq 'Warning') -and ($Global:ScriptStatus -ne 'Error'))
 #	{
 #		$Global:ScriptStatus = $type
 #	}
-#	
+#
 #    if ($type -eq 'Error')
 #	{
 #		$Global:ScriptStatus = $type
@@ -77,7 +77,7 @@
     }
 
 
-} 
+}
 # SIG # Begin signature block
 # MIIOogYJKoZIhvcNAQcCoIIOkzCCDo8CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR

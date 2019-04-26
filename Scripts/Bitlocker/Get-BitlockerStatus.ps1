@@ -37,7 +37,7 @@ param(
     [alias("ComputerName")]
     [String[]] $Name,
   [parameter(ParameterSetName="PasswordID",Mandatory=$true)]
-    [String] $PasswordID,
+    [SecureString] $PasswordID,
     [String] $Domain,
     [String] $Server,
     [Management.Automation.PSCredential] $Credential
@@ -165,7 +165,7 @@ begin {
     )
     process {
       try {
-        $_.Get($property) -ne $null
+        $null -ne $_.Get($property)
       }
       catch [Management.Automation.MethodInvocationException] {
         $false
@@ -229,7 +229,7 @@ begin {
   # Searches for BitLocker recovery information for the specified password ID
   function SearchBitLockerRecoveryByPasswordID {
     param(
-      [String] $passwordID
+      [SecureString] $passwordID
     )
     $RecoverySearcher.Filter = "(&(objectClass=msFVE-RecoveryInformation)(name=*{$passwordID-*}))"
     $searchResults = $RecoverySearcher.FindAll()

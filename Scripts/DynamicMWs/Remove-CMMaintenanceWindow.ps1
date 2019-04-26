@@ -1,9 +1,9 @@
-﻿# Uncomment the line below if running in an environment where script signing is 
+﻿# Uncomment the line below if running in an environment where script signing is
 # required.
 #Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
 # Site configuration
-$SiteCode = "CON" # Site code 
+$SiteCode = "CON" # Site code
 $ProviderMachineName = "configmgr.contoso.com" # SMS Provider machine name
 
 # Customizations
@@ -13,13 +13,13 @@ $initParams = @{}
 
 # Do not change anything below this line
 
-# Import the ConfigurationManager.psd1 module 
-if((Get-Module ConfigurationManager) -eq $null) {
-    Import-Module "$($ENV:SMS_ADMIN_UI_PATH)\..\ConfigurationManager.psd1" @initParams 
+# Import the ConfigurationManager.psd1 module
+if($null -eq (Get-Module ConfigurationManager)) {
+    Import-Module "$($ENV:SMS_ADMIN_UI_PATH)\..\ConfigurationManager.psd1" @initParams
 }
 
 # Connect to the site's drive if it is not already present
-if((Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue) -eq $null) {
+if($null -eq (Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue)) {
     New-PSDrive -Name $SiteCode -PSProvider CMSite -Root $ProviderMachineName @initParams
 }
 
@@ -33,8 +33,8 @@ $Windows = Import-Csv "$PSScriptRoot\Window_Source.csv"
 ForEach($Line in $Windows) {
 $CollectionID = $Line.collectionid
 $CollectionWindows = Get-CMMaintenanceWindow -CollectionID $CollectionID
-    
-    #Remove any and all MWs found on the collection 
+
+    #Remove any and all MWs found on the collection
     Foreach($WindowName in $CollectionWindows) {
         If($WindowName) {
         $LoopWindowName = $WindowName.Name

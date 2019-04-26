@@ -3,16 +3,16 @@
 function LogIt
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Creates a log file in the CMTrace format
 	    .DESCRIPTION
 	    .EXAMPLE
 		    Example LogIt function calls
-		    LogIt -message ("Starting Logging Example Script") -component "Main()" -type Info 
-		    LogIt -message ("Log Warning") -component "Main()" -type Warning 
+		    LogIt -message ("Starting Logging Example Script") -component "Main()" -type Info
+		    LogIt -message ("Log Warning") -component "Main()" -type Warning
 		    LogIt -message ("Log Error") -component "Main()" -type Error
 		    LogIt -message ("Log Verbose") -component "Main()" -type Verbose
-		    LogIt -message ("Script Status: " + $Global:ScriptStatus) -component "Main()" -type Info 
+		    LogIt -message ("Script Status: " + $Global:ScriptStatus) -component "Main()" -type Info
 		    LogIt -message ("Stopping Logging Example Script") -component "Main()" -type Info
 			LogIt -message ("Stopping Logging Example Script") -component "Main()" -type Info -LogFile a.log
 	#>
@@ -22,7 +22,7 @@ function LogIt
 	    [string]$message,
 	    [Parameter(Mandatory=$true)]
 	    [string]$component,
-		[ValidateSet("INFO","WARNING","ERROR","VERBOSE", "DEBUG")] 
+		[ValidateSet("INFO","WARNING","ERROR","VERBOSE", "DEBUG")]
 	    [string]$type,
 		[string]$LogFile
 	)
@@ -110,12 +110,12 @@ function LogIt
     {
         Write-Host $message -foreground "Gray"
     }
-	
+
 #    if (($type -eq 'Warning') -and ($Global:ScriptStatus -ne 'Error'))
 #	{
 #		$Global:ScriptStatus = $type
 #	}
-#	
+#
 #    if ($type -eq 'Error')
 #	{
 #		$Global:ScriptStatus = $type
@@ -134,4 +134,4 @@ function LogIt
     }
 
 
-} 
+}

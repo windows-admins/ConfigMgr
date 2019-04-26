@@ -1,4 +1,4 @@
-# Map GUIDs to GPO display names
+﻿# Map GUIDs to GPO display names
 <#
 .SYNOPSIS
 .DESCRIPTION
@@ -16,7 +16,7 @@ param(
     )
 
 $results = @{}
-$STIGs = dir -Filter DoD* $rootdir
+$STIGs = Get-ChildItem -Filter DoD* $rootdir
 
 ForEach ($STIG in $STIGs)
 {
@@ -26,16 +26,16 @@ ForEach ($STIG in $STIGs)
     Write-Host $pathGPO
     if (Test-Path -Path $pathGPO)
     {
-        $GPOBackup = dir -Filter {*} $pathGPO
+        $GPOBackup = Get-ChildItem -Filter {*} $pathGPO
         $name = "STIG " + $version + " " + $STIG.Name
         Write-Host "Creating STIG: " $name
         Import-GPO -BackupId $GPOBackup.Name -Path $pathGPO -TargetName $name -CreateIfNeeded
     }
     elseif (Test-Path -Path $pathGPOs)
     {
-        $GPOBackups = dir -Filter {*} $pathGPOs
+        $GPOBackups = Get-ChildItem -Filter {*} $pathGPOs
         $count = 1
-        
+
         ForEach ($GPOBackup in $GPOBackups)
         {
             $name = "STIG " + $version + " " + $STIG.Name + " [" + $count + "]"

@@ -1,11 +1,11 @@
-<#
+﻿<#
     Name: CopyOSDLogs.ps1
     Version: 1.0
     Author: Johan Schrewelius, Onevinn AB
     Date: 2016-11-12
     Command: powershell.exe -executionpolicy bypass -file CopyOSDLogs.ps1
     Usage: Run in SCCM Task Sequence Error handling Section to zip and copy SMSTSLog folder to Share.
-    Config: 
+    Config:
         $ComputerNameVariable = "OSDComputerName"
 #>
 

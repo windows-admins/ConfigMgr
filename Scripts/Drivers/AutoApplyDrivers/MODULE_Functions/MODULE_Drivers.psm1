@@ -1,4 +1,4 @@
-Write-Debug "Loading: MODULE_Drivers"
+﻿Write-Debug "Loading: MODULE_Drivers"
 
 function Install-Drivers
 {
@@ -12,7 +12,7 @@ function Install-Drivers
 		$fErrorActionPreference = 'Stop'
 	}
 	process
-	{		
+	{
         try
 		{
             If ($fRestart)
@@ -143,7 +143,7 @@ function Download-Drivers
 
 				$foutfilepath = Join-Path -Path $fdriverpath -ChildPath $fFileName
 
-                try 
+                try
                 {
                     LogIt -message ("Fetching: "+$fURL) -component "MODULE_Drivers" -type "Debug"
                     If ($fCredential)
@@ -179,7 +179,7 @@ function Download-Drivers
 function Query-DriverListAgainstOnlineOS
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Checks drivers against online OS to verify we are only grabbing and updating drivers that have a newer version
 	    .DESCRIPTION
         .PARAMETER
@@ -237,7 +237,7 @@ function Query-DriverListAgainstOnlineOS
 function Query-XMLDevices
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Forms the XML for driver structure
 	    .DESCRIPTION
 	    .EXAMPLE
@@ -254,7 +254,7 @@ function Query-XMLDevices
 
 
         ForEach ($_ in $fDevices){
-    
+
             # Find out all our use cases where we want to skip this device
             If (-not $_)
             {
@@ -285,7 +285,7 @@ function Query-XMLDevices
                     # Edge case but vOv
                     $fXmlDevices_Xml += "<HwId>"+$__.Split("\")[1].ToString()+"</HwId>"
                 }
-        
+
             }
 
             $fXmlDevices_Xml += "</Device>"
@@ -310,7 +310,7 @@ function Query-XMLDevices
 function Query-XMLCategory
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Queries Category Information from the DB
 	    .DESCRIPTION
 	    .EXAMPLE

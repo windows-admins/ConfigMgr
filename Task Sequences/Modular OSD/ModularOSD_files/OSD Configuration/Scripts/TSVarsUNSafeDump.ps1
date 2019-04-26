@@ -16,7 +16,7 @@ $ExcludeVariables = @()
 
 # Config End
 
-$tsenv = New-Object -COMObject Microsoft.SMS.TSEnvironment 
+$tsenv = New-Object -COMObject Microsoft.SMS.TSEnvironment
 $logPath = $tsenv.Value("_SMSTSLogPath")
 $now = Get-Date -Format "yyyy-MM-dd-HH-mm-ss"
 $logFile = "TSVariables-$now.log"
@@ -28,11 +28,11 @@ function MatchArrayItem {
         [string]$Item
         )
 
-    $result = ($null -ne ($Arr | ? { $Item -match $_ }))
+    $result = ($null -ne ($Arr | Where-Object { $Item -match $_ }))
     return $result
 }
 
-$tsenv.GetVariables() | % {
+$tsenv.GetVariables() | ForEach-Object {
     if(!(MatchArrayItem -Arr $ExcludeVariables -Item $_)) {
         "$_ = $($tsenv.Value($_))" | Out-File -FilePath $logFileFullName -Append
     }

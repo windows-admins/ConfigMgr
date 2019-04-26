@@ -25,5 +25,5 @@ ForEach ($Driver in $Drivers)
     if (Test-Path -Path $DriverINF -PathType leaf)
     {
         Write-Host "File does not exist: $DriverINF"
-    }    
+    }
 }

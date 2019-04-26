@@ -1,4 +1,4 @@
-Param(
+﻿Param(
 	[string]$serverName = "SERVER.fqdn.com"
 	,[string]$CMSite = "P01"
 	,[string]$driverStore = "\\SERVER.fqdn.com\Source$\OSD\Drivers"
@@ -54,7 +54,7 @@ Function New-SCCMConnection {
 		[Parameter(Position=1)] $serverName,
 		[Parameter(Position=2)] $siteCode
 	)
-	
+
 	# Clear the results from any previous execution
 	Clear-Variable -name "sccmServer" -Scope "Global" -Force -errorAction SilentlyContinue
 	Clear-Variable -name "sccmSiteCode" -Scope "Global" -Force -errorAction SilentlyContinue
@@ -91,7 +91,7 @@ Function Import-SCCMDriverStore
 		[Parameter(Position=2)] $CMPackageSource,
 		[switch] $cleanup
 	)
-	
+
 	if ($cleanup)
 	{
 		$currentPrincipal = New-Object Security.Principal.WindowsPrincipal( [Security.Principal.WindowsIdentity]::GetCurrent() )
@@ -105,8 +105,8 @@ Function Import-SCCMDriverStore
 
 	LogIt -message ("Starting Importing Driver Store: " + $($driverStore)) -component "Import-SCCMDriverStore()" -type "Info" -LogFile $LogFile
 	#Write-Host "Starting Importing Driver Store: $($driverStore)"
-	
-	Get-ChildItem "FileSystem::$driverStore" | ? {$_.psIsContainer -eq $true} | % {
+
+	Get-ChildItem "FileSystem::$driverStore" | Where-Object {$_.psIsContainer -eq $true} | ForEach-Object {
 		$global:CurrentDepth = 1
 		SDS-ProcessFolder $_
 	}
@@ -118,17 +118,17 @@ Function SDS-ProcessFolder
 	(
 		[Parameter(Position=1)] $path
 	)
-	
+
 	$FolderPath = $path.FullName.Substring($DriverStore.Length+1, $path.FullName.Length-($DriverStore.Length+1))
 	$FolderName = $path.FullName.Substring($DriverStore.Length+1, $path.FullName.Length-($DriverStore.Length+1))
 	LogIt -message ("Processing Folder: " + $($FolderName)) -component "SDS-ProcessFolder()" -type "Verbose" -LogFile $LogFile
 	#Write-Host "Processing Folder: $($FolderName)"
-	
+
 	$FullPath = $path.FullName
 	LogIt -message ("Folder path: " + $FullPath) -component "SDS-ProcessFolder()" -type "Verbose" -LogFile $LogFile
 	#Write-Host "Folder path: $FullPath"
-	
-	Get-ChildItem -Path "FileSystem::$FullPath" | ? {$_.psIsContainer -eq $true} | % {
+
+	Get-ChildItem -Path "FileSystem::$FullPath" | Where-Object {$_.psIsContainer -eq $true} | ForEach-Object {
 		$CurrentDepth = 2
 		$FolderName = $_.FullName.Substring($DriverStore.Length+1, $_.FullName.Length-($DriverStore.Length+1))
 		LogIt -message ("Processing Folder: " + $($FolderName)) -component "SDS-ProcessFolder()" -type "Verbose" -LogFile $LogFile
@@ -136,7 +136,7 @@ Function SDS-ProcessFolder
 		$FullPathLevel2 = $_.FullName
 		LogIt -message ("Folder path: " + $FullPath) -component "SDS-ProcessFolder()" -type "Verbose" -LogFile $LogFile
 		#Write-Host "Folder path: $FullPathLevel2"
-		Get-ChildItem -Path "FileSystem::$FullPathLevel2" | ? {$_.psIsContainer -eq $true} | % {
+		Get-ChildItem -Path "FileSystem::$FullPathLevel2" | Where-Object {$_.psIsContainer -eq $true} | ForEach-Object {
 			$CurrentDepth = 3
 			SDS-ProcessPackage $_ $FolderPath
 		}
@@ -155,13 +155,13 @@ Function SDS-ProcessPackage
 	$PackageName = $PackageName.Replace("\","_")
     # Uncomment if you want to add a string to start/end of package
     #$PackageName = "D " + $PackageName + " P"
-	
+
 	LogIt -message ("Processing Driver Package: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
 	Write-Progress -Activity "Importing Drivers" -Status "Driver Package: $PackageName"
 	#Write-Host "Processing Driver Package: $($PackageName)"
 	$PackageFullPath = $package.FullName
 	LogIt -message ("Driver package path: " + $PackageFullPath) -component "SDS-ProcessPackage()" -type "Verbose" -LogFile $LogFile
-	#Write-Host "Driver package path: $PackageFullPath" 
+	#Write-Host "Driver package path: $PackageFullPath"
 	$PackageHash = Get-FolderHash $PackageFullPath
 	If (Get-ChildItem "FileSystem::$PackageFullPath" -Filter "$($PackageHash).hash")
 	{
@@ -172,18 +172,18 @@ Function SDS-ProcessPackage
 	{
 		#Connect to SCCM provider
 		Set-Location -Path $sccmSiteCode
-		
+
 		$CMCategory = Get-CMCategory -Name $PackageName -CategoryType "DriverCategories"
-		if ($CMCategory -eq $null)
+		if ($null -eq $CMCategory)
 		{
 			$CMCategory = New-CMCategory -Name $PackageName -CategoryType "DriverCategories"
 			LogIt -message ("Created new driver category: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
 			#Write-Host "Created new driver category: $($PackageName)"
 		}
-		
+
 		$CMPackage = Get-CMDriverPackage -Name $PackageName
-		
-		if ($CMPackage -eq $null)
+
+		if ($null -eq $CMPackage)
 		{
 			LogIt -message ("Driver package missing for: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Verbose" -LogFile $LogFile
 			#Write-Host "Driver package missing for $($PackageName)"
@@ -194,13 +194,13 @@ Function SDS-ProcessPackage
 
 			if (Test-Path -Path "FileSystem::$CMPackageSource")
 			{
-				if((Get-Item -Path "FileSystem::$CMPackageSource" | %{$_.GetDirectories().Count + $_.GetFiles().Count}) -gt 0)
+				if((Get-Item -Path "FileSystem::$CMPackageSource" | ForEach-Object{$_.GetDirectories().Count + $_.GetFiles().Count}) -gt 0)
 				{
 					if ($cleanup)
 					{
 						LogIt -message ("Folder already exists, removing content: " + $CMPackageSource) -component "SDS-ProcessPackage()" -type "Warning" -LogFile $LogFile
 						#Write-Host "Folder already exists, removing content"
-						dir $driverPackageSource | remove-item -recurse -force
+						Get-ChildItem $driverPackageSource | remove-item -recurse -force
 					}
 					else
 					{
@@ -218,7 +218,7 @@ Function SDS-ProcessPackage
 				LogIt -message ("Created driver package folder") -component "SDS-ProcessPackage()" -type "Verbose" -LogFile $LogFile
 				#Write-Host "Created driver package folder"
 			}
-		
+
             try
             {
 			    $CMPackage = New-CMDriverPackage -Name $PackageName -Path $CMPackageSource #-PackageSourceType StorageDirect
@@ -236,12 +236,12 @@ Function SDS-ProcessPackage
 			#Grab existing drivers for this package. This will save us time later if they already exist.
 			$ExistingDrivers = Get-CMDriver -DriverPackage $CMPackage
 			LogIt -message ("Existing driver package " + $($PackageName) + " (" + $($CMPackage.PackageID) + ") retrieved.") -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
-			#Write-Host "Existing driver package $($PackageName) ($($CMPackage.PackageID)) retrieved." 
+			#Write-Host "Existing driver package $($PackageName) ($($CMPackage.PackageID)) retrieved."
 		}
-		
+
 		$DriverFiles = Get-ChildItem "FileSystem::$PackageFullPath" -Filter *.inf -File -recurse
 		Clear-Variable -name "Count" -Force -errorAction SilentlyContinue
-		
+
 		ForEach ($DriverFile in $DriverFiles)
 		{
 			$Count++
@@ -250,11 +250,11 @@ Function SDS-ProcessPackage
 			Write-Progress -Activity "Importing Drivers" -Status "Driver Package: $PackageName" -CurrentOperation $CurrentCount
 			SDS-ImportDriver $DriverFile $CMCategory $CMPackage $ExistingDrivers
 		}
-		
-		Get-ChildItem "FileSystem::$PackageFullPath" -Filter "*.hash"  | Remove-Item 
-		
+
+		Get-ChildItem "FileSystem::$PackageFullPath" -Filter "*.hash"  | Remove-Item
+
 		$HashFile = "$($PackageFullPath)\$($PackageHash).hash"
-		$null = New-Item "FileSystem::$HashFile" -type file 
+		$null = New-Item "FileSystem::$HashFile" -type file
 	}
 }
 
@@ -272,9 +272,9 @@ Function SDS-ImportDriver
 	LogIt -message ("Importing driver: " + $driverPath) -component "SDS-ImportDriver" -type "Verbose" -LogFile $LogFile
 	#Write-Host "Importing driver $driverPath"
 
-        $driverINF = split-path $dv.FullName -leaf 
+        $driverINF = split-path $dv.FullName -leaf
         $driverPath = split-path $dv.FullName
-        
+
 	$ExistingDriver = $ExistingDrivers  | Where-Object {$_.ContentSourcePath -eq $driverPath -and $_.DriverINFFile -eq $driverINF}
 
 
@@ -285,7 +285,7 @@ Function SDS-ImportDriver
 	}
 	Else
 	{
-        
+
 		$DriverImport = Import-CMDriver -UncFileLocation $dv.FullName -AdministrativeCategory $category -DriverPackage $package -EnableAndAllowInstall $true -ImportDuplicateDriverOption "AppendCategory"
 
 		If($DriverImport)
@@ -326,7 +326,7 @@ Function Get-FolderHash
 		[string]$Algorithm="md5"
 	)
 
-	Get-ChildItem "FileSystem::$Folder" -Recurse -Exclude "*.hash" | % { $content += Get-ContentHash $_ $Algorithm }
+	Get-ChildItem "FileSystem::$Folder" -Recurse -Exclude "*.hash" | ForEach-Object { $content += Get-ContentHash $_ $Algorithm }
 
 
 	$algo = [type]"System.Security.Cryptography.$Algorithm"

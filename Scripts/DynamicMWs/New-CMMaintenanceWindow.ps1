@@ -1,12 +1,12 @@
 ﻿<#
 
-.SYNOPSIS 
+.SYNOPSIS
 Creates a Maintenace Window in Configuration Manager.
 
-.DESCRIPTION 
+.DESCRIPTION
 This script will create Maintenace Windows in Configuration Manager 2012 (or 2007).
 It will create a non-reoccuring Maintenace Window with the specified options.
-There is also an option to create Maintenace Windows based on "Patch Tuesday" or with 
+There is also an option to create Maintenace Windows based on "Patch Tuesday" or with
 an offset of days from "Patch Tuesday". This is useful when for example second Thursday of a month
 occurs before second Tuesday (see may 2013 as an example).
 
@@ -19,7 +19,7 @@ occurs before second Tuesday (see may 2013 as an example).
 .PARAMETER AddMaintenanceWindowNameMonth
     If this is used the month number, month name and year will be added to the Maintenance Window Name
     For example: <MaintenanceWindowName> "01 january 2013"
-    
+
 .PARAMETER MaintenanceWindowDescription
     Optional, this is the description of the Maintenace Window (Will be overwritten if any changes is done in the GUI).
 .PARAMETER CollectionID
@@ -61,38 +61,38 @@ New-CMMaintenanceWindow.ps1 -SiteCode EVL -MaintenanceWindowName "MW Patch Tuesd
 This will create a Maintenance Window for every month 2014 on the second Thursday after Patch Tuesday starting 21:00 and lasting 4 hours.
 
 
-.EXAMPLE 
+.EXAMPLE
 New-CMMaintenanceWindow.ps1 -SiteCode EVL -MaintenanceWindowName "MW Patch Window 8th April" -CollectionID "EVL00001" -StartYear 2013 -StartMonth 04 -StartDay 08 -StartHour 20 -StartMinute 30 -HourDuration 2 -MinuteDuration 30
 
 This will create a Maintenance Window for 2013-04-08 starting 20.30 and lasting 2 hours and 30 minutes.
 
-.EXAMPLE 
+.EXAMPLE
 New-CMMaintenanceWindow.ps1 -SiteCode EVL -MaintenanceWindowName "MW Patch Window Today" -CollectionID "EVL00001" -StartHour 20 -StartMinute 30 -HourDuration 2 -MinuteDuration 30
 
 This will create a Maintenance Window for today starting 20.30 and lasting 2 hours and 30 minutes.
 
-.NOTES 
+.NOTES
 PowerShell Source File -- New-CMMaintenanceWindow.ps1
 
 AUTHOR: 	Mattias Benninge
-MODIFIED BY: 
-COMPANY: 
+MODIFIED BY:
+COMPANY:
 DATE: 2013-04-28
 VERSION: 03
 SCRIPT LANGUAGE: PowerShell
-LAST UPDATE: 
+LAST UPDATE:
 v1.1 2013-04-28 Added switch for IsGMT
 v1.2 2014-12-19 Rewrote part of the code to solve issues when UTC convertion messed up the time and calculation of patchtuesday.
-KEYWORDS: PowerShell, SCCM, 
-DESCRIPTION: 
+KEYWORDS: PowerShell, SCCM,
+DESCRIPTION:
 
-KNOWN ISSUES: 
+KNOWN ISSUES:
 
-COMMENT: 
+COMMENT:
 
-.LINK 
+.LINK
 http://www.codeplex.com
-		
+
 #>
 
 [CmdletBinding()]
@@ -111,13 +111,13 @@ param(
 	[switch]$patchTuesday,
 	[switch]$nextmonth,
 	[switch]$currentmonth,
-	# Will create an offset of days calculated from patch Tuesday, 
+	# Will create an offset of days calculated from patch Tuesday,
 	# if this is not done sometimes for example third Thursday of the month will occur before third tuesday.
 	[int]$adddays = 0,
-	
+
     # Set values for When service windows will start, if not specified it will start at current time
 	# If Patch Tuesday switch is used only $StartYear, $starthour and $startminute will be honored.
-    [parameter(ValueFromPipeline=$true)] 
+    [parameter(ValueFromPipeline=$true)]
 	[int]$StartYear = (Get-Date).Year,
 	[int]$StartMonth = "{0:00}" -f (Get-Date).Month,
 	[int]$StartDay = "{0:00}" -f (Get-Date).Day,
@@ -130,30 +130,30 @@ param(
     [int]$HourDuration = 0,
     [parameter(Mandatory=$true)]
     [int]$MinuteDuration = 0,
-	
+
 	# If enabled MW will be created with GMT/UTC option
 	[switch]$IsGMT
 
 )
 
 ### Functions Start Here ###
-function get-secondTuesdayDate {            
+function get-secondTuesdayDate {
 param(
 [datetime]$date
-)            
-    switch ($date.DayOfWeek){            
-        "Monday"    {$patchTuesdayDate = $date.AddDays(8); break}             
-        "Tuesday"   {$patchTuesdayDate = $date.AddDays(7); break}             
-        "Wednesday" {$patchTuesdayDate = $date.AddDays(13); break}             
-        "Thursday"  {$patchTuesdayDate = $date.AddDays(12); break}             
-        "Friday"    {$patchTuesdayDate = $date.AddDays(11); break}             
-        "Saturday"  {$patchTuesdayDate = $date.AddDays(10); break}             
+)
+    switch ($date.DayOfWeek){
+        "Monday"    {$patchTuesdayDate = $date.AddDays(8); break}
+        "Tuesday"   {$patchTuesdayDate = $date.AddDays(7); break}
+        "Wednesday" {$patchTuesdayDate = $date.AddDays(13); break}
+        "Thursday"  {$patchTuesdayDate = $date.AddDays(12); break}
+        "Friday"    {$patchTuesdayDate = $date.AddDays(11); break}
+        "Saturday"  {$patchTuesdayDate = $date.AddDays(10); break}
         "Sunday"    {$patchTuesdayDate = $date.AddDays(9); break}
-     }            
+     }
      $patchDate = $patchTuesdayDate.AddDays($adddays)
-     return $patchDate          
-}            
-            
+     return $patchDate
+}
+
 #Function to convert normal datetime object into DMTFDateTime which is needed by ConfigManager ScheduleToken
 Function Convert-NormalDateToConfigMgrDate {
     [CmdletBinding()]
@@ -165,12 +165,12 @@ Function Convert-NormalDateToConfigMgrDate {
     return [System.Management.ManagementDateTimeconverter]::ToDMTFDateTime($convertdate)
 }
 
-Function create-ScheduleToken { 
+Function create-ScheduleToken {
 $class_SMS_ST_NonRecurring = [wmiclass]""
 $class_SMS_ST_NonRecurring.psbase.Path ="\\$siteserver\ROOT\SMS\Site_$($SiteCode):SMS_ST_NonRecurring"
 
-$scheduleToken = $class_SMS_ST_NonRecurring.CreateInstance()   
-    if($scheduleToken) 
+$scheduleToken = $class_SMS_ST_NonRecurring.CreateInstance()
+    if($scheduleToken)
         {
         $scheduleToken.DayDuration = 0
         $scheduleToken.HourDuration = $HourDuration
@@ -180,14 +180,14 @@ $scheduleToken = $class_SMS_ST_NonRecurring.CreateInstance()
 
         $class_SMS_ScheduleMethods = [wmiclass]""
         $class_SMS_ScheduleMethods.psbase.Path ="\\$siteserver\ROOT\SMS\Site_$($SiteCode):SMS_ScheduleMethods"
-        
+
         $script:ScheduleString = $class_SMS_ScheduleMethods.WriteToString($scheduleToken)
         [string]$ScheduleString.StringData
-        
-        } 
+
+        }
 }
 
-Function New-CMMaintenanceWindow 
+Function New-CMMaintenanceWindow
 {
 [CmdletBinding()]
 param
@@ -203,11 +203,11 @@ $SccmWmiInfo = @{
 $CollelectionSettings = Get-WmiObject @SccmWmiInfo -Query "Select * From SMS_CollectionSettings Where CollectionID = '$COLLECTIONID'"
 $CollelectionSettings = [wmi]$CollelectionSettings.__PATH
 
-if ($CollelectionSettings -eq $null) {
+if ($null -eq $CollelectionSettings) {
 $CollelectionSettings = ([WMIClass] ("\\$siteserver\root\SMS\site_$($SiteCode):SMS_CollectionSettings")).CreateInstance();
 $CollelectionSettings.CollectionID = $CollectionID;
 $disposable = $CollelectionSettings.Put();
-} 
+}
 
 $CollelectionSettings.Get()
 
@@ -245,34 +245,34 @@ $CollelectionSettings.Put() |Out-Null
 
 }
 
-function Get-patchTuesdayDate {            
- 	if ($nextmonth){            
-        $now = Get-Date            
+function Get-patchTuesdayDate {
+ 	if ($nextmonth){
+        $now = Get-Date
         if ($now.Month -eq 12){
             $dateUTC = Get-Date -Day 1 -Month $($now.addmonths(1)).month -Year $($now.addyears(1)).year
             $date = [datetime]"$($dateUTC)"
             get-secondTuesdayDate $date $adddays
-        } 
-        else {       
+        }
+        else {
             $dateUTC = Get-Date -Day 1 -Month $($now.Month + 1) -Year $now.Year
             $date = [datetime]"$($dateUTC)"
-            get-secondTuesdayDate $date $adddays           
+            get-secondTuesdayDate $date $adddays
         }
-    }       
+    }
 	elseif ($currentmonth) {
-			$now = Get-Date  
+			$now = Get-Date
 			$dateUTC = Get-Date -Day 1 -Month $now.Month -Year $now.Year
             $date = [datetime]"$($dateUTC)"
             get-secondTuesdayDate $date $adddays
 		}
-	
-    else {            
+
+    else {
         For ($i = 1; $i -le 12 ; $i++)
         {
-            $dateUTC = Get-Date -Day 1 -Month $i -Year $($StartYear) 
-            get-secondTuesdayDate $dateUTC $adddays 
-        }                
-    }            
+            $dateUTC = Get-Date -Day 1 -Month $i -Year $($StartYear)
+            get-secondTuesdayDate $dateUTC $adddays
+        }
+    }
 }
 ### Functions End Here ###
 
@@ -283,7 +283,7 @@ if($patchTuesday)
     {
         [datetime]$MWstartTime = Get-Date -Day $newdate.Day -Month $newdate.Month -Year $newdate.Year -Hour $StartHour -Minute $StartMinute -Second 0 -Millisecond 0
         $schedulestring = create-ScheduleToken $MWstartTime
-        try 
+        try
             {
                 New-CMMaintenanceWindow $MWstartTime
             }
@@ -303,11 +303,11 @@ if($patchTuesday)
 }
 else
 {
-    [datetime]$MWstartTime = Get-Date -Day $StartDay -Month $StartMonth -Year $StartYear -Hour $StartHour -Minute $StartMinute -Second 0 -Millisecond 0 
+    [datetime]$MWstartTime = Get-Date -Day $StartDay -Month $StartMonth -Year $StartYear -Hour $StartHour -Minute $StartMinute -Second 0 -Millisecond 0
 
     $schedulestring = create-ScheduleToken $MWstartTime
 
-    try 
+    try
         {
             New-CMMaintenanceWindow $MWstartTime
         }

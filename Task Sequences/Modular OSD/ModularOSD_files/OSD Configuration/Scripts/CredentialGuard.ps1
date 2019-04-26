@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Enable Credential Guard on Windows 10 during OS Deployment with ConfigMgr
 
@@ -63,7 +63,7 @@ Process {
 
         # Construct final log entry
         $LogText = "<![LOG[$($Value)]LOG]!><time=""$($Time)"" date=""$($Date)"" component=""CredentialGuard"" context=""$($Context)"" type=""$($Severity)"" thread=""$($PID)"" file="""">"
-  
+
       # Add value to log file
         try {
           Add-Content -Value $LogText -LiteralPath $LogFilePath -ErrorAction Stop
@@ -90,7 +90,7 @@ Process {
             Write-CMLogEntry -Value "An error occured when enabling required windows features" -Severity 3
         }
     }
-    
+
     # Add required registry key for Credential Guard
     $RegistryKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard"
     if (-not(Test-Path -Path $RegistryKeyPath)) {

@@ -83,7 +83,7 @@ function New-SqlConnection
 	(
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
-		[string]$ConnectionString	
+		[string]$ConnectionString
 	)
 	begin
 	{
@@ -143,7 +143,7 @@ function Invoke-SqlCommand
             else
             {
                 LogIt -message ("Calling New-SqlConnectionString without credentials") -component "MODULE_SQL" -type "DEBUG"
-                $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database 
+                $connectionString = New-SqlConnectionString -ServerName $ServerName -Database $Database
             }
 
             LogIt -message ("Calling New-SqlConnection") -component "MODULE_SQL" -type "DEBUG"

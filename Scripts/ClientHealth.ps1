@@ -1,27 +1,27 @@
-###########################################################  
+﻿###########################################################
 # Automated repair of SCCM client
-########################################################### 
- 
-#ERROR REPORTING ALL 
-Set-StrictMode -Version latest 
- 
-#---------------------------------------------------------- 
-#FUNCTION RepairServices 
-#---------------------------------------------------------- 
+###########################################################
+
+#ERROR REPORTING ALL
+Set-StrictMode -Version latest
+
+#----------------------------------------------------------
+#FUNCTION RepairServices
+#----------------------------------------------------------
 Function Repair_Services
-{ 
+{
 
    Param(
 	[parameter(Mandatory=$true)]
 	$ServiceName  # Must be string or array of strings
 	)
-   
+
 	ForEach ($Service in $ServiceName)
 	{
 		Write-Host "Verifying $Service"
 
-		Try 
-		{ 
+		Try
+		{
 			$OBJ_service = Get-Service -Name $Service
 			$Test = $True
 
@@ -47,23 +47,23 @@ Function Repair_Services
 }
 
 
-#---------------------------------------------------------- 
-#FUNCTION Register Windows Components 
-#---------------------------------------------------------- 
-Function Register_Windows_Components 
-{ 
+#----------------------------------------------------------
+#FUNCTION Register Windows Components
+#----------------------------------------------------------
+Function Register_Windows_Components
+{
 
    Param(
 	[parameter(Mandatory=$true)]
 	$Components  # Must be string or array of strings
 	)
-   
+
 	ForEach ($Component in $Components)
 	{
 		Write-Host "Verifying $Component"
 
-		Try 
-		{ 
+		Try
+		{
 			Write-Host "regsvr32.exe /s C:\Windows\system32\$Component"
 			regsvr32.exe /s "C:\Windows\system32\$Component"
 		}
@@ -74,11 +74,11 @@ Function Register_Windows_Components
 	}
 }
 
-#---------------------------------------------------------- 
+#----------------------------------------------------------
 #FUNCTION Reset DCOM Permissions
-#---------------------------------------------------------- 
-Function Reset_DCOM_Permissions 
-{ 
+#----------------------------------------------------------
+Function Reset_DCOM_Permissions
+{
 	$converter = new-object system.management.ManagementClass Win32_SecurityDescriptorHelper
 
 	 $Reg = [WMIClass]"root\default:StdRegProv"
@@ -98,50 +98,50 @@ Function Reset_DCOM_Permissions
 }
 
 
-#---------------------------------------------------------- 
+#----------------------------------------------------------
 #FUNCTION Repair WMI
-#---------------------------------------------------------- 
+#----------------------------------------------------------
 Function Repair_WMI
-{ 
+{
 	winmgmt /verifyrepository
 	winmgmt /salvagerepository
 }
 
 
 
-#---------------------------------------------------------- 
-#FUNCTION RepairSCCM 
-#---------------------------------------------------------- 
-Function Repair_SCCM 
-{ 
+#----------------------------------------------------------
+#FUNCTION RepairSCCM
+#----------------------------------------------------------
+Function Repair_SCCM
+{
 	Write-Host "Repairing CCM Client"
-	Try 
-	{ 
-		$getProcess = Get-Process -Name ccmrepair* 
-		If ($getProcess) 
-		{ 
-			Write-Host "[WARNING] SCCM Repair is already running. Script will end." 
-			Exit 1 
-		} 
-		Else 
-		{ 
-			Write-Host "[INFO] Connect to the WMI Namespace on $strComputer." 
-			$SMSCli = [wmiclass] "\root\ccm:sms_client" 
-			Write-Host "[INFO] Trigger the SCCM Repair on $strComputer." 
-			# The actual repair is put in a variable, to trap unwanted output. 
-			$repair = $SMSCli.RepairClient() 
-			Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair" 
-		} 
-	} 
-	Catch 
-    	{ 
+	Try
+	{
+		$getProcess = Get-Process -Name ccmrepair*
+		If ($getProcess)
+		{
+			Write-Host "[WARNING] SCCM Repair is already running. Script will end."
+			Exit 1
+		}
+		Else
+		{
+			Write-Host "[INFO] Connect to the WMI Namespace on $strComputer."
+			$SMSCli = [wmiclass] "\root\ccm:sms_client"
+			Write-Host "[INFO] Trigger the SCCM Repair on $strComputer."
+			# The actual repair is put in a variable, to trap unwanted output.
+			$repair = $SMSCli.RepairClient()
+			Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair"
+		}
+	}
+	Catch
+    	{
 		# The soft repair trigger failed, so lets fall back to some more hands on methods.
-		
+
         	Stop-Service -Name "CcmExec"
 
 		$CCMPath = (Get-ItemProperty("HKLM:\SOFTWARE\Microsoft\SMS\Client\Configuration\Client Properties")).$("Local SMS Path")
-		$files = get-childitem "$($CCMPath)ServiceData\Messaging\EndpointQueues" -include *.msg,*.que -recurse 
-		
+		$files = get-childitem "$($CCMPath)ServiceData\Messaging\EndpointQueues" -include *.msg,*.que -recurse
+
 		foreach ($file in $files)
 		{
 		    Try
@@ -219,22 +219,22 @@ Function Repair_SCCM
 
 		# Probably should do something if running CCMsetup failed but that's for a future improvement.
 		# For now we just give up.
-	} 
-} 
-# RUN SCRIPT  
+	}
+}
+# RUN SCRIPT
 
- 
-#---------------------------------------------------------- 
+
+#----------------------------------------------------------
 #FUNCTION PolicyHandler
-#---------------------------------------------------------- 
+#----------------------------------------------------------
 Function Policy_Handler
-{ 
+{
 	# Reset the policy, and fetch new ones.
 
 	Try
 	{
-		$SMSCli = [wmiclass] "\root\ccm:sms_client" 
-	
+		$SMSCli = [wmiclass] "\root\ccm:sms_client"
+
 		$trapreturn = $SMSCli.ResetPolicy()
 		Start-Sleep -Seconds 60
 		$trapreturn = $SMSCli.RequestMachinePolicy()
@@ -311,4 +311,4 @@ Reset_DCOM_Permissions
 Repair_WMI
 Repair_SCCM
 Policy_Handler
-#Finished 
+#Finished

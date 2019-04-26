@@ -1,4 +1,4 @@
-###################################
+﻿###################################
 #
 #Automated Windows Update Fix
 #Gleaned from https://support.microsoft.com/en-us/help/971058/how-do-i-reset-windows-update-components
@@ -45,9 +45,9 @@ $dllList = @(
     "wuweb.dll", # Windows Update Web Control
     "qmgr.dll", # Background Intelligent Transfer Service
     "qmgrprxy.dll", # Background Intelligent Transfer Service
-    "wucltux.dll", # Windows Update Client User Experience 
+    "wucltux.dll", # Windows Update Client User Experience
     "muweb.dll", # Microsoft Update Web Control
-    "wuwebv.dll" # Windows Update Vista Web Control  
+    "wuwebv.dll" # Windows Update Vista Web Control
 )
 $userDL = "$env:ALLUSERSPORFILE\Microsoft\Network\Downloader"
 $swdFolder = "$env:WINDIR\SoftwareDistribution"
@@ -62,7 +62,7 @@ If (Test-path $userDL) {
     Write-Host "Deleting qmgr*.dat from the All Users Profile."
 }
 
-# Aggressive approach: Rename the Software Distribution & catroot2 folder's backup copies   
+# Aggressive approach: Rename the Software Distribution & catroot2 folder's backup copies
     # First, check to see if its been done already; remove .bak if so, then rename current folder
     If (Test-Path ($swdFolder + ".bak")) {
         Remove-Item ($swdFolder + ".bak") -Recurse

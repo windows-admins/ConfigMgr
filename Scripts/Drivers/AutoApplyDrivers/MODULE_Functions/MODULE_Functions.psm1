@@ -1,9 +1,9 @@
-Write-Debug "Loading: MODULE_Functions"
+ï»¿Write-Debug "Loading: MODULE_Functions"
 
 function Get-TSEnvironment
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Connects to a task sequence environment and fetches variables
 	    .DESCRIPTION
 	    .EXAMPLE
@@ -105,7 +105,7 @@ Format the incoming object as the text of an XML document.
 function Validate-CriticalParameters
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Validates paramaters that are critical and cannot be missing.
 	    .DESCRIPTION
 	    .EXAMPLE
@@ -145,7 +145,7 @@ function Validate-CriticalParameters
 function Query-IfAdministrator
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Verifies that the current execution context has administrative rights
 	    .DESCRIPTION
 	    .EXAMPLE
@@ -157,7 +157,7 @@ function Query-IfAdministrator
 
     try
     {
-        If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] “Administrator”))
+        If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] ï¿½Administratorï¿½))
         {
             Return $True
         }
@@ -176,7 +176,7 @@ function Query-IfAdministrator
 function Invoke-ErrorHandler
 {
 	<#
-	    .SYNOPSIS 
+	    .SYNOPSIS
 	      Handles an error outputting standard information and optionally exiting.
 	    .DESCRIPTION
 	    .EXAMPLE
@@ -200,7 +200,7 @@ function Invoke-ErrorHandler
         {
             LogIt -message (" ") -component "MODULE_ErrorHandler" -type "Error"
             LogIt -message ("Error information:") -component "MODULE_ErrorHandler" -type "Error"
-            
+
             If ($Exception.Exception.Message)
             {
                 LogIt -message ($Exception.Exception.Message) -component "MODULE_ErrorHandler" -type "Error"
@@ -227,7 +227,7 @@ function Invoke-ErrorHandler
             }
         }
 
-        
+
         If ($ExitCode)
         {
             LogIt -message ("Exiting with code: "+$ExitCode) -component " " -type "Warning"
