@@ -3,14 +3,9 @@ parameters:
 
 steps:
 
-# Clean
-- checkout: self
-  clean: true
-
-  # Start collect diagnostics
-  - powershell: ./_CI/start-collect-diagnostics.ps1
-    displayName: Start collect diagnostics
-    condition: and(succeeded(), eq(variables.collect_diagnostics, 'true'))
+  # Clean
+  - checkout: self
+    clean: true
     
   - task: PowerShell@2
     displayName: 'Dump SourcesDirectory'
@@ -36,7 +31,3 @@ steps:
       targetType: 'inline'
       script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory) -EnableExit -IncludeDefaultRules -ReportSummary -Recurse'
 
-  # Stop collect diagnostics
-  - powershell: ./_CI/stop-collect-diagnostics.ps1
-    displayName: Stop collect diagnostics
-    condition: and(always(), eq(variables.collect_diagnostics, 'true'), ne(variables['numTasks'], 0))
