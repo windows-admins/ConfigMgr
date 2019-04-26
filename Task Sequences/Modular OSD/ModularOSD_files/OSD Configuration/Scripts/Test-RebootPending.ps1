@@ -11,7 +11,10 @@ function Test-PendingReboot
    if(($null -ne $status) -and $status.RebootPending){
      return $true
    }
- }catch{}
+ }
+ catch {
+  Write-Debug "Failed to query WMI"
+ }
 
  return $false
 }
