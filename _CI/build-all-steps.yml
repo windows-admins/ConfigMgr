@@ -7,9 +7,6 @@ steps:
 - checkout: self
   clean: true
 
-# Only when building on Windows:
-- ${{ if eq(parameters.os, 'Windows_NT') }}:
-
   # Start collect diagnostics
   - powershell: ./_CI/start-collect-diagnostics.ps1
     displayName: Start collect diagnostics
@@ -38,10 +35,6 @@ steps:
     inputs:
       targetType: 'inline'
       script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory) -EnableExit -IncludeDefaultRules -ReportSummary -Recurse'
-    
-
-# Only when building on Windows:
-- ${{ if eq(parameters.os, 'Windows_NT') }}:
 
   # Stop collect diagnostics
   - powershell: ./_CI/stop-collect-diagnostics.ps1
