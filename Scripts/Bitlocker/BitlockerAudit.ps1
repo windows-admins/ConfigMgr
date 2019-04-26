@@ -23,11 +23,11 @@ ForEach ($_ in $ADComputers)
 
     $row = $table.NewRow()
 
-    Write-Host $_.Name
+    Write-Debug $_.Name
 
     If ($_.Name -eq "CLIENT2")
     {
-        Write-Host BREAK
+        Write-Debug BREAK
     }
 
 

@@ -5,12 +5,12 @@ $RemoveWindows = "$PSScriptRoot\Remove-CMMaintenanceWindow.ps1"
 $CMMaintenance = "$PSScriptRoot\New-CMMaintenanceWindow.ps1"
 
 #Remove existing maintenance windows with the Remove-CMMantenanceWindow.ps1
-Write-Host "Removing existing Maintenance Windows"
+Write-Debug "Removing existing Maintenance Windows"
 Start-Process -FilePath powershell.exe -ArgumentList "-file $RemoveWindows" -Wait
-Write-Host "Maintenance Windows Removed" -ForegroundColor Green
+Write-Debug "Maintenance Windows Removed" -ForegroundColor Green
 
 #Import the CSV file containing the new MW information, and their intended targets
-Write-Host "Applying new Maintenance Windows"
+Write-Debug "Applying new Maintenance Windows"
 $Windows = Import-Csv "$PSScriptRoot\Window_Source.csv" #If you use a different CSV name, make sure to change it here!
 
 #Loop through the Collections listed in the CSV, and create a MW based on the specifications on each of the Collections
@@ -26,7 +26,7 @@ ForEach($Line in $Windows) {
     $StartMinute = $line.StartMinute.Trim() #Limited to 59 minutes. Anything over will add one hour and all else will be ignored. Ex: 61 = 1 hour, no minutes
 
     #Add new MW, via Add-CMMaintenanceWindow.ps1, with the variables above pulled from the CSV
-    Write-Host "Processing"$MaintenanceWindowName
+    Write-Debug "Processing"$MaintenanceWindowName
     Start-Process -FilePath powershell.exe -ArgumentList "-file $CMMaintenance -SiteCode $SiteCode -MaintenanceWindowName ""$MaintenanceWindowName"" -AddMaintenanceWindowNameMonth -CollectionID $collectionid -PatchTuesday -adddays $adddays -currentmonth -StartHour $StartHour -StartMinute $StartMinute -HourDuration $HourDuration -MinuteDuration $MinuteDuration -siteserver $siteserver" -NoNewWindow -Wait
 
 }

@@ -5,7 +5,7 @@ $drivers = Get-CMDriver
 ForEach ($driver in $drivers)
 {
 Remove-CMDriver -InputObject $driver -Force
-Write-Host "Removing driver: $($driver.LocalizedDisplayName)"
+Write-Debug "Removing driver: $($driver.LocalizedDisplayName)"
 
 }
 
@@ -14,7 +14,7 @@ $CMCategories = $CMCategories = Get-CMCategory -CategoryType "DriverCategories"
 ForEach ($CMCategory in $CMCategories)
 {
     Remove-CMCategory -InputObject $CMCategory -Force
-    Write-Host "Removing driver category: $($CMCategory.LocalizedCategoryInstanceName)"
+    Write-Debug "Removing driver category: $($CMCategory.LocalizedCategoryInstanceName)"
 }
 
 $CMDriverPackages = Get-CMDriverPackage
@@ -22,5 +22,5 @@ $CMDriverPackages = Get-CMDriverPackage
 ForEach ($CMDriverPackage in $CMDriverPackages)
 {
     Remove-CMDriverPackage -InputObject $CMDriverPackage -Force
-    Write-Host "Removing driver package: $($CMDriverPackage.Name)"
+    Write-Debug "Removing driver package: $($CMDriverPackage.Name)"
 }

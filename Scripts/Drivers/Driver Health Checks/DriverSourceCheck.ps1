@@ -13,17 +13,17 @@ ForEach ($Driver in $Drivers)
 
     $DriverINF = $Driver.ContentSourcePath + $Driver.DriverINFFile
 
-    #Write-Host "Testing: $DriverINF"
+    #Write-Debug "Testing: $DriverINF"
 
     #if (Test-Path -Path FileSystem::$Driver.ContentSourcePath)
     if (Test-Path -Path $Driver.ContentSourcePath)
     {
-        Write-Host "Path does not exist: $Driver.ContentSourcePath"
+        Write-Debug "Path does not exist: $Driver.ContentSourcePath"
     }
 
     #if (Test-Path -Path FileSystem::$Driver.ContentSourcePath+$Driver.DriverINFFile -PathType leaf)
     if (Test-Path -Path $DriverINF -PathType leaf)
     {
-        Write-Host "File does not exist: $DriverINF"
+        Write-Debug "File does not exist: $DriverINF"
     }
 }

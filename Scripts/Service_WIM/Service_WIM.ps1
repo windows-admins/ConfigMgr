@@ -70,7 +70,7 @@ $AdkDism = 'C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit
 if (Test-Path -PathType Leaf -Path $AdkDism) {$dism = $AdkDism} else {$dism = "dism.exe"}
 
 #Export specified Index.
-Write-Host "Exporting Single Index..."
+Write-Debug "Exporting Single Index..."
 #Check for existence of destination image file for export. If it already exists, dism will not error out and just add another index, so it needs to be removed.
 if ((Test-Path $DestinationImage) -eq $True) {Write-Warning "Destination image file, $DestinationImage, already exists. Please remove the file and re-run the script. Otherwise, DISM will reuse the existing file and add another index."
     Exit}
@@ -87,8 +87,8 @@ If ($dism_wait.ExitCode -ne 0) {
 if ($IndexOnly -eq $False)
     {
     #Mount .wim for dism actions.
-    Write-Host "Mounting Image..."
-    Write-Host "Do not open $MountDir in Explorer while the script is running."
+    Write-Debug "Mounting Image..."
+    Write-Debug "Do not open $MountDir in Explorer while the script is running."
     $dism_wait = Start-Process $dism -PassThru -ArgumentList "/mount-image /ImageFile:`"$SourceDirectory\install-temp.wim`" /Index:1 /MountDir:`"$MountDir`""
     $dism_wait.WaitForExit()
     If ($dism_wait.ExitCode -ne 0) {
@@ -99,7 +99,7 @@ if ($IndexOnly -eq $False)
     #Add update package(s) to mounted WIM.
     $UpdateFiles = Get-ChildItem -Path "$SourceDirectory" -Recurse -Include *.msu,*.cab
     foreach ($UpdateFile in $UpdateFiles) {
-        Write-Host "Adding Update: $UpdateFile"
+        Write-Debug "Adding Update: $UpdateFile"
         $dism_wait = Start-Process $dism -PassThru -Argumentlist "/Image:`"$MountDir`" /Add-Package /PackagePath:`"$UpdateFile`""
         $dism_wait.WaitForExit()
         If ($dism_wait.ExitCode -ne 0) {
@@ -111,7 +111,7 @@ if ($IndexOnly -eq $False)
             }
         }
     #Cleanup .wim
-    Write-Host "Cleaning Up WIM..."
+    Write-Debug "Cleaning Up WIM..."
     $dism_wait = Start-Process $dism -PassThru -Argumentlist "/Image:`"$MountDir`" /Cleanup-Image /StartComponentCleanup /ResetBase"
     $dism_wait.WaitForExit()
     If ($dism_wait.ExitCode -ne 0) {
@@ -122,7 +122,7 @@ if ($IndexOnly -eq $False)
         Exit
         }
     #Unmount .wim and save changes.
-    Write-Host "Unmounting WIM..."
+    Write-Debug "Unmounting WIM..."
     $dism_wait = Start-Process $dism -PassThru -ArgumentList "/unmount-image /MountDir:`"$MountDir`" /Commit"
     $dism_wait.WaitForExit()
     If ($dism_wait.ExitCode -ne 0) {
@@ -130,7 +130,7 @@ if ($IndexOnly -eq $False)
         Write-Warning "You can check C:\Windows\Logs\DISM\dism.log for errors."
     }
     #Final Export to Optimize Size
-    Write-Host "Exporting WIM for additional space savings..."
+    Write-Debug "Exporting WIM for additional space savings..."
     $dism_wait = Start-Process $dism -PassThru -ArgumentList "/export-image /SourceImageFile:`"$SourceDirectory\install-temp.wim`" /SourceIndex:1 /DestinationImageFile:`"$DestinationImage`" /Compress:max"
     $dism_wait.WaitForExit()
     If ($dism_wait.ExitCode -ne 0) {
@@ -139,6 +139,6 @@ if ($IndexOnly -eq $False)
         Exit
     }
    #Delete Temporary WIM File.
-   Write-Host "Deleting Temporary WIM..."
+   Write-Debug "Deleting Temporary WIM..."
    Remove-Item -Path "$SourceDirectory\install-temp.wim" -Force
    }

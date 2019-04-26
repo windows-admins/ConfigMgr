@@ -1,15 +1,15 @@
 # Setup job variables
 $collectorName = "vsts-tasks"
-Write-Host "##vso[task.setvariable variable=collectorName]$collectorName"
-Write-Host "##vso[task.setvariable variable=collectorStartTime]$([System.DateTime]::UtcNow.ToString("O"))"
+Write-Debug "##vso[task.setvariable variable=collectorName]$collectorName"
+Write-Debug "##vso[task.setvariable variable=collectorStartTime]$([System.DateTime]::UtcNow.ToString("O"))"
 $jobName = $env:system_jobDisplayName
 
 # Remove any previously created collector
-Write-Host "Deleting collector"
+Write-Debug "Deleting collector"
 & C:\Windows\System32\logman.exe delete -n $collectorName
 
 # Create the collector
-Write-Host "Creating collector"
+Write-Debug "Creating collector"
 $counters = @(
     "\FileSystem Disk Activity(_Total)\FileSystem Bytes Read"
     "\FileSystem Disk Activity(_Total)\FileSystem Bytes Written"
@@ -29,5 +29,5 @@ $maxSize = "1000" # 1,000 mb
 & C:\Windows\System32\logman.exe create counter -n $collectorName -c @counters -o "$PSScriptRoot\..\performance-monitors-$jobName-$('{0:yyyyMMdd-hhmmss}' -f ([System.DateTime]::Now))" -v nnnnnn -f bin -max $maxSize
 
 # Start the collector
-Write-Host "Starting collector"
+Write-Debug "Starting collector"
 & C:\Windows\System32\logman.exe start -n $collectorName

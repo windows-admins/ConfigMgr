@@ -18,7 +18,7 @@ Function Repair_Services
 
 	ForEach ($Service in $ServiceName)
 	{
-		Write-Host "Verifying $Service"
+		Write-Debug "Verifying $Service"
 
 		Try
 		{
@@ -34,14 +34,14 @@ Function Repair_Services
 			# Start service if it isn't already
 			if ($obj_service.Status -ne "Running")
 			{
-				Write-Host "Starting service."
+				Write-Debug "Starting service."
 				Set-Service -Name $obj_service.Name -StartupType Automatic -Status Running
 				Start-Service -Name $obj_service.Name
 			}
 		}
 		Catch
 		{
-			Write-Host "Error fixing service"
+			Write-Debug "Error fixing service"
 		}
 	}
 }
@@ -60,16 +60,16 @@ Function Register_Windows_Components
 
 	ForEach ($Component in $Components)
 	{
-		Write-Host "Verifying $Component"
+		Write-Debug "Verifying $Component"
 
 		Try
 		{
-			Write-Host "regsvr32.exe /s C:\Windows\system32\$Component"
+			Write-Debug "regsvr32.exe /s C:\Windows\system32\$Component"
 			regsvr32.exe /s "C:\Windows\system32\$Component"
 		}
 		Catch
 		{
-			Write-Host "Error fixing service"
+			Write-Debug "Error fixing service"
 		}
 	}
 }
@@ -114,23 +114,23 @@ Function Repair_WMI
 #----------------------------------------------------------
 Function Repair_SCCM
 {
-	Write-Host "Repairing CCM Client"
+	Write-Debug "Repairing CCM Client"
 	Try
 	{
 		$getProcess = Get-Process -Name ccmrepair*
 		If ($getProcess)
 		{
-			Write-Host "[WARNING] SCCM Repair is already running. Script will end."
+			Write-Debug "[WARNING] SCCM Repair is already running. Script will end."
 			Exit 1
 		}
 		Else
 		{
-			Write-Host "[INFO] Connect to the WMI Namespace on $strComputer."
+			Write-Debug "[INFO] Connect to the WMI Namespace on $strComputer."
 			$SMSCli = [wmiclass] "\root\ccm:sms_client"
-			Write-Host "[INFO] Trigger the SCCM Repair on $strComputer."
+			Write-Debug "[INFO] Trigger the SCCM Repair on $strComputer."
 			# The actual repair is put in a variable, to trap unwanted output.
 			$repair = $SMSCli.RepairClient()
-			Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair"
+			Write-Debug "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair"
 		}
 	}
 	Catch
@@ -146,12 +146,12 @@ Function Repair_SCCM
 		{
 		    Try
 		    {
-			Write-Host "Removing $file.FullName"
+			Write-Debug "Removing $file.FullName"
 			remove-item $file.FullName -Force
 		    }
 		    Catch
 		    {
-			Write-Host "Failed to remove $file.FullName"
+			Write-Debug "Failed to remove $file.FullName"
 		    }
 		}
 
@@ -168,8 +168,8 @@ Function Repair_SCCM
 			While (Get-Process -Name ccmrepair*)
 			{
 				if ($count -gt 60){
-					Write-Host "We've looped more than 60 times which means this has ran for more than 10 minutes."
-					Write-Host "Break out so we don't run forever."
+					Write-Debug "We've looped more than 60 times which means this has ran for more than 10 minutes."
+					Write-Debug "Break out so we don't run forever."
 					$CCMRepairFailed = $True
 					break
 				}
@@ -179,7 +179,7 @@ Function Repair_SCCM
 		}
 		else
 		{
-			Write-Host "CCMRepair doesn't exist"
+			Write-Debug "CCMRepair doesn't exist"
 			$CCMRepairFailed = $True
 		}
 
@@ -201,8 +201,8 @@ Function Repair_SCCM
 				While (Get-Process -Name ccmsetup*)
 				{
 					if ($count -gt 60){
-						Write-Host "We've looped more than 60 times which means this has ran for more than 10 minutes."
-						Write-Host "Break out so we don't run forever."
+						Write-Debug "We've looped more than 60 times which means this has ran for more than 10 minutes."
+						Write-Debug "Break out so we don't run forever."
 						$CCMSetupFailed = $True
 						break
 					}
@@ -212,7 +212,7 @@ Function Repair_SCCM
 			}
 			else
 			{
-				Write-Host "CCMSetup doesn't exist"
+				Write-Debug "CCMSetup doesn't exist"
 				$CCMSetupFailed = $True
 			}
 		}

@@ -76,14 +76,14 @@ function Get-GPOKeys
 		}
 		Catch [Exception]
 		{
-			Write-Host "Error trying to import GroupPolicy module." -ForegroundColor Red
-			Write-Host "Script will exit." -ForegroundColor Red
+			Write-Debug "Error trying to import GroupPolicy module." -ForegroundColor Red
+			Write-Debug "Script will exit." -ForegroundColor Red
 			pause
 			Exit
 		}
 	}
 
-    Write-Host "Querying for registry keys associated with $PolicyName..."
+    Write-Debug "Querying for registry keys associated with $PolicyName..."
 
     $gpoKeys = @("HKLM\Software", "HKLM\System", "HKCU\Software", "HKCU\System")    # Sets registry hives to extract from Group Policy
     $values = @()
@@ -107,7 +107,7 @@ function Get-GPOKeys
                 {
 					If ($_.Exception.Message -notlike "*The following Group Policy registry setting was not found:*")
 					{
-						Write-Host $_.Exception.Message -ForegroundColor Red
+						Write-Debug $_.Exception.Message -ForegroundColor Red
 						Break
 					}
                 }
@@ -152,8 +152,8 @@ function Get-GPOKeys
 
     $valueCount = $values.Count
 
-    Write-Host "`t$keyCount keys found."
-    Write-Host "`t$valueCount values found."
+    Write-Debug "`t$keyCount keys found."
+    Write-Debug "`t$valueCount values found."
 
     $values
 }
@@ -341,8 +341,8 @@ function New-SCCMConfigurationItems
 		}
 		Catch [Exception]
 		{
-			Write-Host "Error trying to import ConfigurationManager module." -ForegroundColor Red
-			Write-Host "Script will exit." -ForegroundColor Red
+			Write-Debug "Error trying to import ConfigurationManager module." -ForegroundColor Red
+			Write-Debug "Script will exit." -ForegroundColor Red
 			pause
 			Exit
 		}
@@ -353,7 +353,7 @@ function New-SCCMConfigurationItems
 		$Name = $Name.Substring(0,$MAX_NAME_LENGTH)
 	}
 
-    Write-Host "Creating Configuration Item..."
+    Write-Debug "Creating Configuration Item..."
 
     Set-Location "$SiteCode`:"
 
@@ -437,7 +437,7 @@ function New-SCCMConfigurationItems
             }
             catch
             {
-                Write-Host Failed: New-SCCMConfigurationItemRule -DisplayName ("$valueName - $value - $type") -Description "" -Severity $Severity -Operator Equals -SettingSourceType Registry -DataType $dataType -Method Value -Changeable $Remediate -Value $value -ValueDataType $dataType -AuthoringScope $authScope -SettingLogicalName $logicalNameS -LogicalName $ruleLogName
+                Write-Debug Failed: New-SCCMConfigurationItemRule -DisplayName ("$valueName - $value - $type") -Description "" -Severity $Severity -Operator Equals -SettingSourceType Registry -DataType $dataType -Method Value -Changeable $Remediate -Value $value -ValueDataType $dataType -AuthoringScope $authScope -SettingLogicalName $logicalNameS -LogicalName $ruleLogName
                 Continue
             }
             $importS = $ciXml.ImportNode($settingXml.SimpleSetting, $true)
@@ -452,9 +452,9 @@ function New-SCCMConfigurationItems
 
 	If ($ExportOnly)
 	{
-		Write-Host "Deleting Empty Configuration Item..."
+		Write-Debug "Deleting Empty Configuration Item..."
 		Remove-CMConfigurationItem -Id $ci.CI_ID -Force
-		Write-Host "Creating CAB File..."
+		Write-Debug "Creating CAB File..."
 		if ($ResultantSetOfPolicy)
 		{
 			Export-CAB -Name $Global:ouPath -Path $ciFile
@@ -466,7 +466,7 @@ function New-SCCMConfigurationItems
 	}
 	Else
 	{
-		Write-Host "Setting DCM Digest..."
+		Write-Debug "Setting DCM Digest..."
 		Set-CMConfigurationItem -DesiredConfigurationDigestPath $ciFile -Id $ci.CI_ID
 		Remove-Item -Path $ciFile -Force
 	}
@@ -518,12 +518,12 @@ function Get-RSOP
 
 	try
 	{
-		Write-Host "Processing Resultant Set of Policy for $ComputerName"
+		Write-Debug "Processing Resultant Set of Policy for $ComputerName"
 		Get-GPResultantSetOfPolicy -Computer $ComputerName -ReportType xml -Path $tmpXmlFile
 	}
 	catch [Exception]
 	{
-		Write-Host "Unable to process Resultant Set of Policy" -ForegroundColor Red
+		Write-Debug "Unable to process Resultant Set of Policy" -ForegroundColor Red
 		Pause
 		Exit
 	}
@@ -611,9 +611,9 @@ If ($null -ne $gpo)
 
 	Set-Location $startingDrive
 
-	Write-Host "Complete"
+	Write-Debug "Complete"
 }
 Else
 {
-	Write-Host "** ERROR! The script will terminate. **" -ForegroundColor Red
+	Write-Debug "** ERROR! The script will terminate. **" -ForegroundColor Red
 }

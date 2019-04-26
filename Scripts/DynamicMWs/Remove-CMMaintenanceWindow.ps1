@@ -38,7 +38,7 @@ $CollectionWindows = Get-CMMaintenanceWindow -CollectionID $CollectionID
     Foreach($WindowName in $CollectionWindows) {
         If($WindowName) {
         $LoopWindowName = $WindowName.Name
-        Write-Host "Removing " $LoopWindowName
+        Write-Debug "Removing " $LoopWindowName
         Remove-CMMaintenanceWindow -CollectionID $CollectionID -Name $LoopWindowName -Force
         } Else {
         }

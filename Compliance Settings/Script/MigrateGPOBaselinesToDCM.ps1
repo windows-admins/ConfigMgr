@@ -54,11 +54,11 @@ ForEach ($GPO in $GPOs)
 {
     if ($GPO.DisplayName -like '*'+$GPOName+'*')
     {
-        Write-Host "Converting: " $GPO.DisplayName
+        Write-Debug "Converting: " $GPO.DisplayName
         & $PSScriptRoot\Convert-GPOtoCI_1.2.6\Convert-GPOtoCI.ps1 -GpoTarget $GPO.DisplayName -DomainTarget $TargetDomain -SiteCode $SCCMSiteCode -Remediate -Severity Critical
     }
     else
     {
-        Write-Host "Skipping: " $GPO.DisplayName
+        Write-Debug "Skipping: " $GPO.DisplayName
     }
 }

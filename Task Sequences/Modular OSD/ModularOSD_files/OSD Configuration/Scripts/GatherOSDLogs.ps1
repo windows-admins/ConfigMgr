@@ -16,7 +16,7 @@ ForEach ($Log in $DesiredLogs)
 {
     if (Test-Path $Log)
     {
-        Write-host "Copying: $Log"
+        Write-Debug "Copying: $Log"
 
         if ($Log -like "*BT~.Windows*")
         {
@@ -36,6 +36,6 @@ ForEach ($Log in $DesiredLogs)
     }
     Else
     {
-        Write-host "$Log does not exist."
+        Write-Debug "$Log does not exist."
     }
 }

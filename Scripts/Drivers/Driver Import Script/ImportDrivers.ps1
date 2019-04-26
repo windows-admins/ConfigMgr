@@ -98,13 +98,13 @@ Function Import-SCCMDriverStore
 		if (!$currentPrincipal.IsInRole( [Security.Principal.WindowsBuiltInRole]::Administrator ))
 		{
 			LogIt -message ("You need to run Powershell as Administrator.") -component "Import-SCCMDriverStore()" -type "Error" -LogFile $LogFile
-			#Write-Host "You need to run Powershell as Administrator."
+			#Write-Debug "You need to run Powershell as Administrator."
 			return;
 		}
 	}
 
 	LogIt -message ("Starting Importing Driver Store: " + $($driverStore)) -component "Import-SCCMDriverStore()" -type "Info" -LogFile $LogFile
-	#Write-Host "Starting Importing Driver Store: $($driverStore)"
+	#Write-Debug "Starting Importing Driver Store: $($driverStore)"
 
 	Get-ChildItem "FileSystem::$driverStore" | Where-Object {$_.psIsContainer -eq $true} | ForEach-Object {
 		$global:CurrentDepth = 1
@@ -122,20 +122,20 @@ Function SDS-ProcessFolder
 	$FolderPath = $path.FullName.Substring($DriverStore.Length+1, $path.FullName.Length-($DriverStore.Length+1))
 	$FolderName = $path.FullName.Substring($DriverStore.Length+1, $path.FullName.Length-($DriverStore.Length+1))
 	LogIt -message ("Processing Folder: " + $($FolderName)) -component "SDS-ProcessFolder()" -type "Verbose" -LogFile $LogFile
-	#Write-Host "Processing Folder: $($FolderName)"
+	#Write-Debug "Processing Folder: $($FolderName)"
 
 	$FullPath = $path.FullName
 	LogIt -message ("Folder path: " + $FullPath) -component "SDS-ProcessFolder()" -type "Verbose" -LogFile $LogFile
-	#Write-Host "Folder path: $FullPath"
+	#Write-Debug "Folder path: $FullPath"
 
 	Get-ChildItem -Path "FileSystem::$FullPath" | Where-Object {$_.psIsContainer -eq $true} | ForEach-Object {
 		$CurrentDepth = 2
 		$FolderName = $_.FullName.Substring($DriverStore.Length+1, $_.FullName.Length-($DriverStore.Length+1))
 		LogIt -message ("Processing Folder: " + $($FolderName)) -component "SDS-ProcessFolder()" -type "Verbose" -LogFile $LogFile
-		#Write-Host "Processing Folder: $($FolderName)"
+		#Write-Debug "Processing Folder: $($FolderName)"
 		$FullPathLevel2 = $_.FullName
 		LogIt -message ("Folder path: " + $FullPath) -component "SDS-ProcessFolder()" -type "Verbose" -LogFile $LogFile
-		#Write-Host "Folder path: $FullPathLevel2"
+		#Write-Debug "Folder path: $FullPathLevel2"
 		Get-ChildItem -Path "FileSystem::$FullPathLevel2" | Where-Object {$_.psIsContainer -eq $true} | ForEach-Object {
 			$CurrentDepth = 3
 			SDS-ProcessPackage $_ $FolderPath
@@ -158,15 +158,15 @@ Function SDS-ProcessPackage
 
 	LogIt -message ("Processing Driver Package: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
 	Write-Progress -Activity "Importing Drivers" -Status "Driver Package: $PackageName"
-	#Write-Host "Processing Driver Package: $($PackageName)"
+	#Write-Debug "Processing Driver Package: $($PackageName)"
 	$PackageFullPath = $package.FullName
 	LogIt -message ("Driver package path: " + $PackageFullPath) -component "SDS-ProcessPackage()" -type "Verbose" -LogFile $LogFile
-	#Write-Host "Driver package path: $PackageFullPath"
+	#Write-Debug "Driver package path: $PackageFullPath"
 	$PackageHash = Get-FolderHash $PackageFullPath
 	If (Get-ChildItem "FileSystem::$PackageFullPath" -Filter "$($PackageHash).hash")
 	{
 		LogIt -message ("No changes has been made to this Driver Package. Skipping.") -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
-		#Write-Host "No changes has been made to this Driver Package. Skipping."
+		#Write-Debug "No changes has been made to this Driver Package. Skipping."
 	}
 	Else
 	{
@@ -178,7 +178,7 @@ Function SDS-ProcessPackage
 		{
 			$CMCategory = New-CMCategory -Name $PackageName -CategoryType "DriverCategories"
 			LogIt -message ("Created new driver category: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
-			#Write-Host "Created new driver category: $($PackageName)"
+			#Write-Debug "Created new driver category: $($PackageName)"
 		}
 
 		$CMPackage = Get-CMDriverPackage -Name $PackageName
@@ -186,11 +186,11 @@ Function SDS-ProcessPackage
 		if ($null -eq $CMPackage)
 		{
 			LogIt -message ("Driver package missing for: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Verbose" -LogFile $LogFile
-			#Write-Host "Driver package missing for $($PackageName)"
+			#Write-Debug "Driver package missing for $($PackageName)"
 			#$CMPackageSource = "$($CMPackageSource)\$($folderPath)\$($PackageName)"
 			$CMPackageSource = "$($CMPackageSource)\$($PackageName)"
 			LogIt -message ("Driver Package Source Location: " + $CMPackageSource) -component "SDS-ProcessPackage()" -type "Verbose" -LogFile $LogFile
-			#Write-Host "Driver Package Source Location: $CMPackageSource"
+			#Write-Debug "Driver Package Source Location: $CMPackageSource"
 
 			if (Test-Path -Path "FileSystem::$CMPackageSource")
 			{
@@ -199,31 +199,31 @@ Function SDS-ProcessPackage
 					if ($cleanup)
 					{
 						LogIt -message ("Folder already exists, removing content: " + $CMPackageSource) -component "SDS-ProcessPackage()" -type "Warning" -LogFile $LogFile
-						#Write-Host "Folder already exists, removing content"
+						#Write-Debug "Folder already exists, removing content"
 						Get-ChildItem $driverPackageSource | remove-item -recurse -force
 					}
 					else
 					{
 						LogIt -message ("Folder already exists, remove it manually: " + $CMPackageSource) -component "SDS-ProcessPackage()" -type "Error" -LogFile $LogFile
-						#Write-Host "Folder already exists, remove it manually."
+						#Write-Debug "Folder already exists, remove it manually."
 						return
 					}
 				}
 				LogIt -message ("Driver package folder already exists") -component "SDS-ProcessPackage()" -type "Verbose" -LogFile $LogFile
-				#Write-Host "Driver package folder already exists"
+				#Write-Debug "Driver package folder already exists"
 			}
 			else
 			{
 				$null = New-Item "FileSystem::$CMPackageSource" -type directory
 				LogIt -message ("Created driver package folder") -component "SDS-ProcessPackage()" -type "Verbose" -LogFile $LogFile
-				#Write-Host "Created driver package folder"
+				#Write-Debug "Created driver package folder"
 			}
 
             try
             {
 			    $CMPackage = New-CMDriverPackage -Name $PackageName -Path $CMPackageSource #-PackageSourceType StorageDirect
 			    LogIt -message ("Created new driver package: " + $($PackageName)) -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
-			    #Write-Host "Created new driver package $($PackageName)"
+			    #Write-Debug "Created new driver package $($PackageName)"
             }
             catch
             {
@@ -236,7 +236,7 @@ Function SDS-ProcessPackage
 			#Grab existing drivers for this package. This will save us time later if they already exist.
 			$ExistingDrivers = Get-CMDriver -DriverPackage $CMPackage
 			LogIt -message ("Existing driver package " + $($PackageName) + " (" + $($CMPackage.PackageID) + ") retrieved.") -component "SDS-ProcessPackage()" -type "Info" -LogFile $LogFile
-			#Write-Host "Existing driver package $($PackageName) ($($CMPackage.PackageID)) retrieved."
+			#Write-Debug "Existing driver package $($PackageName) ($($CMPackage.PackageID)) retrieved."
 		}
 
 		$DriverFiles = Get-ChildItem "FileSystem::$PackageFullPath" -Filter *.inf -File -recurse
@@ -270,7 +270,7 @@ Function SDS-ImportDriver
 
 	$driverPath = $dv.FullName
 	LogIt -message ("Importing driver: " + $driverPath) -component "SDS-ImportDriver" -type "Verbose" -LogFile $LogFile
-	#Write-Host "Importing driver $driverPath"
+	#Write-Debug "Importing driver $driverPath"
 
         $driverINF = split-path $dv.FullName -leaf
         $driverPath = split-path $dv.FullName
@@ -281,7 +281,7 @@ Function SDS-ImportDriver
 	If ($ExistingDriver)
 	{
 		LogIt -message ("Driver (" + $driverINF + ") already exists. Skipping.") -component "SDS-ImportDriver" -type "Verbose" -LogFile $LogFile
-		#Write-Host "Driver ($driverINF) already exists. Skipping."
+		#Write-Debug "Driver ($driverINF) already exists. Skipping."
 	}
 	Else
 	{
@@ -291,13 +291,13 @@ Function SDS-ImportDriver
 		If($DriverImport)
 		{
 			LogIt -message ("Imported driver (" + $driverINF + ") successfully.") -component "SDS-ImportDriver" -type "Verbose" -LogFile $LogFile
-			#Write-Host "Imported driver ($driverINF) successfully"
+			#Write-Debug "Imported driver ($driverINF) successfully"
 			Return
 		}
 		Else
 		{
 			LogIt -message ("Error importing driver: " + $dv.FullName) -component "SDS-ImportDriver" -type "Error" -LogFile $LogFile
-			#Write-Host "Error importing driver $driverPath"
+			#Write-Debug "Error importing driver $driverPath"
 			Return
 		}
 	}
