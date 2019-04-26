@@ -60,7 +60,9 @@ try {
     try { # Catch Error if already authenticated
         Authenticate -UNCPath $LogPath -User $NaaUser -PW $NaaPW
     }
-    catch {}
+    catch {
+        Write-Debug "Error caught, most likely already authenticated."
+    }
 
     $filename =  Join-Path -Path "$LogPath" -ChildPath "$($CmpName )-$($dt).zip"
     ZipFiles -ZipFileName $filename -SourceDir $source
