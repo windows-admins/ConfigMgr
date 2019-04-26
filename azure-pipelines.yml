@@ -30,7 +30,7 @@ jobs:
 # All tasks on Linux
 - job: build_all_linux
   displayName: Build all tasks (Linux)
-  condition: and(succeeded(), not(variables.task), eq(variables.os, 'Linux'))
+  condition: succeeded()
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -41,7 +41,7 @@ jobs:
 # All tasks on macOS
 - job: build_all_darwin
   displayName: Build all tasks (macOS)
-  condition: and(succeeded(), not(variables.task), eq(variables.os, 'Darwin'))
+  condition: succeeded()
   pool:
     vmImage: macos-10.13
   steps:
