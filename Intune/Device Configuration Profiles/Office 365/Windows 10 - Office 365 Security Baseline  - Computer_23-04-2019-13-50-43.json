@@ -1,0 +1,127 @@
+{
+    "@odata.type":  "#microsoft.graph.windows10CustomConfiguration",
+    "id":  "7dc2009f-bd9b-4f92-b24f-a7cd37c64af5",
+    "lastModifiedDateTime":  "2019-04-23T16:08:31.9279632Z",
+    "roleScopeTagIds":  [
+
+                        ],
+    "supportsScopeTags":  true,
+    "createdDateTime":  "2019-04-19T04:19:34.5220374Z",
+    "description":  "Requires Windows 10 - Office 365 Security Baseline - ADMX Ingestion",
+    "displayName":  "Windows 10 - Office 365 Security Baseline - Computer",
+    "version":  41,
+    "omaSettings":  [   
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Configure SIP Security Mode",
+                            "description":  "Skype for Business",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_Lync~L_LyncConfiguration/L_PolicyEnableSIPHighSecurityMode",
+                            "value":  "\u003cenabled/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Disable HTTP fallback for SIP Connection",
+                            "description":  "Skype for Business",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_Lync~L_LyncConfiguration/L_PolicyDisableHttpConnect",
+                            "value":  "\u003cenabled/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "Block Flash activation in Office documents",
+                            "description":  "MS Security Guide",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~Cat_SecGuide/Pol_SecGuide_A001_Block_Flash",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"Pol_SecGuide_Block_Flash\" value=\"Block all Flash activation\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Addon Management",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_AddonManagement",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe14\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe15\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe16\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe17\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe18\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe19\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe20\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe21\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe22\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe23\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe24\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe25\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe26\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe27\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Consistent Mime Handling",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_ConsistentMimeHandling",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe42\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe43\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe44\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe45\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe46\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe47\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe48\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe49\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe50\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe51\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe52\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe53\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe54\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe55\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Disable user name and password",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_Disableusernameandpassword",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe126\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe127\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe128\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe129\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe130\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe131\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe132\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe133\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe134\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe135\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe136\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe137\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe138\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe139\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Information Bar",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_Informationbar",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe112\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe113\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe114\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe115\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe116\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe117\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe118\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe119\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe120\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe121\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe122\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe123\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe124\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe125\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Local Machine Zone Lockdown Security",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_LocalMachineZoneLockdownSecurity",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe28\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe29\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe30\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe31\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe32\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe33\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe34\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe35\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe36\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe37\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe38\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe39\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe40\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe41\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Mime Sniffing Safety Feature",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_MimeSniffingSafetyFature",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe56\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe57\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe58\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe59\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe60\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe61\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe62\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe63\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe64\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe65\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe66\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe67\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe68\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe69\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Navigate URL",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_NavigateURL",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe168\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe169\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe170\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe171\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe172\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe173\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe174\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe175\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe176\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe177\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe178\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe179\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe180\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe181\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Object Caching Protection",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_ObjectCachingProtection",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe70\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe71\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe72\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe73\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe74\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe75\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe76\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe77\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe78\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe79\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe80\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe81\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe82\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe83\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Protection From Zone Elevation",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_ProtectionFromZoneElevation",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe98\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe99\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe100\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe101\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe102\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe103\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe104\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe105\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe106\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe107\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe108\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe109\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe110\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe111\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Restrict ActiveX Install",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_RestrictActiveXInstall",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe\" value=\"true\"/\u003e\u003cdata id=\"L_spDesignexe\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Restrict File Download",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_RestrictFileDownload",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe0\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe1\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe2\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe3\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe4\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe5\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe6\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe7\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe8\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe9\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe10\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe11\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe12\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe13\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Saved from URL",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_SavedfromURL",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe154\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe155\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe156\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe157\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe158\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe159\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe160\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe161\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe162\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe163\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe164\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe165\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe166\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe167\" value=\"true\"/\u003e"
+                        },
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingString",
+                            "displayName":  "IE Scripted Window Security Restrictions",
+                            "description":  "Office 2016 Machine",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Office16~Policy~L_MicrosoftOfficemachine~L_SecuritySettingsMachine~L_IESecurity/L_ScriptedWindowSecurityRestrictions",
+                            "value":  "\u003cenabled/\u003e \u003cdata id=\"L_grooveexe84\" value=\"true\"/\u003e\u003cdata id=\"L_excelexe85\" value=\"true\"/\u003e\u003cdata id=\"L_mspubexe86\" value=\"true\"/\u003e\u003cdata id=\"L_powerpntexe87\" value=\"true\"/\u003e\u003cdata id=\"L_pptviewexe88\" value=\"true\"/\u003e\u003cdata id=\"L_visioexe89\" value=\"true\"/\u003e\u003cdata id=\"L_winprojexe90\" value=\"true\"/\u003e\u003cdata id=\"L_winwordexe91\" value=\"true\"/\u003e\u003cdata id=\"L_outlookexe92\" value=\"true\"/\u003e\u003cdata id=\"L_spdesignexe93\" value=\"true\"/\u003e\u003cdata id=\"L_exprwdexe94\" value=\"true\"/\u003e\u003cdata id=\"L_msaccessexe95\" value=\"true\"/\u003e\u003cdata id=\"L_onenoteexe96\" value=\"true\"/\u003e\u003cdata id=\"L_mse7exe97\" value=\"true\"/\u003e"
+                        }
+                    ]
+}

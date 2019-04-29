@@ -1,3 +1,5 @@
+*NOTE:* This is better handled by using AppV or MSIX.  This is a very legacy way of handling this.
+
 For installations with thousands of files, it's more efficient to transfer one large VHD. This script will mount the VHD, run the installation, then unmount the VHD.
 
 To create a VHD:

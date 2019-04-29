@@ -1,0 +1,89 @@
+#trigger:
+#- master
+#- releases/*
+
+
+jobs:
+
+# All tasks on Windows
+- job: build_all_windows
+  displayName: Build all tasks (Windows)
+  condition: succeeded()
+  pool:
+    vmImage: vs2017-win2016
+  steps:
+  - template: _CI/build-all-steps.yml
+    parameters:
+      os: Windows_NT
+
+# Publish on Windows
+#- job: publish_windows
+#  displayName: Publish
+#  dependsOn: 
+#  - build_all_windows
+#  condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), eq(variables.os, 'Windows_NT'))
+#  pool:
+#    vmImage: vs2017-win2016
+#  steps:
+#  - template: _CI/publish-steps.yml
+
+# All tasks on Linux
+- job: build_all_linux
+  displayName: Build all tasks (Linux)
+  condition: succeeded()
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - template: _CI/build-all-steps.yml
+    parameters:
+      os: Linux
+
+# All tasks on macOS
+- job: build_all_darwin
+  displayName: Build all tasks (macOS)
+  condition: succeeded()
+  pool:
+    vmImage: macos-10.13
+  steps:
+  - template: _CI/build-all-steps.yml
+    parameters:
+      os: Darwin
+
+# Single task
+#- job: buildSingle
+#  displayName: Build single task
+#  condition: succeeded()
+#  steps:
+#  - template: _CI/build-single-steps.yml
+
+
+
+# Run directly
+- job: runNative
+  displayName: Run PSScriptAnalyzer Natively
+  condition: succeeded()
+  steps:
+
+  - task: PowerShell@2
+    displayName: 'Dump SourcesDirectory'
+    inputs:
+      targetType: 'inline'
+      script: 'Get-ChildItem -Path $(Build.Repository.LocalPath)'
+
+  - task: PowerShell@2
+    displayName: 'Install Pester'
+    inputs:
+      targetType: 'inline'
+      script: 'Install-Module -Name Pester -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
+
+  - task: PowerShell@2
+    displayName: 'Install PSScriptAnalyzer'
+    inputs:
+      targetType: 'inline'
+      script: 'Install-Module -Name PSScriptAnalyzer -SkipPublisherCheck -Force -Verbose -Scope CurrentUser'
+
+  - task: PowerShell@2
+    displayName: 'Run PSScriptAnalyzer 2'
+    inputs:
+      targetType: 'inline'
+      script: 'Invoke-ScriptAnalyzer -Path $(Build.SourcesDirectory) -EnableExit -IncludeDefaultRules -ReportSummary -Recurse'

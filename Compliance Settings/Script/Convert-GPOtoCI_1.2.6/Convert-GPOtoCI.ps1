@@ -76,17 +76,17 @@ function Get-GPOKeys
 		}
 		Catch [Exception]
 		{
-			Write-Host "Error trying to import GroupPolicy module." -ForegroundColor Red
-			Write-Host "Script will exit." -ForegroundColor Red
+			Write-Debug "Error trying to import GroupPolicy module." -ForegroundColor Red
+			Write-Debug "Script will exit." -ForegroundColor Red
 			pause
 			Exit
 		}
 	}
 
-    Write-Host "Querying for registry keys associated with $PolicyName..."
+    Write-Debug "Querying for registry keys associated with $PolicyName..."
 
     $gpoKeys = @("HKLM\Software", "HKLM\System", "HKCU\Software", "HKCU\System")    # Sets registry hives to extract from Group Policy
-    $values = @()    
+    $values = @()
     $keyList = @()
     $newKeyList = @()
     $keyCount = 0
@@ -107,19 +107,19 @@ function Get-GPOKeys
                 {
 					If ($_.Exception.Message -notlike "*The following Group Policy registry setting was not found:*")
 					{
-						Write-Host $_.Exception.Message -ForegroundColor Red					
+						Write-Debug $_.Exception.Message -ForegroundColor Red
 						Break
 					}
                 }
 				# For each key in list of registry keys
                 foreach ($nKey in $newKeys)
-                {               
+                {
 					# If key is not already in list
                     if ($keyList -notcontains $nKey)
                     {
                         #Write-Verbose $nKey
                         $keyList += $nKey
-                        $keyCount++						
+                        $keyCount++
                     }
                     if ($newKeyList -notcontains $nKey)
                     {
@@ -134,12 +134,12 @@ function Get-GPOKeys
                 $countUp = $false
             }
     }
-    
-	If ($newKeys -ne $null)
+
+	If ($null -ne $newKeys)
 	{
 		foreach ($key in $keyList)
 		{
-			$values += Get-GPRegistryValue -Name $PolicyName -Domain $Domain -Key $key -ErrorAction SilentlyContinue | select FullKeyPath, ValueName, Value, Type | Where-Object {($_.Value -ne $null) -and ($_.Value.Length -gt 0)} 
+			$values += Get-GPRegistryValue -Name $PolicyName -Domain $Domain -Key $key -ErrorAction SilentlyContinue | Select-Object FullKeyPath, ValueName, Value, Type | Where-Object {($null -ne $_.Value) -and ($_.Value.Length -gt 0)}
 		}
 		if ($Log)
 		{
@@ -152,10 +152,10 @@ function Get-GPOKeys
 
     $valueCount = $values.Count
 
-    Write-Host "`t$keyCount keys found."
-    Write-Host "`t$valueCount values found."
+    Write-Debug "`t$keyCount keys found."
+    Write-Debug "`t$valueCount values found."
 
-    $values    
+    $values
 }
 
 <#
@@ -212,7 +212,7 @@ function New-SCCMConfigurationItemSetting
     $settingXml.SimpleSetting.RegistryDiscoverySource.Key = $Key
     $settingXml.SimpleSetting.RegistryDiscoverySource.ValueName = $ValueName
 
-    $settingXml    
+    $settingXml
 }
 
 <#
@@ -240,7 +240,7 @@ function New-SCCMConfigurationItemRule
         [Parameter(
             Mandatory=$true)]
         [ValidateSet('Registry', 'IisMetabase', 'WqlQuery', 'Script', 'XPathQuery', 'ADQuery', 'File', 'Folder', 'RegistryKey', 'Assembly')]
-            [string]$SettingSourceType, 
+            [string]$SettingSourceType,
         [Parameter(
             Mandatory=$true)]
         [ValidateSet('String', 'Boolean', 'DateTime', 'Double', 'Int64', 'Version', 'FileSystemAccessControl', 'RegistryAccessControl', `
@@ -300,7 +300,7 @@ function New-SCCMConfigurationItemRule
     $ruleXml.Rule.Expression.Operands.ConstantValue.DataType = $ValueDataType
     $ruleXml.Rule.Expression.Operands.ConstantValue.Value = $Value
 
-    $ruleXml    
+    $ruleXml
 }
 
 <#
@@ -328,7 +328,7 @@ function New-SCCMConfigurationItems
         [ValidateSet('None', 'Informational', 'Warning', 'Critical')]
 		[string]$Severity='Informational'    # Rule severity
     )
-    
+
 	If ((Get-Module).Name -contains 'ConfigurationManager')
 	{
 		Write-Verbose "ConfigurationManager module already loaded."
@@ -341,8 +341,8 @@ function New-SCCMConfigurationItems
 		}
 		Catch [Exception]
 		{
-			Write-Host "Error trying to import ConfigurationManager module." -ForegroundColor Red
-			Write-Host "Script will exit." -ForegroundColor Red
+			Write-Debug "Error trying to import ConfigurationManager module." -ForegroundColor Red
+			Write-Debug "Script will exit." -ForegroundColor Red
 			pause
 			Exit
 		}
@@ -353,7 +353,7 @@ function New-SCCMConfigurationItems
 		$Name = $Name.Substring(0,$MAX_NAME_LENGTH)
 	}
 
-    Write-Host "Creating Configuration Item..."
+    Write-Debug "Creating Configuration Item..."
 
     Set-Location "$SiteCode`:"
 
@@ -373,13 +373,13 @@ function New-SCCMConfigurationItems
 		$ciFile = "$scriptPath\$gpoNoSpace.xml"
 	}
 
-    
+
     for ($i = 1; $i -le 99; $i++)
     {
         $testCI = Get-CMConfigurationItem -Name $Name
-        if ($testCI -eq $null)
+        if ($null -eq $testCI)
         {
-            break   
+            break
         }
         else
         {
@@ -406,7 +406,7 @@ function New-SCCMConfigurationItems
         $logicalNameS = "RegSetting_$([guid]::NewGuid())"
         $ruleLogName = $ciXml.DesiredConfigurationDigest.OperatingSystem.LogicalName
         $authScope = $ciXml.DesiredConfigurationDigest.OperatingSystem.AuthoringScopeId
-        
+
 		if ($Key.Type -eq "Binary")
 		{
 			continue
@@ -429,7 +429,7 @@ function New-SCCMConfigurationItems
         {
             $settingXml = New-SCCMConfigurationItemSetting -DisplayName $dName -Description ("$keyName - $valueName") -DataType $dataType -Hive $hive -Is64Bit $false `
                 -Key $subKey -ValueName $valueName -LogicalName $logicalNameS
-        
+
             try
             {
                 $ruleXml = New-SCCMConfigurationItemRule -DisplayName ("$valueName - $value - $type") -Description "" -Severity $Severity -Operator Equals -SettingSourceType Registry -DataType $dataType -Method Value -Changeable $Remediate `
@@ -437,13 +437,13 @@ function New-SCCMConfigurationItems
             }
             catch
             {
-                Write-Host Failed: New-SCCMConfigurationItemRule -DisplayName ("$valueName - $value - $type") -Description "" -Severity $Severity -Operator Equals -SettingSourceType Registry -DataType $dataType -Method Value -Changeable $Remediate -Value $value -ValueDataType $dataType -AuthoringScope $authScope -SettingLogicalName $logicalNameS -LogicalName $ruleLogName
+                Write-Debug Failed: New-SCCMConfigurationItemRule -DisplayName ("$valueName - $value - $type") -Description "" -Severity $Severity -Operator Equals -SettingSourceType Registry -DataType $dataType -Method Value -Changeable $Remediate -Value $value -ValueDataType $dataType -AuthoringScope $authScope -SettingLogicalName $logicalNameS -LogicalName $ruleLogName
                 Continue
             }
             $importS = $ciXml.ImportNode($settingXml.SimpleSetting, $true)
             $ciXml.DesiredConfigurationDigest.OperatingSystem.Settings.RootComplexSetting.AppendChild($importS) | Out-Null
             $importR = $ciXml.ImportNode($ruleXml.Rule, $true)
-        
+
             $ciXml.DesiredConfigurationDigest.OperatingSystem.Rules.AppendChild($importR) | Out-Null
             $ciXml = [xml] $ciXml.OuterXml.Replace(" xmlns=`"`"", "")
             $ciXml.Save($ciFile)
@@ -452,9 +452,9 @@ function New-SCCMConfigurationItems
 
 	If ($ExportOnly)
 	{
-		Write-Host "Deleting Empty Configuration Item..."
+		Write-Debug "Deleting Empty Configuration Item..."
 		Remove-CMConfigurationItem -Id $ci.CI_ID -Force
-		Write-Host "Creating CAB File..."
+		Write-Debug "Creating CAB File..."
 		if ($ResultantSetOfPolicy)
 		{
 			Export-CAB -Name $Global:ouPath -Path $ciFile
@@ -466,7 +466,7 @@ function New-SCCMConfigurationItems
 	}
 	Else
 	{
-		Write-Host "Setting DCM Digest..."
+		Write-Debug "Setting DCM Digest..."
 		Set-CMConfigurationItem -DesiredConfigurationDigestPath $ciFile -Id $ci.CI_ID
 		Remove-Item -Path $ciFile -Force
 	}
@@ -486,7 +486,7 @@ function Export-CAB
 	$ddfHeader =@"
 ;*** MakeCAB Directive file
 ;
-.OPTION EXPLICIT      
+.OPTION EXPLICIT
 .Set CabinetNameTemplate=$fileName.cab
 .set DiskDirectory1=$scriptPath
 .Set MaxDiskSize=CDROM
@@ -518,12 +518,12 @@ function Get-RSOP
 
 	try
 	{
-		Write-Host "Processing Resultant Set of Policy for $ComputerName"
+		Write-Debug "Processing Resultant Set of Policy for $ComputerName"
 		Get-GPResultantSetOfPolicy -Computer $ComputerName -ReportType xml -Path $tmpXmlFile
 	}
 	catch [Exception]
 	{
-		Write-Host "Unable to process Resultant Set of Policy" -ForegroundColor Red
+		Write-Debug "Unable to process Resultant Set of Policy" -ForegroundColor Red
 		Pause
 		Exit
 	}
@@ -531,27 +531,27 @@ function Get-RSOP
 	$rsop = [xml](Get-Content -Path $tmpXmlFile)
 	$domainName = $rsop.Rsop.ComputerResults.Domain
 	$rsopKeys = @()
-	
+
 	# Loop through all applied GPOs starting with the last applied
 	for ($x = $rsop.Rsop.ComputerResults.Gpo.Name.Count; $x -ge 1; $x--)
 	{
 		$rsopTemp = @()
 		# Get GPO name
-		$gpoResults = ($rsop.Rsop.ComputerResults.Gpo | Where-Object {($_.Link.AppliedOrder -eq $x) -and ($_.Name -ne "Local Group Policy")} | select Name).Name
-		If ($gpoResults -ne $null)
+		$gpoResults = ($rsop.Rsop.ComputerResults.Gpo | Where-Object {($_.Link.AppliedOrder -eq $x) -and ($_.Name -ne "Local Group Policy")} | Select-Object Name).Name
+		If ($null -ne $gpoResults)
 		{
 			# If name is not null gets registry keys for that GPO and assign to temp value
-			$rsopTemp = Get-GPOKeys -PolicyName $gpoResults -Domain $domainName			
-			if ($Global:ouPath -eq $null)
+			$rsopTemp = Get-GPOKeys -PolicyName $gpoResults -Domain $domainName
+			if ($null -eq $Global:ouPath)
 			{
-				$Global:ouPath = ($rsop.Rsop.ComputerResults.SearchedSom | Where-Object {$_.Order -eq $x} | select Path).path
+				$Global:ouPath = ($rsop.Rsop.ComputerResults.SearchedSom | Where-Object {$_.Order -eq $x} | Select-Object Path).path
 			}
 		}
 		# foreach registry key value in gpo results
 		foreach ($key in $rsopTemp)
 		{
 			# if a value is not already stored with that FullKeyPath and ValueName store that value
-			if (($rsopKeys | Where-Object {($_.FullKeyPath -eq $key.FullKeyPath) -and ($_.ValueName -eq $key.ValueName)}) -eq $null)
+			if ($null -eq ($rsopKeys | Where-Object {($_.FullKeyPath -eq $key.FullKeyPath) -and ($_.ValueName -eq $key.ValueName)}))
 			{
 				$rsopKeys += $key
 			}
@@ -588,13 +588,13 @@ if ($GroupPolicy)
 if ($ResultantSetOfPolicy)
 {
 	$gpo = Get-RSOP -ComputerName $ComputerName
-	if ($gpo[0].RsopMode -ne $null)
+	if ($null -ne $gpo[0].RsopMode)
 	{
 		$gpo = $gpo[1..($gpo.Length - 1)]
 	}
 }
 
-If ($gpo -ne $null)
+If ($null -ne $gpo)
 {
 	# If ResultantSetOfPolicy option is used use the OU path to name the CI
 	if ($ResultantSetOfPolicy -eq $true)
@@ -611,9 +611,9 @@ If ($gpo -ne $null)
 
 	Set-Location $startingDrive
 
-	Write-Host "Complete"
+	Write-Debug "Complete"
 }
 Else
 {
-	Write-Host "** ERROR! The script will terminate. **" -ForegroundColor Red 
+	Write-Debug "** ERROR! The script will terminate. **" -ForegroundColor Red
 }

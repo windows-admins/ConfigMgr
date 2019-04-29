@@ -1,4 +1,4 @@
-# REQUIRES Convert-GPOtoCI.ps1
+﻿# REQUIRES Convert-GPOtoCI.ps1
 #
 # Fetch off WinAdmins Github or:
 # https://blogs.technet.microsoft.com/samroberts/2017/06/19/create-configmgr-configuration-items-from-group-policy-object/
@@ -25,7 +25,7 @@ param(
     $SCCMSiteServerFQDN
     )
 
-# Uncomment the line below if running in an environment where script signing is 
+# Uncomment the line below if running in an environment where script signing is
 # required.
 #Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
@@ -34,13 +34,13 @@ $initParams = @{}
 
 # Do not change anything below this line
 
-# Import the ConfigurationManager.psd1 module 
-if((Get-Module ConfigurationManager) -eq $null) {
-    Import-Module "$($ENV:SMS_ADMIN_UI_PATH)\..\ConfigurationManager.psd1" @initParams 
+# Import the ConfigurationManager.psd1 module
+if($null -eq (Get-Module ConfigurationManager)) {
+    Import-Module "$($ENV:SMS_ADMIN_UI_PATH)\..\ConfigurationManager.psd1" @initParams
 }
 
 # Connect to the site's drive if it is not already present
-if((Get-PSDrive -Name $SCCMSiteCode -PSProvider CMSite -ErrorAction SilentlyContinue) -eq $null) {
+if($null -eq (Get-PSDrive -Name $SCCMSiteCode -PSProvider CMSite -ErrorAction SilentlyContinue)) {
     New-PSDrive -Name $SCCMSiteCode -PSProvider CMSite -Root $SCCMSiteServerFQDN @initParams
 }
 
@@ -54,11 +54,11 @@ ForEach ($GPO in $GPOs)
 {
     if ($GPO.DisplayName -like '*'+$GPOName+'*')
     {
-        Write-Host "Converting: " $GPO.DisplayName
+        Write-Debug "Converting: " $GPO.DisplayName
         & $PSScriptRoot\Convert-GPOtoCI_1.2.6\Convert-GPOtoCI.ps1 -GpoTarget $GPO.DisplayName -DomainTarget $TargetDomain -SiteCode $SCCMSiteCode -Remediate -Severity Critical
     }
     else
     {
-        Write-Host "Skipping: " $GPO.DisplayName
+        Write-Debug "Skipping: " $GPO.DisplayName
     }
 }

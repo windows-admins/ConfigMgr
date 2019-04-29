@@ -17,12 +17,12 @@ param(
     )
 
 $results = @{}
-dir -Recurse -Include backup.xml $rootdir | %{
+Get-ChildItem -Recurse -Include backup.xml $rootdir | ForEach-Object{
     $guid = $_.Directory.Name
-    $x = [xml](gc $_)
+    $x = [xml](Get-Content $_)
     $dn = $x.GroupPolicyBackupScheme.GroupPolicyObject.GroupPolicyCoreSettings.DisplayName.InnerText
     # $dn + "`t" + $guid
     $results.Add($dn, $guid)
     Import-GPO -BackupId $guid -Path (Get-Item (get-item $_.PSParentPath).PSParentPath).FullName -TargetName $dn -CreateIfNeeded
 }
-$results | ft Name, Value -AutoSize
+$results | Format-Table Name, Value -AutoSize

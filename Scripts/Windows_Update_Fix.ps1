@@ -1,4 +1,4 @@
-###################################
+﻿###################################
 #
 #Automated Windows Update Fix
 #Gleaned from https://support.microsoft.com/en-us/help/971058/how-do-i-reset-windows-update-components
@@ -45,9 +45,9 @@ $dllList = @(
     "wuweb.dll", # Windows Update Web Control
     "qmgr.dll", # Background Intelligent Transfer Service
     "qmgrprxy.dll", # Background Intelligent Transfer Service
-    "wucltux.dll", # Windows Update Client User Experience 
+    "wucltux.dll", # Windows Update Client User Experience
     "muweb.dll", # Microsoft Update Web Control
-    "wuwebv.dll" # Windows Update Vista Web Control  
+    "wuwebv.dll" # Windows Update Vista Web Control
 )
 $userDL = "$env:ALLUSERSPORFILE\Microsoft\Network\Downloader"
 $swdFolder = "$env:WINDIR\SoftwareDistribution"
@@ -59,25 +59,25 @@ Get-Service -Name $svcList | Set-Service -StartupType Automatic -Status Stopped
 # Delete qmgr*.dat files under %ALLUSERSPROFILE%
 If (Test-path $userDL) {
     Get-ChildItem $userDL -Recurse -Force -Include qmgr*.dat | Remove-Item -Force
-    Write-Host "Deleting qmgr*.dat from the All Users Profile."
+    Write-Debug "Deleting qmgr*.dat from the All Users Profile."
 }
 
-# Aggressive approach: Rename the Software Distribution & catroot2 folder's backup copies   
+# Aggressive approach: Rename the Software Distribution & catroot2 folder's backup copies
     # First, check to see if its been done already; remove .bak if so, then rename current folder
     If (Test-Path ($swdFolder + ".bak")) {
         Remove-Item ($swdFolder + ".bak") -Recurse
-        Write-Host "$swdFolder.bak deleted; renaming current folder."
+        Write-Debug "$swdFolder.bak deleted; renaming current folder."
         Rename-Item $swdFolder "SoftwareDistribution.bak"
     } Else {
-        Write-Host "$swdFolder.bak does not exist; renaming current folder"
+        Write-Debug "$swdFolder.bak does not exist; renaming current folder"
         Rename-Item $swdFolder "SoftwareDistribution.bak"
     }
     If (Test-Path ($cr2Folder + ".bak")) {
         Remove-Item ($cr2Folder + ".bak")
-        Write-Host "$cr2Folder.bak deleted; renaming current folder."
+        Write-Debug "$cr2Folder.bak deleted; renaming current folder."
         Rename-Item $cr2Folder "catroot2.bak"
     } Else {
-        Write-Host "$cr2Folder.bak does not exist; renaming current folder."
+        Write-Debug "$cr2Folder.bak does not exist; renaming current folder."
         Rename-Item $cr2Folder "catroot2.bak"
     }
     # Reset BITS and WU service to the default descriptor
@@ -89,9 +89,9 @@ ForEach ($dll in $dllList) {
 
     If (Test-Path $env:WINDIR\system32\$dll) {
         regsvr32.exe /s $env:WINDIR\system32\$dll
-        Write-Host "Registering $dll."
+        Write-Debug "Registering $dll."
     } Else {
-        Write-Host "$dll does not exist on your system."
+        Write-Debug "$dll does not exist on your system."
     }
 }
 

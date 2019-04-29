@@ -1,27 +1,27 @@
-###########################################################  
+﻿###########################################################
 # Automated repair of SCCM client
-########################################################### 
- 
-#ERROR REPORTING ALL 
-Set-StrictMode -Version latest 
- 
-#---------------------------------------------------------- 
-#FUNCTION RepairServices 
-#---------------------------------------------------------- 
+###########################################################
+
+#ERROR REPORTING ALL
+Set-StrictMode -Version latest
+
+#----------------------------------------------------------
+#FUNCTION RepairServices
+#----------------------------------------------------------
 Function Repair_Services
-{ 
+{
 
    Param(
 	[parameter(Mandatory=$true)]
 	$ServiceName  # Must be string or array of strings
 	)
-   
+
 	ForEach ($Service in $ServiceName)
 	{
-		Write-Host "Verifying $Service"
+		Write-Debug "Verifying $Service"
 
-		Try 
-		{ 
+		Try
+		{
 			$OBJ_service = Get-Service -Name $Service
 			$Test = $True
 
@@ -34,51 +34,51 @@ Function Repair_Services
 			# Start service if it isn't already
 			if ($obj_service.Status -ne "Running")
 			{
-				Write-Host "Starting service."
+				Write-Debug "Starting service."
 				Set-Service -Name $obj_service.Name -StartupType Automatic -Status Running
 				Start-Service -Name $obj_service.Name
 			}
 		}
 		Catch
 		{
-			Write-Host "Error fixing service"
+			Write-Debug "Error fixing service"
 		}
 	}
 }
 
 
-#---------------------------------------------------------- 
-#FUNCTION Register Windows Components 
-#---------------------------------------------------------- 
-Function Register_Windows_Components 
-{ 
+#----------------------------------------------------------
+#FUNCTION Register Windows Components
+#----------------------------------------------------------
+Function Register_Windows_Components
+{
 
    Param(
 	[parameter(Mandatory=$true)]
 	$Components  # Must be string or array of strings
 	)
-   
+
 	ForEach ($Component in $Components)
 	{
-		Write-Host "Verifying $Component"
+		Write-Debug "Verifying $Component"
 
-		Try 
-		{ 
-			Write-Host "regsvr32.exe /s C:\Windows\system32\$Component"
+		Try
+		{
+			Write-Debug "regsvr32.exe /s C:\Windows\system32\$Component"
 			regsvr32.exe /s "C:\Windows\system32\$Component"
 		}
 		Catch
 		{
-			Write-Host "Error fixing service"
+			Write-Debug "Error fixing service"
 		}
 	}
 }
 
-#---------------------------------------------------------- 
+#----------------------------------------------------------
 #FUNCTION Reset DCOM Permissions
-#---------------------------------------------------------- 
-Function Reset_DCOM_Permissions 
-{ 
+#----------------------------------------------------------
+Function Reset_DCOM_Permissions
+{
 	$converter = new-object system.management.ManagementClass Win32_SecurityDescriptorHelper
 
 	 $Reg = [WMIClass]"root\default:StdRegProv"
@@ -98,60 +98,60 @@ Function Reset_DCOM_Permissions
 }
 
 
-#---------------------------------------------------------- 
+#----------------------------------------------------------
 #FUNCTION Repair WMI
-#---------------------------------------------------------- 
+#----------------------------------------------------------
 Function Repair_WMI
-{ 
+{
 	winmgmt /verifyrepository
 	winmgmt /salvagerepository
 }
 
 
 
-#---------------------------------------------------------- 
-#FUNCTION RepairSCCM 
-#---------------------------------------------------------- 
-Function Repair_SCCM 
-{ 
-	Write-Host "Repairing CCM Client"
-	Try 
-	{ 
-		$getProcess = Get-Process -Name ccmrepair* 
-		If ($getProcess) 
-		{ 
-			Write-Host "[WARNING] SCCM Repair is already running. Script will end." 
-			Exit 1 
-		} 
-		Else 
-		{ 
-			Write-Host "[INFO] Connect to the WMI Namespace on $strComputer." 
-			$SMSCli = [wmiclass] "\root\ccm:sms_client" 
-			Write-Host "[INFO] Trigger the SCCM Repair on $strComputer." 
-			# The actual repair is put in a variable, to trap unwanted output. 
-			$repair = $SMSCli.RepairClient() 
-			Write-Host "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair" 
-		} 
-	} 
-	Catch 
-    	{ 
+#----------------------------------------------------------
+#FUNCTION RepairSCCM
+#----------------------------------------------------------
+Function Repair_SCCM
+{
+	Write-Debug "Repairing CCM Client"
+	Try
+	{
+		$getProcess = Get-Process -Name ccmrepair*
+		If ($getProcess)
+		{
+			Write-Debug "[WARNING] SCCM Repair is already running. Script will end."
+			Exit 1
+		}
+		Else
+		{
+			Write-Debug "[INFO] Connect to the WMI Namespace on $strComputer."
+			$SMSCli = [wmiclass] "\root\ccm:sms_client"
+			Write-Debug "[INFO] Trigger the SCCM Repair on $strComputer."
+			# The actual repair is put in a variable, to trap unwanted output.
+			$repair = $SMSCli.RepairClient()
+			Write-Debug "[INFO] Successfully connected to the WMI Namespace and triggered the SCCM Repair"
+		}
+	}
+	Catch
+    	{
 		# The soft repair trigger failed, so lets fall back to some more hands on methods.
-		
+
         	Stop-Service -Name "CcmExec"
 
 		$CCMPath = (Get-ItemProperty("HKLM:\SOFTWARE\Microsoft\SMS\Client\Configuration\Client Properties")).$("Local SMS Path")
-		$files = get-childitem "$($CCMPath)ServiceData\Messaging\EndpointQueues" -include *.msg,*.que -recurse 
-		
+		$files = get-childitem "$($CCMPath)ServiceData\Messaging\EndpointQueues" -include *.msg,*.que -recurse
+
 		foreach ($file in $files)
 		{
 		    Try
 		    {
-			Write-Host "Removing $file.FullName"
+			Write-Debug "Removing $file.FullName"
 			remove-item $file.FullName -Force
 		    }
 		    Catch
 		    {
-			Write-Host "Failed to remove $file.FullName"
+			Write-Debug "Failed to remove $file.FullName"
 		    }
 		}
 
@@ -168,8 +168,8 @@ Function Repair_SCCM
 			While (Get-Process -Name ccmrepair*)
 			{
 				if ($count -gt 60){
-					Write-Host "We've looped more than 60 times which means this has ran for more than 10 minutes."
-					Write-Host "Break out so we don't run forever."
+					Write-Debug "We've looped more than 60 times which means this has ran for more than 10 minutes."
+					Write-Debug "Break out so we don't run forever."
 					$CCMRepairFailed = $True
 					break
 				}
@@ -179,7 +179,7 @@ Function Repair_SCCM
 		}
 		else
 		{
-			Write-Host "CCMRepair doesn't exist"
+			Write-Debug "CCMRepair doesn't exist"
 			$CCMRepairFailed = $True
 		}
 
@@ -201,8 +201,8 @@ Function Repair_SCCM
 				While (Get-Process -Name ccmsetup*)
 				{
 					if ($count -gt 60){
-						Write-Host "We've looped more than 60 times which means this has ran for more than 10 minutes."
-						Write-Host "Break out so we don't run forever."
+						Write-Debug "We've looped more than 60 times which means this has ran for more than 10 minutes."
+						Write-Debug "Break out so we don't run forever."
 						$CCMSetupFailed = $True
 						break
 					}
@@ -212,29 +212,29 @@ Function Repair_SCCM
 			}
 			else
 			{
-				Write-Host "CCMSetup doesn't exist"
+				Write-Debug "CCMSetup doesn't exist"
 				$CCMSetupFailed = $True
 			}
 		}
 
 		# Probably should do something if running CCMsetup failed but that's for a future improvement.
 		# For now we just give up.
-	} 
-} 
-# RUN SCRIPT  
+	}
+}
+# RUN SCRIPT
 
- 
-#---------------------------------------------------------- 
+
+#----------------------------------------------------------
 #FUNCTION PolicyHandler
-#---------------------------------------------------------- 
+#----------------------------------------------------------
 Function Policy_Handler
-{ 
+{
 	# Reset the policy, and fetch new ones.
 
 	Try
 	{
-		$SMSCli = [wmiclass] "\root\ccm:sms_client" 
-	
+		$SMSCli = [wmiclass] "\root\ccm:sms_client"
+
 		$trapreturn = $SMSCli.ResetPolicy()
 		Start-Sleep -Seconds 60
 		$trapreturn = $SMSCli.RequestMachinePolicy()
@@ -311,4 +311,4 @@ Reset_DCOM_Permissions
 Repair_WMI
 Repair_SCCM
 Policy_Handler
-#Finished 
+#Finished
