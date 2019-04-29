@@ -1,7 +1,7 @@
 
 /*
 
-	Purpose: Find Assets by Primary User (Top Console User)
+	Purpose: Inventory installed web browsers across environment.
 
 	Author(s): Chris Kibble (www.ChristopherKibble.com)
 	Contributor(s): 
