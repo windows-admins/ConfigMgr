@@ -33,7 +33,7 @@ Function Write-CMLogEntry {
         [parameter(Mandatory = $false, HelpMessage = 'Maximum number of rotated log files to keep. Set to 0 for unlimited rotated log files.')]
         [ValidateNotNullOrEmpty()]
         [int32]$MaxNumOfRotatedLogs = 0,
-        [parameter(Mandatory = $true, HelpMessage = 'A switch that enables the use of this function.')]
+        [parameter(Mandatory = $false, HelpMessage = 'A switch that enables the use of this function.')]
         [ValidateNotNullOrEmpty()]
         [bool]$Enable
     )
