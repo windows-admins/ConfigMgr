@@ -5,7 +5,7 @@ Function Write-CMLogEntry {
     .EXAMPLE
         $Bias = Get-WmiObject -Class Win32_TimeZone | Select-Object -ExpandProperty Bias
         $FileName = "myscript_" + (Get-Date -Format 'yyyy-MM-dd_HH-mm-ss') + ".log"
-        Write-CMLogEntry -Value "Writing text to log file" -Severity 1 -Component "Some component name" -FileName $FileName -Folder "C:\Windows\temp" -Bias $Bias -Enable $true -MaxLogFileSize 1MB -MaxNumOfRotatedLogs 3
+        Write-CMLogEntry -Value "Writing text to log file" -Severity 1 -Component "Some component name" -FileName $FileName -Folder "C:\Windows\temp" -Bias $Bias -Enable -MaxLogFileSize 1MB -MaxNumOfRotatedLogs 3
     #>
     param (
         [parameter(Mandatory = $true, HelpMessage = 'Value added to the log file.')]
@@ -35,7 +35,7 @@ Function Write-CMLogEntry {
         [int32]$MaxNumOfRotatedLogs = 0,
         [parameter(Mandatory = $false, HelpMessage = 'A switch that enables the use of this function.')]
         [ValidateNotNullOrEmpty()]
-        [bool]$Enable
+        [switch]$Enable
     )
     If ($Enable) {
         # Determine log file location
