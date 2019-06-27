@@ -6,6 +6,9 @@ Function Write-CMLogEntry {
         $Bias = Get-WmiObject -Class Win32_TimeZone | Select-Object -ExpandProperty Bias
         $FileName = "myscript_" + (Get-Date -Format 'yyyy-MM-dd_HH-mm-ss') + ".log"
         Write-CMLogEntry -Value "Writing text to log file" -Severity 1 -Component "Some component name" -FileName $FileName -Folder "C:\Windows\temp" -Bias $Bias -Enable -MaxLogFileSize 1MB -MaxNumOfRotatedLogs 3
+    .NOTES
+        Authors:    Cody Mathis / Adam Cook
+        Contact:    @CodyMathis123 / @codaamok
     #>
     param (
         [parameter(Mandatory = $true, HelpMessage = 'Value added to the log file.')]
