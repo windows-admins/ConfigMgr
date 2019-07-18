@@ -10,7 +10,7 @@ Function Test-FileSystemAccess {
         ERROR_ELEVATION_REQUIRED (740)
     .NOTES
         Authors:    Patrick Seymour / Adam Cook
-        Contact:    @codaamok
+        Contact:    @pseymour / @codaamok
     #>
     param
     (
