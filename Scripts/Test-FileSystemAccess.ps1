@@ -1,26 +1,37 @@
 Function Test-FileSystemAccess {
     <#
     .SYNOPSIS
-    Check for file system access on a given folder.
+        Check for file system access on a given folder.
     .OUTPUTS
-    System.Int32
-    0   = ERROR_SUCCESS
-    3   = ERROR_PATH_NOT_FOUND
-    5   = ERROR_ACCESS_DENIED
-    740 = ERROR_ELEVATION_REQUIRED
+        [System.Enum]
+        ERROR_SUCCESS (0)
+        ERROR_PATH_NOT_FOUND (3)
+        ERROR_ACCESS_DENIED (5)
+        ERROR_ELEVATION_REQUIRED (740)
     .NOTES
         Authors:    Patrick Seymour / Adam Cook
         Contact:    @codaamok
     #>
     param
     (
+        [ValidateScript({Test-Path $_ -PathType "Container"})]
+        [Parameter(Mandatory=$true)]
         [string]$Path,
+        [Parameter(Mandatory=$true)]
         [System.Security.AccessControl.FileSystemRights]$Rights
     )
+
+    enum FileSystemAccessState {
+        ERROR_SUCCESS
+        ERROR_PATH_NOT_FOUND = 3
+        ERROR_ACCESS_DENIED = 5
+        ERROR_ELEVATION_REQUIRED = 740
+    }
 
     [System.Security.Principal.WindowsIdentity]$currentIdentity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     [System.Security.Principal.WindowsPrincipal]$currentPrincipal = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
     $IsElevated = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    $IsInAdministratorsGroup = $currentIdentity.Claims.Value -contains "S-1-5-32-544"
 
     if ([System.IO.Directory]::Exists($Path))
     {
@@ -37,35 +48,36 @@ Function Test-FileSystemAccess {
                         [System.Security.AccessControl.FileSystemAccessRule]$fileSystemRule = [System.Security.AccessControl.FileSystemAccessRule]$rules[$i]
                         if ($fileSystemRule.FileSystemRights.HasFlag($Rights))
                         {
-                            return 0
+                            return [FileSystemAccessState]::ERROR_SUCCESS
                         }
                     }
                 }
 
-                if (($IsElevated -eq $false) -And ($rules.Where( { ($_.IdentityReference -eq "S-1-5-32-544") -And ($_.FileSystemRights -eq $Rights) } )))
+                if (($IsElevated -eq $false) -And ($IsInAdministratorsGroup -eq $true) -And ($rules.Where( { ($_.IdentityReference -eq "S-1-5-32-544") -And ($_.FileSystemRights.HasFlag($Rights)) } )))
                 {
-                    return 740
+                    # At this point we were able to read ACL and verify Administrators group access, likely because we were qualified by the object set as owner
+                    return [FileSystemAccessState]::ERROR_ELEVATION_REQUIRED
                 }
                 else
                 {
-                    return 5
+                    return [FileSystemAccessState]::ERROR_ACCESS_DENIED
                 }
 
             }
             else
             {
-                return 5
+                return [FileSystemAccessState]::ERROR_ACCESS_DENIED
             }
         }
         catch
         {
-            return 5
+            return [FileSystemAccessState]::ERROR_ACCESS_DENIED
         }
     }
     else
     {
-        return 3
+        return [FileSystemAccessState]::ERROR_PATH_NOT_FOUND
     }
 }
 
-Test-FileSystemAccess -Path "F:\Applications\notused\elevationrequired" -Rights Read
+Test-FileSystemAccess -Path "C:\Users\acc\Documents\New folder" -Rights Read
