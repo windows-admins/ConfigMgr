@@ -14,7 +14,6 @@ Function Test-FileSystemAccess {
     #>
     param
     (
-        [ValidateScript({Test-Path $_ -PathType "Container"})]
         [Parameter(Mandatory=$true)]
         [string]$Path,
         [Parameter(Mandatory=$true)]
