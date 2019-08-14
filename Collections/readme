@@ -3,3 +3,9 @@ WARNING: If you do not first import the hardware inventory MOF (HealthChecksHINV
 To add the collections, either download the whole repository or just the MOF file.  (If you try to copy and paste you might screw up the formatting, but you can try.)
 
 To import: https://technet.microsoft.com/en-us/library/cc181056.aspx#EBAA
+
+SecurityHealthCollections.MOF - For straight up pure security goodness.  Anything that directly relates to client security information (UEFI, Bitlocker, Defender, etc).
+
+HealthCollections.MOF - For client health, because if the SCCM client isn't working, what good is anything else?
+
+Dogfood.MOF - For Windows Update health. Not strictly required for Windows Updates, but can be a quick and easy way to build out a phased update strategy.
