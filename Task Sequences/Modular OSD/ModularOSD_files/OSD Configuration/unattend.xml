@@ -21,6 +21,10 @@
                 <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
                 <NetworkLocation>Work</NetworkLocation>
                 <ProtectYourPC>1</ProtectYourPC>
+                <InputLocale>un-US</InputLocale>
+		<SystemLocale>en-US</SystemLocale> 
+		<UILanguage>en-US</UILanguage> 
+		<UserLocale>en-US</UserLocale>
             </OOBE>
             <FirstLogonCommands>
                 <SynchronousCommand wcm:action="add">
