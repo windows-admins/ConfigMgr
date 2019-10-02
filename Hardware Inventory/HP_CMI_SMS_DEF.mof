@@ -1,0 +1,54 @@
+#pragma namespace("");
+
+[ SMS_Report(TRUE), SMS_Group_Name("CMI BIOS Setting Data"), SMS_Class_ID("HP|HP_BIOSSetting|1.0"), SMS_Namespace(FALSE), Namespace("\\\\.\\root\\HP\\InstrumentedBIOS") ]
+class HP_BIOSSetting : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string Name;
+[SMS_Report (TRUE)]	string Value;
+[SMS_Report (TRUE)]	string Path;
+[SMS_Report (TRUE)]	uint32 IsReadOnly;
+[SMS_Report (TRUE)]	uint32 DisplayInUI;
+[SMS_Report (TRUE)]	uint32 RequiresPhysicalPresence;
+[SMS_Report (TRUE)]	uint32 Sequence;
+[SMS_Report (TRUE)]	string Prerequisites[];
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("CMI BIOS String Data"), SMS_Class_ID("HP|HP_BIOSString|1.0"), SMS_Namespace(FALSE), Namespace("\\\\.\\root\\HP\\InstrumentedBIOS") ]
+class HP_BIOSString : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint32 MinLength;
+[SMS_Report (TRUE)]	uint32 MaxLength;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("CMI BIOS Integer Data"), SMS_Class_ID("HP|HP_BIOSInteger|1.0"), SMS_Namespace(FALSE), Namespace("\\\\.\\root\\HP\\InstrumentedBIOS") ]
+class HP_BIOSInteger : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint32 LowerBound;
+[SMS_Report (TRUE)]	uint32 UpperBound;
+[SMS_Report (TRUE)]	uint32 IntValue;
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("CMI BIOS Enumeration Data"), SMS_Class_ID("HP|HP_BIOSEnumeration|1.0"), SMS_Namespace(FALSE), Namespace("\\\\.\\root\\HP\\InstrumentedBIOS") ]
+class HP_BIOSEnumeration : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	string CurrentValue;
+[SMS_Report (TRUE)]	uint32 Size;
+[SMS_Report (TRUE)]	string PossibleValues[];
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("CMI BIOS Ordered List Data"), SMS_Class_ID("HP|HP_BIOSOrderedList|1.0"), SMS_Namespace(FALSE), Namespace("\\\\.\\root\\HP\\InstrumentedBIOS") ]
+class HP_BIOSOrderedList : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint32 Size;
+[SMS_Report (TRUE)]	string Elements[];
+};
+
+[ SMS_Report(TRUE), SMS_Group_Name("CMI BIOS Password Data"), SMS_Class_ID("HP|HP_BIOSPassword|1.0"), SMS_Namespace(FALSE), Namespace("\\\\.\\root\\HP\\InstrumentedBIOS") ]
+class HP_BIOSPassword : SMS_Class_Template
+{
+[SMS_Report (TRUE)]	uint32 MinLength;
+[SMS_Report (TRUE)]	uint32 MaxLength;
+[SMS_Report (TRUE)]	string SupportedEncoding[];
+[SMS_Report (TRUE)]	uint32 IsSet;
+};
+
