@@ -153,7 +153,7 @@ ForEach ($ADRRule in $ADRRules)
         -Language "English" `
         -LanguageSelection "English" `
         -NoInstallOnRemote $False `
-        -NoInstallOnUnprotected $True `
+        -NoInstallOnUnprotected $False `
         -Product $ADRRule.Products `
         -RunType RunTheRuleAfterAnySoftwareUpdatePointSynchronization `
         -Superseded $False `
@@ -203,7 +203,9 @@ ForEach ($ADRRule in $ADRRules)
             -SuccessPercentage 80 `
             -GenerateSuccessAlert $True `
             -AlertTime 7 `
-            -AlertTimeUnit Days
+            -AlertTimeUnit Days `
+            -NoInstallOnRemote $False `
+            -NoInstallOnUnprotected $False
             # These don't exist yet :(
             # -DownloadFromInternet $False `
             # -DownloadFromMicrosoftUpdate $True `
