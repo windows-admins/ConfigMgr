@@ -3,14 +3,12 @@
 # module for Windows PowerShell and will connect to the site.
 #
 
-# Uncomment the line below if running in an environment where script signing is 
-# required.
+# Uncomment the line below if running in an environment where script signing is required.
 #Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
 # ____________________________________________________________________________________________
 #
-# CHANGE SETTINGS BELOW THIS LINE
-#
+#			CHANGE SETTINGS BELOW THIS LINE
 # ____________________________________________________________________________________________
 
 # Site configuration
@@ -20,7 +18,8 @@ $ProviderMachineName = "CM1.corp.contoso.com" # SMS Provider machine name
 # Set to the FQDN of where update package content source is stored
 $ContentSourcePath = "\\cm1.corp.contoso.com\Source\_Updates\"
 
-# Change this if you want to target a different set of collections.  The number of $collections and the number of $schedule must match.
+# Change this if you want to target a different set of collections.
+# The number of $collections and the number of $schedule must match.
 $collections = (”DOGFOOD1”,”DOGFOOD2”,”DOGFOOD3”,”DOGFOOD4”,”DOGFOOD5”,”DOGFOOD6”,”DOGFOOD7”,”DOGFOOD8”)
 
 # Add ADR rules to create multiple ADRs in a single pass.
@@ -29,13 +28,25 @@ $ADRRules = (`
         ADRName = "Windows 10"; 
         Products = 'Windows 10', 'Windows 10, version 1903 and later';
         UpdateClassifications = "Critical Updates", "Definition Updates", "Feature Packs", "Security Updates","Service Packs", "Tools", "Update Rollups","Updates";
-        Title = "-en-gb"
+        Title = "-en-gb";
+        RunType = "RunTheRuleOnSchedule";
+        Schedule = New-CMSchedule -DayOfWeek Tuesday -WeekOrder 2 -OffsetDay 2
     },`
     @{
         ADRName = "Office 365"; 
         Products = 'Office 365 Client';
         UpdateClassifications = "Critical Updates", "Definition Updates", "Feature Packs", "Security Updates","Service Packs", "Tools", "Update Rollups","Updates";
-        Title = ""
+        Title = "";
+        RunType = "RunTheRuleOnSchedule";
+        Schedule = New-CMSchedule -DayOfWeek Tuesday -WeekOrder 2 -OffsetDay 2
+    },`
+    @{
+        ADRName = "Microsoft Defender"; 
+        Products = 'MS Security Essentials', 'Security Essentials', 'Windows Defender';
+        UpdateClassifications = "Critical Updates", "Definition Updates", "Feature Packs", "Security Updates","Service Packs", "Tools", "Update Rollups","Updates";
+        Title = "";
+        RunType = "RunTheRuleAfterAnySoftwareUpdatePointSynchronization";
+        Schedule = New-CMSchedule -RecurCount 1 -RecurInterval Hours
     }`
 )
 
@@ -80,8 +91,7 @@ $schedule = (`
 
 # ____________________________________________________________________________________________
 #
-# DO NOT CHANGE ANYTHING BELOW THIS LINE
-#
+#			DO NOT CHANGE ANYTHING BELOW THIS LINE
 # ____________________________________________________________________________________________
 
 # Customizations
@@ -107,7 +117,7 @@ Set-Location "$($SiteCode):\" @initParams
 
 ForEach ($ADRRule in $ADRRules)
 {
-    Write-Host "Creating ADR rule for:" $ADRRule.ADRName
+    Write-Host "Creating ADR rule for:" $ADRRule.ADRName -ForegroundColor Green
 
     if (Test-Path -Path (Join-Path -Path FileSystem::$ContentSourcePath -ChildPath $ADRRule.ADRName))
     {
@@ -155,7 +165,6 @@ ForEach ($ADRRule in $ADRRules)
         -NoInstallOnRemote $False `
         -NoInstallOnUnprotected $False `
         -Product $ADRRule.Products `
-        -RunType RunTheRuleAfterAnySoftwareUpdatePointSynchronization `
         -Superseded $False `
         -SuppressRestartServer $False `
         -SuppressRestartWorkstation $False `
@@ -173,7 +182,11 @@ ForEach ($ADRRule in $ADRRules)
         -SuccessPercentage 80 `
         -GenerateSuccessAlert $True `
         -AlertTime 7 `
-        -AlertTimeUnit Days
+        -AlertTimeUnit Days `
+        -RunType $ADRRule.RunType `
+        -Schedule $ADRRule.Schedule
+
+        Write-Host "Created deployment for" (Get-CMCollection -Id $collections[0] -CollectionType Device).Name
 
         $Count=0
         ForEach ($_ in $schedule)
