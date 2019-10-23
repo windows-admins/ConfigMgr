@@ -1,5 +1,5 @@
 These are converted from the published DoD STIGs.
-https://iase.disa.mil/stigs/gpo/Pages/index.aspx
+https://public.cyber.mil/stigs/gpo/
 
 There are a couple of caveats.  One is that they do not contain any GPP settings.  Additionally, there is one setting missing from each of the baselines below that did not convert over properly (due to being a multistring registry item).
 
