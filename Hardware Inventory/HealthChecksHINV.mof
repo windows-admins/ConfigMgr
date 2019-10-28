@@ -726,7 +726,7 @@ class Win32_Volume : SMS_Class_Template
         Boolean     DirtyBitSet;
     [ SMS_Report (FALSE) ]
         String         DriveLetter;
-    [ SMS_Report (FALSE) ]
+    [ SMS_Report (TRUE) ]
         uint32         DriveType;
     [ SMS_Report (TRUE) ]
         Boolean     ErrorCleared;
