@@ -20,7 +20,7 @@ $ContentSourcePath = "\\cm1.corp.contoso.com\Source\_Updates\"
 
 # Change this if you want to target a different set of collections.
 # The number of $collections and the number of $schedule must match.
-$collections = (”DOGFOOD1”,”DOGFOOD2”,”DOGFOOD3”,”DOGFOOD4”,”DOGFOOD5”,”DOGFOOD6”,”DOGFOOD7”,”DOGFOOD8”)
+$collections = ("DOGFOOD1","DOGFOOD2","DOGFOOD3","DOGFOOD4","DOGFOOD5","DOGFOOD6","DOGFOOD7","DOGFOOD8")
 
 # Add ADR rules to create multiple ADRs in a single pass.
 $ADRRules = (`
