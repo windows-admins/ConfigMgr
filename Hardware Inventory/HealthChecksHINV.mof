@@ -198,6 +198,12 @@ class Win32_ComputerSystem : SMS_Class_Template
         String         UserName;
     [ SMS_Report (TRUE) ]
         UInt16     WakeUpType;
+    [ SMS_Report (FALSE) ]
+        DateTime     InstallDate;
+    [ SMS_Report (FALSE) ]
+        DateTime     LastBootUpTime;
+    [ SMS_Report (FALSE) ]
+        DateTime     LocalDateTime;
 };
 
 [ SMS_Report (TRUE),
