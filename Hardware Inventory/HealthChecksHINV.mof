@@ -948,3 +948,50 @@ class Win32_OperatingSystem : SMS_Class_Template
     [ SMS_Report (TRUE) ]
     String     WindowsDirectory;
 };
+
+[ SMS_Report (TRUE),
+  SMS_Group_Name ("System Boot Summary"),
+  SMS_Class_ID ("MICROSOFT|SYSTEMBOOTSUMMARY|1.0"),
+  Namespace ("\\\\\\\\.\\\\root\\\\CCM") ]
+class CCM_SystemBootSummary : SMS_Class_Template
+{
+    [ SMS_Report (TRUE) ]
+    UInt32     AverageBootFrequency;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestBiosDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestCoreBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestEventLogStart;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestGPDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestUpdateDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxBiosDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxCoreBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxEventLogStart;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxGPDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxUpdateDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianBiosDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianCoreBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianEventLogStart;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianGPDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianUpdateDuration;
+};
+
