@@ -28,7 +28,7 @@ $ADRRules = (`
         ADRName = "Windows 10"; 
         Products = 'Windows 10', 'Windows 10, version 1903 and later';
         UpdateClassifications = "Critical Updates", "Definition Updates", "Feature Packs", "Security Updates","Service Packs", "Tools", "Update Rollups","Updates";
-        Title = "-en-gb";
+        Title = "-en-gb", "-preview", "-security only", "-language packs", "-beta";
         RunType = "RunTheRuleOnSchedule";
         Schedule = New-CMSchedule -DayOfWeek Tuesday -WeekOrder 2 -OffsetDay 2
     },`
@@ -36,7 +36,7 @@ $ADRRules = (`
         ADRName = "Office 365"; 
         Products = 'Office 365 Client';
         UpdateClassifications = "Critical Updates", "Definition Updates", "Feature Packs", "Security Updates","Service Packs", "Tools", "Update Rollups","Updates";
-        Title = "";
+        Title = "-preview", "-security only", "-language packs", "-beta";
         RunType = "RunTheRuleOnSchedule";
         Schedule = New-CMSchedule -DayOfWeek Tuesday -WeekOrder 2 -OffsetDay 2
     },`
