@@ -2,20 +2,27 @@
   <PolicySection Name="FEP.AmPolicy" Disabled="false">
     <LocalGroupPolicySettings>
       <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Paths" Disabled="false">
-        <AddValue Name="%SystemRoot%\system32\CCM\Cache" Type="REG_SZ" Disabled="false">0</AddValue>
         <AddValue Name="%SystemDrive%\_SMSTaskSequence" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\CCMCache" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\CCMSetup" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\CCM\Logs" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\CCM\ServiceData" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\CCM\SystemTemp" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%SystemDrive%\ConfigMgr_OfflineImageServicing" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\TEMP\BootImages" Type="REG_SZ" Disabled="false">0</AddValue>
       </AddKey>
       <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Extensions" Disabled="false">
         <AddValue Name=".lo_" Type="REG_SZ" Disabled="false">0</AddValue>
         <AddValue Name=".log" Type="REG_SZ" Disabled="false">0</AddValue>
         <AddValue Name=".mof" Type="REG_SZ" Disabled="false">0</AddValue>
         <AddValue Name=".xml" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name=".sdf" Type="REG_SZ" Disabled="false">0</AddValue>
       </AddKey>
       <AddKey Name="SOFTWARE\Policies\Microsoft\Microsoft Antimalware\Exclusions\Processes" Disabled="false">
-        <AddValue Name="Ccmexec.exe" Type="REG_SZ" Disabled="false">0</AddValue>
-        <AddValue Name="Ccmrepair.exe" Type="REG_SZ" Disabled="false">0</AddValue>
-        <AddValue Name="Ccmsetup.exe" Type="REG_SZ" Disabled="false">0</AddValue>
-        <AddValue Name="Ccmdump.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\CCM\Ccmexec.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\CCM\CmRcService" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\CCM\Ccmrepair.exe" Type="REG_SZ" Disabled="false">0</AddValue>
+        <AddValue Name="%windir%\ccmsetup\ccmsetup.exe" Type="REG_SZ" Disabled="false">0</AddValue>
       </AddKey>
     </LocalGroupPolicySettings>
   </PolicySection>

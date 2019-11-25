@@ -121,7 +121,7 @@ class Win32_ComputerSystem : SMS_Class_Template
     [ SMS_Report (TRUE) ]
         UInt16     ChassisBootupState;
     [ SMS_Report (TRUE) ]
-    SInt16     CurrentTimeZone;
+        SInt16     CurrentTimeZone;
     [ SMS_Report (TRUE) ]
         Boolean     DaylightInEffect;
     [ SMS_Report (TRUE) ]
@@ -136,8 +136,6 @@ class Win32_ComputerSystem : SMS_Class_Template
         Boolean     InfraredSupported;
     [ SMS_Report (TRUE) ]
         String         InitialLoadInfo[];
-    [ SMS_Report (TRUE) ]
-    DateTime     InstallDate;
     [ SMS_Report (TRUE) ]
         UInt16     KeyboardPasswordStatus;
     [ SMS_Report (TRUE) ]
@@ -157,7 +155,7 @@ class Win32_ComputerSystem : SMS_Class_Template
     [ SMS_Report (TRUE) ]
         String         OEMStringArray[];
     [ SMS_Report (TRUE), SMS_Units ("DecimalString") ]
-    SInt64     PauseAfterReset;
+        SInt64     PauseAfterReset;
     [ SMS_Report (TRUE) ]
         UInt16     PowerManagementCapabilities[];
     [ SMS_Report (TRUE) ]
@@ -175,9 +173,9 @@ class Win32_ComputerSystem : SMS_Class_Template
     [ SMS_Report (TRUE) ]
         UInt16     ResetCapability;
     [ SMS_Report (TRUE) ]
-    SInt16     ResetCount;
+        SInt16     ResetCount;
     [ SMS_Report (TRUE) ]
-    SInt16     ResetLimit;
+        SInt16     ResetLimit;
     [ SMS_Report (TRUE) ]
         String         Roles[];
     [ SMS_Report (TRUE) ]
@@ -200,6 +198,12 @@ class Win32_ComputerSystem : SMS_Class_Template
         String         UserName;
     [ SMS_Report (TRUE) ]
         UInt16     WakeUpType;
+    [ SMS_Report (FALSE) ]
+        DateTime     InstallDate;
+    [ SMS_Report (FALSE) ]
+        DateTime     LastBootUpTime;
+    [ SMS_Report (FALSE) ]
+        DateTime     LocalDateTime;
 };
 
 [ SMS_Report (TRUE),
@@ -726,7 +730,7 @@ class Win32_Volume : SMS_Class_Template
         Boolean     DirtyBitSet;
     [ SMS_Report (FALSE) ]
         String         DriveLetter;
-    [ SMS_Report (FALSE) ]
+    [ SMS_Report (TRUE) ]
         uint32         DriveType;
     [ SMS_Report (TRUE) ]
         Boolean     ErrorCleared;
@@ -832,5 +836,162 @@ class Win32_DeviceGuard : SMS_Class_Template
     String     Version;
     [ SMS_Report (TRUE) ]
     UInt32     VirtualizationBasedSecurityStatus;
+};
+
+
+[ SMS_Report (TRUE),
+  SMS_Group_Name ("Operating System"),
+  SMS_Class_ID ("MICROSOFT|OPERATING_SYSTEM|1.0"),
+  Namespace ("\\\\\\\\.\\\\root\\\\cimv2") ]
+class Win32_OperatingSystem : SMS_Class_Template
+{
+    [ SMS_Report (TRUE), key ]
+    String     Name;
+    [ SMS_Report (TRUE) ]
+    String     BootDevice;
+    [ SMS_Report (TRUE) ]
+    String     BuildNumber;
+    [ SMS_Report (FALSE) ]
+    String     BuildType;
+    [ SMS_Report (TRUE) ]
+    String     Caption;
+    [ SMS_Report (FALSE) ]
+    String     CodeSet;
+    [ SMS_Report (TRUE) ]
+    String     CountryCode;
+    [ SMS_Report (TRUE) ]
+    String     CSDVersion;
+    [ SMS_Report (FALSE) ]
+    SInt16     CurrentTimeZone;
+    [ SMS_Report (FALSE) ]
+    Boolean     Debug;
+    [ SMS_Report (TRUE) ]
+    String     Description;
+    [ SMS_Report (FALSE) ]
+    Boolean     Distributed;
+    [ SMS_Report (FALSE) ]
+    UInt8     ForegroundApplicationBoost;
+    [ SMS_Report (FALSE), SMS_Units ("KiloBytes") ]
+    UInt64     FreePhysicalMemory;
+    [ SMS_Report (FALSE), SMS_Units ("KiloBytes") ]
+    UInt64     FreeSpaceInPagingFiles;
+    [ SMS_Report (FALSE), SMS_Units ("KiloBytes") ]
+    UInt64     FreeVirtualMemory;
+    [ SMS_Report (TRUE) ]
+    DateTime     InstallDate;
+    [ SMS_Report (TRUE) ]
+    DateTime     LastBootUpTime;
+    [ SMS_Report (TRUE) ]
+    DateTime     LocalDateTime;
+    [ SMS_Report (TRUE) ]
+    String     Locale;
+    [ SMS_Report (TRUE) ]
+    String     Manufacturer;
+    [ SMS_Report (FALSE) ]
+    UInt32     MaxNumberOfProcesses;
+    [ SMS_Report (FALSE), SMS_Units ("KiloBytes") ]
+    UInt64     MaxProcessMemorySize;
+    [ SMS_Report (FALSE) ]
+    String     MUILanguages[];
+    [ SMS_Report (FALSE) ]
+    UInt32     NumberOfLicensedUsers;
+    [ SMS_Report (FALSE) ]
+    UInt32     NumberOfProcesses;
+    [ SMS_Report (FALSE) ]
+    UInt32     NumberOfUsers;
+    [ SMS_Report (TRUE) ]
+    UInt32     OperatingSystemSKU;
+    [ SMS_Report (TRUE) ]
+    String     Organization;
+    [ SMS_Report (FALSE) ]
+    String     OSArchitecture;
+    [ SMS_Report (TRUE) ]
+    UInt32     OSLanguage;
+    [ SMS_Report (TRUE) ]
+    UInt32     OSProductSuite;
+    [ SMS_Report (FALSE) ]
+    UInt16     OSType;
+    [ SMS_Report (FALSE) ]
+    String     OtherTypeDescription;
+    [ SMS_Report (FALSE) ]
+    String     PlusProductID;
+    [ SMS_Report (FALSE) ]
+    String     PlusVersionNumber;
+    [ SMS_Report (FALSE) ]
+    Boolean     Primary;
+    [ SMS_Report (TRUE) ]
+    UInt32     ProductType;
+    [ SMS_Report (TRUE) ]
+    String     RegisteredUser;
+    [ SMS_Report (TRUE) ]
+    String     SerialNumber;
+    [ SMS_Report (FALSE) ]
+    UInt16     ServicePackMajorVersion;
+    [ SMS_Report (FALSE) ]
+    UInt16     ServicePackMinorVersion;
+    [ SMS_Report (FALSE), SMS_Units ("KiloBytes") ]
+    UInt64     SizeStoredInPagingFiles;
+    [ SMS_Report (FALSE) ]
+    String     Status;
+    [ SMS_Report (FALSE) ]
+    String     SystemDevice;
+    [ SMS_Report (TRUE) ]
+    String     SystemDirectory;
+    [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
+    UInt64     TotalSwapSpaceSize;
+    [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
+    UInt64     TotalVirtualMemorySize;
+    [ SMS_Report (TRUE), SMS_Units ("KiloBytes") ]
+    UInt64     TotalVisibleMemorySize;
+    [ SMS_Report (TRUE) ]
+    String     Version;
+    [ SMS_Report (TRUE) ]
+    String     WindowsDirectory;
+};
+
+[ SMS_Report (TRUE),
+  SMS_Group_Name ("System Boot Summary"),
+  SMS_Class_ID ("MICROSOFT|SYSTEMBOOTSUMMARY|1.0"),
+  Namespace ("\\\\\\\\.\\\\root\\\\CCM") ]
+class CCM_SystemBootSummary : SMS_Class_Template
+{
+    [ SMS_Report (TRUE) ]
+    UInt32     AverageBootFrequency;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestBiosDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestCoreBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestEventLogStart;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestGPDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     LatestUpdateDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxBiosDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxCoreBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxEventLogStart;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxGPDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MaxUpdateDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianBiosDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianCoreBootDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianEventLogStart;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianGPDuration;
+    [ SMS_Report (TRUE) ]
+    UInt32     MedianUpdateDuration;
 };
 
