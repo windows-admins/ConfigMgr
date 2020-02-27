@@ -241,7 +241,7 @@ ForEach ($deployment in $deployments.Keys) {
         if ((Measure-Object -InputObject $AppDeploysToRemove).Count -gt 0) {
             foreach ($App in $AppDeploysToRemove) {
                 if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.ApplicationName)']", "Remove-CMApplicationDeployment")) {
-                    Write-Verbose "Removing deployment [Application = '$($app.SoftwareName)'] to [CollectionName = '$($app.CollectionName)']"
+                    Write-Verbose "Removing deployment [Application = '$($app.ApplicationName)'] to [CollectionName = '$($app.CollectionName)']"
                     Remove-CMApplicationDeployment -Name $App.ApplicationName -CollectionID $App.CollectionID -Force
                 }
             }
