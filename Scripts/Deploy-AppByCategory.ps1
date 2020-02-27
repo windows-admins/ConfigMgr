@@ -216,20 +216,21 @@ ForEach ($deployment in $deployments.Keys) {
     ForEach ($collection in $deployments[$deployment].Collections) {
         $GoodAppListSqlArray = [string]::Format("'{0}'", [string]::Join("', '", $appList.DisplayName))
         $AppDeploysToRemove = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
-        SELECT summ.SoftwareName
+        SELECT summ.ApplicationName
             , summ.CollectionID
             , summ.CollectionName
         FROM v_DeploymentSummary summ
-        WHERE summ.CollectionName = '$Collection'
-            AND summ.SoftwareName NOT IN ($GoodAppListSqlArray)
+        JOIN v_ApplicationAssignment appass ON appass.AssignmentID = summ.AssignmentID
+            WHERE summ.CollectionName = '$Collection'
+            AND appass.ApplicationName NOT IN ($GoodAppListSqlArray)
 "@
 
         # Find apps that aren't in our AppList for this collection and remove the deployment
         if ($AppDeploysToRemove.Count -gt 0) {
             foreach ($App in $AppDeploysToRemove) {
-                if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.DisplayName)']", "Remove-CMApplicationDeployment")) {
+                if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.ApplicationName)']", "Remove-CMApplicationDeployment")) {
                     Write-Verbose "Removing deployment [Application = '$($app.SoftwareName)'] to [CollectionName = '$($app.CollectionName)']"
-                    Remove-CMApplicationDeployment -Name $App.SoftwareName -CollectionID $App.CollectionID -Force
+                    Remove-CMApplicationDeployment -Name $App.ApplicationName -CollectionID $App.CollectionID -Force
                 }
             }
         }
