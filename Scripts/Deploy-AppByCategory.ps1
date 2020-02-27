@@ -225,11 +225,16 @@ ForEach ($deployment in $deployments.Keys) {
 "@
 
         # Find apps that aren't in our AppList for this collection and remove the deployment
-        foreach ($App in $AppDeploysToRemove) {
-            if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.DisplayName)']", "Remove-CMApplicationDeployment")) {
-                Write-Verbose "Removing deployment [Application = '$($app.SoftwareName)'] to [CollectionName = '$($app.CollectionName)']"
-                Remove-CMApplicationDeployment -Name $App.SoftwareName -CollectionID $App.CollectionID -Force
+        if ($AppDeploysToRemove.Count -gt 0) {
+            foreach ($App in $AppDeploysToRemove) {
+                if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.DisplayName)']", "Remove-CMApplicationDeployment")) {
+                    Write-Verbose "Removing deployment [Application = '$($app.SoftwareName)'] to [CollectionName = '$($app.CollectionName)']"
+                    Remove-CMApplicationDeployment -Name $App.SoftwareName -CollectionID $App.CollectionID -Force
+                }
             }
+        }
+        else {
+            Write-Verbose "There are no application deployments to remove for $collection"
         }
     }
 }
