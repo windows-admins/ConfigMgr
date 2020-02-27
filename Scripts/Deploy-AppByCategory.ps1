@@ -1,4 +1,3 @@
-[CmdletBinding(SupportsShouldProcess = $true)]
 <#
     .SYNOPSIS
         Deploy applications to collections, based on Administrative Categories
@@ -63,6 +62,7 @@
             Version 1.0.2: 2020-02-26
             Version 1.0.3: 2020-02-27
 #>
+[CmdletBinding(SupportsShouldProcess = $true)]
 param (
     [Parameter(Mandatory = $true)]
     [string]$SiteServer,
