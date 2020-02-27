@@ -177,7 +177,7 @@ ForEach ($deployment in $deployments.Keys) {
 "@
 
     # Loop over each application that should be deployed and ensure it is
-    if ($appList.Count -gt 0) {
+    if ((Measure-Object -InputObject $appList).Count -gt 0) {
         ForEach ($app in $appList) {
             # Loop through the collections, if there are multiples
             ForEach ($collection in $deployments[$deployment].Collections) {
@@ -238,7 +238,7 @@ ForEach ($deployment in $deployments.Keys) {
 "@
 
         # Find apps that aren't in our AppList for this collection and remove the deployment
-        if ($AppDeploysToRemove.Count -gt 0) {
+        if ((Measure-Object -InputObject $AppDeploysToRemove).Count -gt 0) {
             foreach ($App in $AppDeploysToRemove) {
                 if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.ApplicationName)']", "Remove-CMApplicationDeployment")) {
                     Write-Verbose "Removing deployment [Application = '$($app.SoftwareName)'] to [CollectionName = '$($app.CollectionName)']"
