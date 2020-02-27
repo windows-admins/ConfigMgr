@@ -1,35 +1,110 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 <#
-.SYNOPSIS
-    Deploy applications to collections, based on Administrative Categories
-.DESCRIPTION
-    This script deploys applications to specified collections based on the attached Administrative Categories.
-    It will then loop through those collections and remove any deployments for apps that no longer bear the
-    category queried.
+    .SYNOPSIS
+        Deploy applications to collections, based on Administrative Categories
+    .DESCRIPTION
+        This script deploys applications to specified collections based on the attached Administrative Categories.
+        It will then loop through those collections and remove any deployments for apps that no longer bear the
+        category queried.
 
-    Originally designed to automatically deploy applications as available to a Helpdesk user collection, and
-    Available/Required (for Fast Channel installs) to a Machine Collection
-.INPUTS
-    "$deployments" = Edit table with relevant collections, admin categories, and deployment settings
-    "$newAppArgs" = Additional settings/defaults for application deployments
-    $newAppArgs["DistributionPointGroupName"] = Set your distribution group name
-.NOTES
-    Name:      Deploy-AppByCategory.ps1
-    Author:    Vex
-    Contributor: Chris Kibble (On a _massive_ level, thanks Chris!!!)
-    Contributor: Cody Mathis (On a _miniscule_ level)
-    Version: 1.0.2
-    Release Date: 2019-08-13
-    Updated:
-        Version 1.0.1: 2019-08-14
-        Version 1.0.2: 2020-02-26
+        Originally designed to automatically deploy applications as available to a Helpdesk user collection, and
+        Available/Required (for Fast Channel installs) to a Machine Collection.
+
+        If you want, this script can be be triggered by a status filter rule, with MessageID 30153.
+
+        You can either define your deployments in the script below, or you can provide a JSON file as a paramter,
+        which contains an exported hashtable following the deployment template
+
+        @{
+            "HelpDesk Deployments"     = @{
+                "Category"         = "Helpdesk"
+                "Collections"      = @("IT - Helpdesk")
+                "ApprovalRequired" = $false
+                "DeployAction"     = "Install"
+                "DeployPurpose"    = "Available"
+                "UserNotification" = "DisplayAll"
+            }
+            "Fast Channel Deployments" = @{
+                "Category"         = "Fast Channel App"
+                "Collections"      = @("Deploy - Fast Channel Deployment")
+                "ApprovalRequired" = $true
+                "DeployAction"     = "Install"
+                "DeployPurpose"    = "Available"
+                "UserNotification" = "DisplaySoftwareCenterOnly"
+            }
+        }
+    .PARAMETER SiteServer
+        The MEMCM Site Server, which will be used to identify other resources as needed. 
+
+        IF this script is used as part of a status message filter rule, the variable will be %sitesvr
+    .PARAMETER SQLServer
+        The MEMCM Site Database Server, which will be queried against. 
+
+        IF this script is used as part of a status message filter rule, the variable will be %sqlsvr
+    .PARAMETER DeploymentJSON
+        An optional JSON file that should be an exported hash table following the Deployment template noted in the description.
+
+        You can create your deployment template hash table and then run 
+        
+        $Deployments | ConvertTo-Json | Out-File c:\path\to\test.json
+    .INPUTS
+        "$deployments" = Edit table with relevant collections, admin categories, and deployment settings
+        "$newAppArgs" = Additional settings/defaults for application deployments
+        $newAppArgs["DistributionPointGroupName"] = Set your distribution group name
+    .NOTES
+        Name:      Deploy-AppByCategory.ps1
+        Author:    Vex
+        Contributor: Chris Kibble (On a _massive_ level, thanks Chris!!!)
+        Contributor: Cody Mathis (On a _miniscule_ level)
+        Version: 1.0.3
+        Release Date: 2019-08-13
+        Updated:
+            Version 1.0.1: 2019-08-14
+            Version 1.0.2: 2020-02-26
+            Version 1.0.3: 2020-02-27
 #>
+param (
+    [Parameter(Mandatory = $true)]
+    [string]$SiteServer,
+    [Parameter(Mandatory = $false)]
+    [string]$SQLServer,
+    [Parameter(Mandatory = $false)]
+    [ValidateScript( { (Test-Path -LiteralPath $_) -and ($_ -match '\.json$') })]
+    [string]$DeploymentJSON
+)
+#region Gather site configuration, including SiteCode, Site Database Name, and SQLServer if not provided as a parameter
+#region gather the Site Code from the SMS Provider
+$getSiteCodeSplat = @{
+    Query        = "SELECT SiteCode FROM SMS_ProviderLocation WHERE Machine LIKE '$SiteServer%'"
+    ComputerName = $SiteServer
+    Namespace    = 'root\SMS'
+}
+$SiteCode = (Get-CimInstance @getSiteCodeSplat).SiteCode
+#endregion gather the Site Code from the SMS Provider
 
-# Site configuration
-$ProviderMachineName = "cm.contoso.com" # SMS Provider machine FQDN
-$SQLServer = 'cm-sql.contoso.com' # SQL Server that hosts your CM_<SiteCode> database
-$SiteCode = (Get-CimInstance -Query "SELECT SiteCode FROM SMS_ProviderLocation WHERE Machine = '$ProviderMachineName'" -Namespace root\SMS -ComputerName $ProviderMachineName).SiteCode
-$CMDB = [string]::Format('CM_{0}', $SiteCode)
+switch ($PSBoundParameters.ContainsKey('SQLServer')) {
+    #region if a SQLServer is provided, we will use that value, and assume the CMDB to be CM_$SiteCode
+    $true {
+        $CMDBServer = $SQLServer
+        $CMDB = [string]::Format('CM_{0}', $SiteCode)
+    }
+    #endregion if a SQLServer is provided, we will use that value, and assume the CMDB to be CM_$SiteCode
+
+    #region if a SQLServer is not provided we will attempt to gather the data from WMI on the SMS Provider
+    $false {
+        $getSQLServerInfoSplat = @{
+            Query        = "SELECT SiteObject FROM SMS_SiteSystemSummarizer WHERE Role = 'SMS SQL SERVER' and SiteCode = '$SiteCode' and ObjectType = 1"
+            ComputerName = $SiteServer
+            Namespace    = "root/sms/site_$siteCode"
+        }
+        
+        $DataSourceSQL = (Get-CimInstance @getSQLServerInfoSplat).SiteObject | Select-Object -Unique
+        $CMDBServer = $DataSourceSQL -replace '.*\\\\([A-Z0-9_-.]+)\\.*', '$+'
+        $CMDB = $DataSourceSQL -replace ".*\\([A-Z_0-9]*?)\\$", '$+'
+    }
+    #endregion if a SQLServer is not provided we will attempt to gather the data from WMI on the SMS Provider
+}
+#endregion Gather site configuration, including SiteCode, Site Database Name, and SQLServer if not provided as a parameter
 
 # Customizations
 $initParams = @{ }
@@ -45,7 +120,7 @@ if ($null -eq (Get-Module ConfigurationManager)) {
 
 # Connect to the site's drive if it is not already present
 if ($null -eq (Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue)) {
-    New-PSDrive -Name $SiteCode -PSProvider CMSite -Root $ProviderMachineName @initParams
+    New-PSDrive -Name $SiteCode -PSProvider CMSite -Root $SiteServer @initParams
 }
 
 # store our current location so we can return to it when the script completes
@@ -55,30 +130,44 @@ Push-Location
 Set-Location "$($SiteCode):\" @initParams
 
 # Set the required deployment args per collection
-$deployments = @{
-    "HelpDesk Deployments"     = @{
-        "Category"         = "Helpdesk"
-        "Collections"      = @("IT - Helpdesk")
-        "ApprovalRequired" = $false
-        "DeployAction"     = "Install"
-        "DeployPurpose"    = "Available"
-        "UserNotification" = "DisplayAll"
+$deployments = switch ($PSBoundParameters.Contains('DeploymentJSON')) {
+    #region if a JSON file is provided, we will get the content of the file, convert from JSON, and then convert to a hash table
+    $true {
+        $Categories = (ConvertFrom-Json -InputObject (Out-String -InputObject (Get-Content -Path $DeploymentJSON))).psobject.Properties
+        foreach ($Category in $Categories) {
+            @{ $Category.Name = $Category.Value }
+        }
     }
-    "Fast Channel Deployments" = @{
-        "Category"         = "Fast Channel App"
-        "Collections"      = @("Deploy - Fast Channel Deployment")
-        "ApprovalRequired" = $true
-        "DeployAction"     = "Install"
-        "DeployPurpose"    = "Available"
-        "UserNotification" = "DisplaySoftwareCenterOnly"
+    #endregion if a JSON file is provided, we will get the content of the file, convert from JSON, and then convert to a hash table
+
+    #region if a JSON file is not provided, the below section should be populated to match your desired category based deployments
+    $false {
+        @{
+            "HelpDesk Deployments"     = @{
+                "Category"         = "Helpdesk"
+                "Collections"      = @("IT - Helpdesk")
+                "ApprovalRequired" = $false
+                "DeployAction"     = "Install"
+                "DeployPurpose"    = "Available"
+                "UserNotification" = "DisplayAll"
+            }
+            "Fast Channel Deployments" = @{
+                "Category"         = "Fast Channel App"
+                "Collections"      = @("Deploy - Fast Channel Deployment")
+                "ApprovalRequired" = $true
+                "DeployAction"     = "Install"
+                "DeployPurpose"    = "Available"
+                "UserNotification" = "DisplaySoftwareCenterOnly"
+            }
+        }
     }
+    #endregion if a JSON file is not provided, the below section should be populated to match your desired category based deployments
 }
 
 # Loop through the $deployemnts
 ForEach ($deployment in $deployments.Keys) {
-
     # Pull a list of applications with that category
-    $appList = Invoke-SqlCmd -ServerInstance $SqlServer -Database $CMDB -Query @"
+    $appList = Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
         SELECT apps.DisplayName
             , apps.CI_UniqueID
             , COUNT(dist.nalpath) AS [TargetedDP]
@@ -131,7 +220,7 @@ ForEach ($deployment in $deployments.Keys) {
     # Loop over each collection and ensure that there are no deployments that shouldn't be here
     ForEach ($collection in $deployments[$deployment].Collections) {
         $GoodAppListSqlArray = [string]::Format("'{0}'", [string]::Join("', '", $appList.LocalizedDisplayName))
-        $AppDeploysToRemove = Invoke-SqlCmd -ServerInstance $SqlServer -Database $CMDB -Query @"
+        $AppDeploysToRemove = Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
         SELECT summ.SoftwareName
             , summ.CollectionID
             , summ.CollectionName
