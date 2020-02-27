@@ -26,7 +26,7 @@
 
 # Site configuration
 $ProviderMachineName = "cm.contoso.com" # SMS Provider machine FQDN
-$SiteCode = (Get-CimInstance -Query "SELECT SiteCode FROM SMS_ProviderLocation WHERE Machine = '$ProviderMachineName'" -Namespace root\SMS).SiteCode
+$SiteCode = (Get-CimInstance -Query "SELECT SiteCode FROM SMS_ProviderLocation WHERE Machine = '$ProviderMachineName'" -Namespace root\SMS -ComputerName $ProviderMachineName).SiteCode
 
 # Customizations
 $initParams = @{ }
