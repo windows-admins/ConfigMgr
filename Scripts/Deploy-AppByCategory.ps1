@@ -92,15 +92,9 @@ switch ($PSBoundParameters.ContainsKey('SQLServer')) {
 
     #region if a SQLServer is not provided we will attempt to gather the data from WMI on the SMS Provider
     $false {
-        $getSQLServerInfoSplat = @{
-            Query        = "SELECT SiteObject FROM SMS_SiteSystemSummarizer WHERE Role = 'SMS SQL SERVER' and SiteCode = '$SiteCode' and ObjectType = 1"
-            ComputerName = $SiteServer
-            Namespace    = "root/sms/site_$siteCode"
-        }
-        
-        $DataSourceSQL = (Get-CimInstance @getSQLServerInfoSplat).SiteObject | Select-Object -Unique
-        $CMDBServer = $DataSourceSQL -replace '.*\\\\([A-Z0-9_-.]+)\\.*', '$+'
-        $CMDB = $DataSourceSQL -replace ".*\\([A-Z_0-9]*?)\\$", '$+'
+        $CMDBInfo = Get-ItemProperty -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\SMS\SQL Server\'
+        $CMDBServer = $CMDBInfo.Server
+        $CMDB = $CMDBInfo.'Database Name'
     }
     #endregion if a SQLServer is not provided we will attempt to gather the data from WMI on the SMS Provider
 }
