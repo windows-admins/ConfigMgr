@@ -177,44 +177,56 @@ ForEach ($deployment in $deployments.Keys) {
 "@
 
     # Loop over each application that should be deployed and ensure it is
-    ForEach ($app in $appList) {
-        # Loop through the collections, if there are multiples
-        ForEach ($collection in $deployments[$deployment].Collections) {
+    if ($appList.Count -gt 0) {
+        ForEach ($app in $appList) {
+            # Loop through the collections, if there are multiples
+            ForEach ($collection in $deployments[$deployment].Collections) {
 
-            $newAppArgs = @{
-                "Name"             = $app.DisplayName
-                "DeployAction"     = $deployments[$deployment].DeployAction
-                "DeployPurpose"    = $deployments[$deployment].DeployPurpose
-                "ApprovalRequired" = $deployments[$deployment].ApprovalRequired
-                "UserNotification" = $deployments[$deployment].UserNotification
-                "TimeBaseOn"       = "LocalTime"
-                "CollectionName"   = $collection
-                "WhatIf"           = $true
-                "Verbose"          = $true
-            }
+                $newAppArgs = @{
+                    "Name"             = $app.DisplayName
+                    "DeployAction"     = $deployments[$deployment].DeployAction
+                    "DeployPurpose"    = $deployments[$deployment].DeployPurpose
+                    "ApprovalRequired" = $deployments[$deployment].ApprovalRequired
+                    "UserNotification" = $deployments[$deployment].UserNotification
+                    "TimeBaseOn"       = "LocalTime"
+                    "CollectionName"   = $collection
+                    "WhatIf"           = $true
+                    "Verbose"          = $true
+                }
 
-            # If the application has not been distributed, append the distribution parameters to the arg list
-            If ($app.TargetedDP -eq 0) {
-                $newAppArgs["DistributeContent"] = $true
-                $newAppArgs["DistributionPointGroupName"] = "Contoso Distribution Group"
-            }
+                # If the application has not been distributed, append the distribution parameters to the arg list
+                If ($app.TargetedDP -eq 0) {
+                    $newAppArgs["DistributeContent"] = $true
+                    $newAppArgs["DistributionPointGroupName"] = "Contoso Distribution Group"
+                }
 
-            If (Get-CMDeployment -SoftwareName $app.DisplayName -CollectionName $collection) {
-                Write-Verbose "Found that $($App.DisplayName) is already deployed to $collection - skipping"
-            }
-            Else {
-                # Deploy application to the collection
-                if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.DisplayName)']", "New-CMApplicationDeployment")) {
-                    Write-Verbose "Deploying [Application = '$($app.DisplayName)'] to [CollectionName = '$Collection']"
-                    New-CMApplicationDeployment @newAppArgs
+                If (Get-CMDeployment -SoftwareName $app.DisplayName -CollectionName $collection) {
+                    Write-Verbose "Found that $($App.DisplayName) is already deployed to $collection - skipping"
+                }
+                Else {
+                    # Deploy application to the collection
+                    if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.DisplayName)']", "New-CMApplicationDeployment")) {
+                        Write-Verbose "Deploying [Application = '$($app.DisplayName)'] to [CollectionName = '$Collection']"
+                        New-CMApplicationDeployment @newAppArgs
+                    }
                 }
             }
         }
     }
+    else {
+        Write-Verbose "There are no applications associated with [Category = '$($deployments[$deployment].Category)'] to deploy"
+    }
 
     # Loop over each collection and ensure that there are no deployments that shouldn't be here
     ForEach ($collection in $deployments[$deployment].Collections) {
-        $GoodAppListSqlArray = [string]::Format("'{0}'", [string]::Join("', '", $appList.DisplayName))
+        $AppListWhereFilter = switch ($appList.Count) {
+            0 {
+                ' '
+            }
+            default {
+                [string]::Format("AND appass.ApplicationName NOT IN ('{0}')", [string]::Join("', '", $appList.DisplayName))
+            }
+        }
         $AppDeploysToRemove = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
         SELECT appass.ApplicationName
             , summ.CollectionID
@@ -222,7 +234,7 @@ ForEach ($deployment in $deployments.Keys) {
         FROM v_DeploymentSummary summ
         JOIN v_ApplicationAssignment appass ON appass.AssignmentID = summ.AssignmentID
             WHERE summ.CollectionName = '$Collection'
-            AND appass.ApplicationName NOT IN ($GoodAppListSqlArray)
+            $AppListWhereFilter
 "@
 
         # Find apps that aren't in our AppList for this collection and remove the deployment
