@@ -62,6 +62,7 @@
             Version 1.0.2: 2020-02-26
             Version 1.0.3: 2020-02-27
 #>
+#Requires -Modules SqlServer
 [CmdletBinding(SupportsShouldProcess = $true)]
 param (
     [Parameter(Mandatory = $true)]
@@ -161,7 +162,7 @@ $deployments = switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
 # Loop through the $deployemnts
 ForEach ($deployment in $deployments.Keys) {
     # Pull a list of applications with that category
-    $appList = Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
+    $appList = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
         SELECT apps.DisplayName
             , apps.CI_UniqueID
             , COUNT(dist.nalpath) AS [TargetedDP]
@@ -214,7 +215,7 @@ ForEach ($deployment in $deployments.Keys) {
     # Loop over each collection and ensure that there are no deployments that shouldn't be here
     ForEach ($collection in $deployments[$deployment].Collections) {
         $GoodAppListSqlArray = [string]::Format("'{0}'", [string]::Join("', '", $appList.LocalizedDisplayName))
-        $AppDeploysToRemove = Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
+        $AppDeploysToRemove = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
         SELECT summ.SoftwareName
             , summ.CollectionID
             , summ.CollectionName
