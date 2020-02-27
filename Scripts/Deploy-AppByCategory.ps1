@@ -118,12 +118,12 @@ ForEach ($deployment in $deployments.Keys) {
     }
 
     # Loop over each collection and ensure that there are no deployments that shouldn't be here
-    ForEach ($collection in $collections) {
+    ForEach ($collection in $deployments[$deployment].Collections) {
         
         # Grab the deployments on the current looped collection
         $deployedApps = Get-CMDeployment -CollectionName $collection | Select-Object ApplicationName
         # Find apps that aren't in our AppList for this collection
-        $badDeployments = $deployedApps.Where( { $_.ApplicationName -notin $appList.LocalizedDisplayName })
+        $badDeployments = $deployedApps.Where( { $_.ApplicationName -notin $appList.LocalizedDisplayName } )
         # Loop over apps and remove
         ForEach ($badDeployment in $badDeployments) {
             Remove-CMDeployment -ApplicationName $badDeployment.ApplicationName -CollectionName $collection -Force
