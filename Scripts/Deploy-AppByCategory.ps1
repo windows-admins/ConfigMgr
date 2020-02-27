@@ -1,3 +1,4 @@
+[CmdletBinding(SupportsShouldProcess = $true)]
 <#
 .SYNOPSIS
     Deploy applications to collections, based on Administrative Categories
@@ -21,12 +22,14 @@
     Release Date: 2019-08-13
     Updated:
         Version 1.0.1: 2019-08-14
-        Version 1.0.1:2020-02-26
+        Version 1.0.2: 2020-02-26
 #>
 
 # Site configuration
 $ProviderMachineName = "cm.contoso.com" # SMS Provider machine FQDN
+$SQLServer = 'cm-sql.contoso.com' # SQL Server that hosts your CM_<SiteCode> database
 $SiteCode = (Get-CimInstance -Query "SELECT SiteCode FROM SMS_ProviderLocation WHERE Machine = '$ProviderMachineName'" -Namespace root\SMS -ComputerName $ProviderMachineName).SiteCode
+$CMDB = [string]::Format('CM_{0}', $SiteCode)
 
 # Customizations
 $initParams = @{ }
@@ -35,9 +38,9 @@ $initParams = @{ }
 
 # Do not change anything below this line
 
-# Import the ConfigurationManager.psd1 module 
+# Import the ConfigurationManager.psd1 module
 if ($null -eq (Get-Module ConfigurationManager)) {
-    Import-Module "$($ENV:SMS_ADMIN_UI_PATH)\..\ConfigurationManager.psd1" @initParams 
+    Import-Module "$($ENV:SMS_ADMIN_UI_PATH)\..\ConfigurationManager.psd1" @initParams
 }
 
 # Connect to the site's drive if it is not already present
@@ -64,36 +67,38 @@ $deployments = @{
     "Fast Channel Deployments" = @{
         "Category"         = "Fast Channel App"
         "Collections"      = @("Deploy - Fast Channel Deployment")
-        "ApprovalRequired" = $true       
+        "ApprovalRequired" = $true
         "DeployAction"     = "Install"
         "DeployPurpose"    = "Available"
         "UserNotification" = "DisplaySoftwareCenterOnly"
     }
 }
 
-# Grab all of the applications in SCCM that are not Expired (Retired)
-$apps = (Get-CMApplication -Fast).Where({ -not $_.IsExpired })
-
-# Get the distribution status of all apps
-$dists = Get-CMDistributionStatus
-
 # Loop through the $deployemnts
 ForEach ($deployment in $deployments.Keys) {
 
     # Pull a list of applications with that category
-    $appList = $apps.Where( { $_.LocalizedCategoryInstanceNames -contains $deployments[$deployment].Category })
+    $appList = Invoke-SqlCmd -ServerInstance $SqlServer -Database $CMDB -Query @"
+        SELECT apps.DisplayName
+            , apps.CI_UniqueID
+            , COUNT(dist.nalpath) AS [TargetedDP]
+        FROM fn_ListLatestApplicationCIs(1033) apps
+            JOIN vAdminCategoryMemberships acm ON acm.ObjectKey = apps.CI_UniqueID
+            JOIN v_LocalizedCategories cats ON cats.CategoryInstanceID = acm.CategoryInstanceID
+            JOIN v_CIContentPackage package ON package.CI_ID = apps.CI_ID
+            JOIN fn_ListDPContents(1033) dist ON dist.PackageID = package.PkgID
+        WHERE IsExpired = 0 AND cats.CategoryInstanceName = '$($deployments[$deployment].Category)'
+        GROUP BY apps.DisplayName
+            , apps.CI_UniqueID
+"@
 
     # Loop over each application that should be deployed and ensure it is
     ForEach ($app in $appList) {
-        
-        $objectId = $(Split-Path $app.CI_UniqueID) -Replace '\\', '/'
-        $distCount = $dists.Where({ $_.ObjectID -eq $objectId}).NumberSuccess
-
         # Loop through the collections, if there are multiples
         ForEach ($collection in $deployments[$deployment].Collections) {
-            
+
             $newAppArgs = @{
-                "Name"             = $app.LocalizedDisplayName
+                "Name"             = $app.DisplayName
                 "DeployAction"     = $deployments[$deployment].DeployAction
                 "DeployPurpose"    = $deployments[$deployment].DeployPurpose
                 "ApprovalRequired" = $deployments[$deployment].ApprovalRequired
@@ -103,34 +108,43 @@ ForEach ($deployment in $deployments.Keys) {
                 "WhatIf"           = $true
                 "Verbose"          = $true
             }
-            
+
             # If the application has not been distributed, append the distribution parameters to the arg list
-            If ($distCount -eq 0) {
+            If ($app.TargetedDP -eq 0) {
                 $newAppArgs["DistributeContent"] = $true
                 $newAppArgs["DistributionPointGroupName"] = "Contoso Distribution Group"
             }
 
-            If (Get-CMDeployment -SoftwareName $app.LocalizedDisplayName -CollectionName $collection) {
-                # Already deployed; do nothing
+            If (Get-CMDeployment -SoftwareName $app.DisplayName -CollectionName $collection) {
+                Write-Verbose "Found that $($App.DisplayName) is already deployed to $collection - skipping"
             }
             Else {
                 # Deploy application to the collection
-                New-CMApplicationDeployment @newAppArgs
+                if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.DisplayName)']", "New-CMApplicationDeployment")) {
+                    Write-Verbose "Deploying [Application = '$($app.DisplayName)'] to [CollectionName = '$Collection']"
+                    New-CMApplicationDeployment @newAppArgs
+                }
             }
         }
     }
 
     # Loop over each collection and ensure that there are no deployments that shouldn't be here
     ForEach ($collection in $deployments[$deployment].Collections) {
-        
-        # Grab the deployments on the current looped collection
-        $deployedApps = (Get-CMDeployment -CollectionName $collection).ApplicationName
+        $GoodAppListSqlArray = [string]::Format("'{0}'", [string]::Join("', '", $appList.LocalizedDisplayName))
+        $AppDeploysToRemove = Invoke-SqlCmd -ServerInstance $SqlServer -Database $CMDB -Query @"
+        SELECT summ.SoftwareName
+            , summ.CollectionID
+            , summ.CollectionName
+        FROM v_DeploymentSummary summ
+        WHERE summ.CollectionName = '$Collection'
+            AND summ.SoftwareName NOT IN ($GoodAppListSqlArray)
+"@
+
         # Find apps that aren't in our AppList for this collection and remove the deployment
-        foreach ($App in $deployedApps) {
-            switch ($App -in $appList.LocalizedDisplayName) {
-                $false {
-                    Remove-CMDeployment -ApplicationName $app -CollectionName $collection -Force
-                }
+        foreach ($App in $AppDeploysToRemove) {
+            if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.DisplayName)']", "Remove-CMApplicationDeployment")) {
+                Write-Verbose "Removing deployment [Application = '$($app.SoftwareName)'] to [CollectionName = '$($app.CollectionName)']"
+                Remove-CMApplicationDeployment -Name $App.SoftwareName -CollectionID $App.CollectionID -Force
             }
         }
     }
