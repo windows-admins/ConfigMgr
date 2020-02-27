@@ -214,7 +214,7 @@ ForEach ($deployment in $deployments.Keys) {
 
     # Loop over each collection and ensure that there are no deployments that shouldn't be here
     ForEach ($collection in $deployments[$deployment].Collections) {
-        $GoodAppListSqlArray = [string]::Format("'{0}'", [string]::Join("', '", $appList.LocalizedDisplayName))
+        $GoodAppListSqlArray = [string]::Format("'{0}'", [string]::Join("', '", $appList.DisplayName))
         $AppDeploysToRemove = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
         SELECT summ.SoftwareName
             , summ.CollectionID
