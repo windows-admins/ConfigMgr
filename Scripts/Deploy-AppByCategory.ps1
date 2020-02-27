@@ -16,15 +16,17 @@
     Name:      Deploy-AppByCategory.ps1
     Author:    Vex
     Contributor: Chris Kibble (On a _massive_ level, thanks Chris!!!)
-    Version: 1.0.1
+    Contributor: Cody Mathis (On a _miniscule_ level)
+    Version: 1.0.2
     Release Date: 2019-08-13
     Updated:
         Version 1.0.1: 2019-08-14
+        Version 1.0.1:2020-02-26
 #>
 
 # Site configuration
-$SiteCode = "CNT" # Site code 
-$ProviderMachineName = "cm.contoso.com" # SMS Provider machine name
+$ProviderMachineName = "cm.contoso.com" # SMS Provider machine FQDN
+$SiteCode = (Get-CimInstance -Query "SELECT SiteCode FROM SMS_ProviderLocation WHERE Machine = '$ProviderMachineName'" -Namespace root\SMS).SiteCode
 
 # Customizations
 $initParams = @{ }
@@ -34,21 +36,24 @@ $initParams = @{ }
 # Do not change anything below this line
 
 # Import the ConfigurationManager.psd1 module 
-if ((Get-Module ConfigurationManager) -eq $null) {
+if ($null -eq (Get-Module ConfigurationManager)) {
     Import-Module "$($ENV:SMS_ADMIN_UI_PATH)\..\ConfigurationManager.psd1" @initParams 
 }
 
 # Connect to the site's drive if it is not already present
-if ((Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue) -eq $null) {
+if ($null -eq (Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue)) {
     New-PSDrive -Name $SiteCode -PSProvider CMSite -Root $ProviderMachineName @initParams
 }
+
+# store our current location so we can return to it when the script completes
+Push-Location
 
 # Set the current location to be the site code.
 Set-Location "$($SiteCode):\" @initParams
 
 # Set the required deployment args per collection
 $deployments = @{
-    "HelpDesk Deployments"             = @{
+    "HelpDesk Deployments"     = @{
         "Category"         = "Helpdesk"
         "Collections"      = @("IT - Helpdesk")
         "ApprovalRequired" = $false
@@ -67,7 +72,7 @@ $deployments = @{
 }
 
 # Grab all of the applications in SCCM that are not Expired (Retired)
-$apps = Get-CMApplication -Fast | Where-Object { ($_.IsExpired -eq $false) } | Select-Object LocalizedDisplayName, LocalizedCategoryInstanceNames, CI_UniqueID
+$apps = (Get-CMApplication -Fast).Where({ -not $_.IsExpired })
 
 # Get the distribution status of all apps
 $dists = Get-CMDistributionStatus
@@ -82,7 +87,7 @@ ForEach ($deployment in $deployments.Keys) {
     ForEach ($app in $appList) {
         
         $objectId = $(Split-Path $app.CI_UniqueID) -Replace '\\', '/'
-        $distCount = ($dists | Where-Object { $_.ObjectID -eq $objectId }).NumberSuccess
+        $distCount = $dists.Where({ $_.ObjectID -eq $objectId}).NumberSuccess
 
         # Loop through the collections, if there are multiples
         ForEach ($collection in $deployments[$deployment].Collections) {
@@ -111,9 +116,7 @@ ForEach ($deployment in $deployments.Keys) {
             Else {
                 # Deploy application to the collection
                 New-CMApplicationDeployment @newAppArgs
-
             }
-
         }
     }
 
@@ -121,14 +124,17 @@ ForEach ($deployment in $deployments.Keys) {
     ForEach ($collection in $deployments[$deployment].Collections) {
         
         # Grab the deployments on the current looped collection
-        $deployedApps = Get-CMDeployment -CollectionName $collection | Select-Object ApplicationName
-        # Find apps that aren't in our AppList for this collection
-        $badDeployments = $deployedApps.Where( { $_.ApplicationName -notin $appList.LocalizedDisplayName } )
-        # Loop over apps and remove
-        ForEach ($badDeployment in $badDeployments) {
-            Remove-CMDeployment -ApplicationName $badDeployment.ApplicationName -CollectionName $collection -Force
+        $deployedApps = (Get-CMDeployment -CollectionName $collection).ApplicationName
+        # Find apps that aren't in our AppList for this collection and remove the deployment
+        foreach ($App in $deployedApps) {
+            switch ($App -in $appList.LocalizedDisplayName) {
+                $false {
+                    Remove-CMDeployment -ApplicationName $app -CollectionName $collection -Force
+                }
+            }
         }
     }
-
-
 }
+
+# return to where we were
+Pop-Location
