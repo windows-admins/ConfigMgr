@@ -90,13 +90,13 @@ switch ($PSBoundParameters.ContainsKey('SQLServer')) {
     }
     #endregion if a SQLServer is provided, we will use that value, and assume the CMDB to be CM_$SiteCode
 
-    #region if a SQLServer is not provided we will attempt to gather the data from WMI on the SMS Provider
+    #region if a SQLServer is not provided we will attempt to gather the data from the registry
     $false {
         $CMDBInfo = Get-ItemProperty -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\SMS\SQL Server\'
         $CMDBServer = $CMDBInfo.Server
         $CMDB = $CMDBInfo.'Database Name'
     }
-    #endregion if a SQLServer is not provided we will attempt to gather the data from WMI on the SMS Provider
+    #endregion if a SQLServer is not provided we will attempt to gather the data from the registry
 }
 #endregion Gather site configuration, including SiteCode, Site Database Name, and SQLServer if not provided as a parameter
 
