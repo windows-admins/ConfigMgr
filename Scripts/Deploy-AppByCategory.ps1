@@ -216,7 +216,7 @@ ForEach ($deployment in $deployments.Keys) {
     ForEach ($collection in $deployments[$deployment].Collections) {
         $GoodAppListSqlArray = [string]::Format("'{0}'", [string]::Join("', '", $appList.DisplayName))
         $AppDeploysToRemove = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
-        SELECT summ.ApplicationName
+        SELECT appass.ApplicationName
             , summ.CollectionID
             , summ.CollectionName
         FROM v_DeploymentSummary summ
