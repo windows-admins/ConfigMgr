@@ -124,7 +124,7 @@ Push-Location
 Set-Location "$($SiteCode):\" @initParams
 
 # Set the required deployment args per collection
-$deployments = switch ($PSBoundParameters.Contains('DeploymentJSON')) {
+$deployments = switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
     #region if a JSON file is provided, we will get the content of the file, convert from JSON, and then convert to a hash table
     $true {
         $Categories = (ConvertFrom-Json -InputObject (Out-String -InputObject (Get-Content -Path $DeploymentJSON))).psobject.Properties
