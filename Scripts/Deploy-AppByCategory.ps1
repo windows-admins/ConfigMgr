@@ -125,19 +125,25 @@ Push-Location
 Set-Location "$($SiteCode):\" @initParams
 
 # Set the required deployment args per collection
-$deployments = switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
+switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
     #region if a JSON file is provided, we will get the content of the file, convert from JSON, and then convert to a hash table
     $true {
-        $Categories = (ConvertFrom-Json -InputObject (Out-String -InputObject (Get-Content -Path $DeploymentJSON))).psobject.Properties
+        $deployments = @{ }
+        $Categories = (ConvertFrom-Json -InputObject (Out-String -InputObject (Get-Content -Path $DeploymentJSON))).PSObject.Properties
         foreach ($Category in $Categories) {
-            @{ $Category.Name = $Category.Value }
+            $Values = $Category.Value.PSObject.Properties
+            $ValueHashTable = @{ }
+            foreach ($Value in $Values) {
+                $ValueHashTable[$Value.Name] = $Value.Value
+            }
+            $deployments[$Category.Name] = $ValueHashTable
         }
     }
     #endregion if a JSON file is provided, we will get the content of the file, convert from JSON, and then convert to a hash table
 
     #region if a JSON file is not provided, the below section should be populated to match your desired category based deployments
     $false {
-        @{
+        $deployments = @{
             "HelpDesk Deployments"     = @{
                 "Category"         = "Helpdesk"
                 "Collections"      = @("IT - Helpdesk")
