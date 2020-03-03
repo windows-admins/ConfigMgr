@@ -197,7 +197,6 @@ ForEach ($deployment in $deployments.Keys) {
                     "UserNotification" = $deployments[$deployment].UserNotification
                     "TimeBaseOn"       = "LocalTime"
                     "CollectionName"   = $collection
-                    "WhatIf"           = $true
                     "Verbose"          = $true
                 }
 
