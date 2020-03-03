@@ -214,7 +214,7 @@ foreach ($Category in $deployments.Keys) {
                         Write-Verbose "Deploying [Application = '$($app)'] to [CollectionName = '$TargetedCollection']"
     
                         #region define the splat to pass to New-CMApplicationDeployment
-                        If ($groupedFullCategoryAppList[$app].TargetedDP -eq 0) {
+                        If (($groupedFullCategoryAppList[$app].TargetedDP | Select-Object -Unique) -eq 0) {
                             Write-Verbose "$app found to not be distributed. Will distribute to $DistributionPointGroup as part of app deployment"
                             $newAppArgs["DistributeContent"] = $true
                             $newAppArgs["DistributionPointGroupName"] = $DistributionPointGroup
