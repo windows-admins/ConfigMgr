@@ -33,18 +33,18 @@
             }
         }
     .PARAMETER SiteServer
-        The MEMCM Site Server, which will be used to identify other resources as needed. 
+        The MEMCM Site Server, which will be used to identify other resources as needed.
 
         IF this script is used as part of a status message filter rule, the variable will be %sitesvr
     .PARAMETER SQLServer
-        The MEMCM Site Database Server, which will be queried against. 
+        The MEMCM Site Database Server, which will be queried against.
 
         IF this script is used as part of a status message filter rule, the variable will be %sqlsvr
     .PARAMETER DeploymentJSON
         An optional JSON file that should be an exported hash table following the Deployment template noted in the description.
 
-        You can create your deployment template hash table and then run 
-        
+        You can create your deployment template hash table and then run
+
         $Deployments | ConvertTo-Json | Out-File c:\path\to\test.json
     .INPUTS
         "$deployments" = Edit table with relevant collections, admin categories, and deployment settings
@@ -55,12 +55,13 @@
         Author:    Vex
         Contributor: Chris Kibble (On a _massive_ level, thanks Chris!!!)
         Contributor: Cody Mathis (On a _miniscule_ level)
-        Version: 1.0.3
+        Version: 1.0.4
         Release Date: 2019-08-13
         Updated:
             Version 1.0.1: 2019-08-14
             Version 1.0.2: 2020-02-26
             Version 1.0.3: 2020-02-27
+            Version 1.0.4: 2020-03-02
 #>
 #Requires -Modules SqlServer
 [CmdletBinding(SupportsShouldProcess = $true)]
@@ -206,7 +207,16 @@ ForEach ($deployment in $deployments.Keys) {
                     $newAppArgs["DistributionPointGroupName"] = "Contoso Distribution Group"
                 }
 
-                If (Get-CMDeployment -SoftwareName $app.DisplayName -CollectionName $collection) {
+                # check if the app is already deployed to the specified collection
+                $IsAppDeployed = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
+                SELECT appass.ApplicationName
+                    , summ.CollectionID
+                    , summ.CollectionName
+                FROM v_DeploymentSummary summ
+                JOIN v_ApplicationAssignment appass ON appass.AssignmentID = summ.AssignmentID
+                    WHERE summ.CollectionName = '$Collection' AND appass.ApplicationName = '$($app.DisplayName)'
+"@
+                if ((Measure-Object -InputObject $IsAppDeployed).Count -gt 0) {
                     Write-Verbose "Found that $($App.DisplayName) is already deployed to $collection - skipping"
                 }
                 Else {
