@@ -143,16 +143,14 @@ switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
     #region if a JSON file is not provided, the below section should be populated to match your desired category based deployments
     $false {
         $deployments = @{
-            "HelpDesk Deployments"     = @{
-                Category         = "Helpdesk"
+            Helpdesk     = @{
                 Collection       = "IT - Helpdesk"
                 ApprovalRequired = $false
                 DeployAction     = "Install"
                 DeployPurpose    = "Available"
                 UserNotification = "DisplayAll"
             }
-            "Fast Channel Deployments" = @{
-                Category         = "Fast Channel App"
+            'Fast Channel App' = @{
                 Collection       = "Deploy - Fast Channel Deployment"
                 ApprovalRequired = $true
                 DeployAction     = "Install"
@@ -166,7 +164,7 @@ switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
 
 #region Loop through the $deployments, adding app deployments that are missing, and removing app deployments that do not match the category
 #region pull all applications associated with the specified categories
-$CategorySQLArray = [string]::Format("('{0}')", [string]::Join("', '", $deployments.Keys))
+$CategorySQLArray = [string]::Format("('{0}')", [string]::Join("', '", @($deployments.Keys)))
 $FullAppDeployList = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
 SELECT apps.DisplayName
 	, summ.CollectionID
@@ -207,19 +205,19 @@ foreach ($Category in $deployments.Keys) {
                     Write-Verbose "Found that $($App) is already deployed to $TargetedCollection - skipping"
                 }
                 #endregion App is already deployed
-    
+
                 #region Deploy application to the collection
                 $false {
                     if ($PSCmdlet.ShouldProcess("[CollectionName = '$TargetedCollection'] [Application = '$($app)']", "New-CMApplicationDeployment")) {
                         Write-Verbose "Deploying [Application = '$($app)'] to [CollectionName = '$TargetedCollection']"
-    
+
                         #region define the splat to pass to New-CMApplicationDeployment
                         If (($groupedFullCategoryAppList[$app].TargetedDP | Select-Object -Unique) -eq 0) {
                             Write-Verbose "$app found to not be distributed. Will distribute to $DistributionPointGroup as part of app deployment"
                             $newAppArgs["DistributeContent"] = $true
                             $newAppArgs["DistributionPointGroupName"] = $DistributionPointGroup
                         }
-        
+
                         $newAppArgs = @{
                             "Name"             = $app
                             "DeployAction"     = $deployments[$Category].DeployAction
@@ -231,7 +229,7 @@ foreach ($Category in $deployments.Keys) {
                             "Verbose"          = $true
                         }
                         #endregion define the splat to pass to New-CMApplicationDeployment
-    
+
                         New-CMApplicationDeployment @newAppArgs
                     }
                 }
@@ -240,27 +238,29 @@ foreach ($Category in $deployments.Keys) {
         }
     }
     else {
-        Write-Verbose "There are no applications associated with [Category = '$($deployments[$deployment].Category)'] to deploy"
+        Write-Verbose "There are no applications associated with [Category = '$Category'] to deploy"
     }
     #endregion Loop over each application that should be deployed and ensure it is
 
     #region Loop over each collection and ensure that there are no deployments that shouldn't be here
-    foreach ($collection in $deployments[$Category].Collections) {
-        $AppListWhereFilter = switch ($appList.Count) {
-            0 {
+    foreach ($collection in $deployments[$Category].Collection) {
+		$CleanCollectionName = $collection -replace "'", "''"
+        $AppListWhereFilter = switch ((Measure-Object -InputObject $FullCategoryAppList).Count -gt 0) {
+            $false {
                 [string]::Empty
             }
-            default {
-                [string]::Format("AND appass.ApplicationName NOT IN ('{0}')", [string]::Join("', '", $appList.DisplayName))
+            $true {
+                [string]::Format("AND appass.ApplicationName NOT IN ('{0}')", [string]::Join("', '", $($FullCategoryAppList.DisplayName -replace "'", "''")))
             }
         }
+
         $AppDeploysToRemove = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
         SELECT appass.ApplicationName
             , summ.CollectionID
             , summ.CollectionName
         FROM v_DeploymentSummary summ
         JOIN v_ApplicationAssignment appass ON appass.AssignmentID = summ.AssignmentID
-            WHERE summ.CollectionName = '$Collection'
+            WHERE summ.CollectionName = '$CleanCollectionName'
             $AppListWhereFilter
 "@
 
