@@ -42,7 +42,7 @@
         IF this script is used as part of a status message filter rule, the variable will be %sqlsvr
     .PARAMETER DistributionPointGroup
         The name of the distribution point group you want to distribute content to in the event of
-        an app being deployed that does not have content distributed. 
+        an app being deployed that does not have content distributed.
     .PARAMETER DeploymentJSON
         An optional JSON file that should be an exported hash table following the Deployment template noted in the description.
 
@@ -144,20 +144,20 @@ switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
     $false {
         $deployments = @{
             "HelpDesk Deployments"     = @{
-                "Category"         = "Helpdesk"
-                "Collections"      = @("IT - Helpdesk")
-                "ApprovalRequired" = $false
-                "DeployAction"     = "Install"
-                "DeployPurpose"    = "Available"
-                "UserNotification" = "DisplayAll"
+                Category         = "Helpdesk"
+                Collection       = "IT - Helpdesk"
+                ApprovalRequired = $false
+                DeployAction     = "Install"
+                DeployPurpose    = "Available"
+                UserNotification = "DisplayAll"
             }
             "Fast Channel Deployments" = @{
-                "Category"         = "Fast Channel App"
-                "Collections"      = @("Deploy - Fast Channel Deployment")
-                "ApprovalRequired" = $true
-                "DeployAction"     = "Install"
-                "DeployPurpose"    = "Available"
-                "UserNotification" = "DisplaySoftwareCenterOnly"
+                Category         = "Fast Channel App"
+                Collection       = "Deploy - Fast Channel Deployment"
+                ApprovalRequired = $true
+                DeployAction     = "Install"
+                DeployPurpose    = "Available"
+                UserNotification = "DisplaySoftwareCenterOnly"
             }
         }
     }
@@ -165,75 +165,78 @@ switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
 }
 
 #region Loop through the $deployments, adding app deployments that are missing, and removing app deployments that do not match the category
-foreach ($deployment in $deployments.Keys) {
-    #region Pull a list of applications with that category assigned
-    $appList = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
-        SELECT apps.DisplayName
-            , apps.CI_UniqueID
-            , COUNT(dist.nalpath) AS [TargetedDP]
-        FROM fn_ListLatestApplicationCIs(1033) apps
-            JOIN vAdminCategoryMemberships acm ON acm.ObjectKey = apps.CI_UniqueID
-            JOIN v_LocalizedCategories cats ON cats.CategoryInstanceID = acm.CategoryInstanceID
-            JOIN v_CIContentPackage package ON package.CI_ID = apps.CI_ID
-            JOIN fn_ListDPContents(1033) dist ON dist.PackageID = package.PkgID
-        WHERE IsExpired = 0 AND cats.CategoryInstanceName = '$($deployments[$deployment].Category)'
-        GROUP BY apps.DisplayName
-            , apps.CI_UniqueID
+#region pull all applications associated with the specified categories
+$CategorySQLArray = [string]::Format("('{0}')", [string]::Join("', '", $deployments.Keys))
+$FullAppDeployList = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
+SELECT apps.DisplayName
+	, summ.CollectionID
+	, summ.CollectionName
+    , cats.CategoryInstanceName AS [Category]
+	, COUNT(dist.NALPath) AS [TargetedDP]
+FROM fn_ListLatestApplicationCIs(1033) apps
+    JOIN vAdminCategoryMemberships acm ON acm.ObjectKey = apps.CI_UniqueID
+    JOIN v_LocalizedCategories cats ON cats.CategoryInstanceID = acm.CategoryInstanceID
+    JOIN v_CIContentPackage package ON package.CI_ID = apps.CI_ID
+    JOIN fn_ListDPContents(1033) dist ON dist.PackageID = package.PkgID
+	LEFT JOIN v_ApplicationAssignment appass ON appass.ApplicationName = apps.DisplayName
+	LEFT JOIN v_DeploymentSummary summ ON summ.AssignmentID = appass.AssignmentID
+WHERE apps.IsExpired = 0 AND cats.CategoryInstanceName IN $CategorySQLArray
+GROUP BY apps.DisplayName
+	, summ.CollectionID
+	, summ.CollectionName
+    , cats.CategoryInstanceName
 "@
+$groupedFullAppDeployList = $FullAppDeployList | Group-Object -Property Category -AsHashTable
+#endregion pull all applications associated with the specified categories
+
+foreach ($Category in $deployments.Keys) {
+    #region Pull a list of applications with that category assigned
+    $FullCategoryAppList = $groupedFullAppDeployList.$Category
     #endregion Pull a list of applications with that category assigned
 
+
     #region Loop over each application that should be deployed and ensure it is
-    if ((Measure-Object -InputObject $appList).Count -gt 0) {
-        foreach ($app in $appList) {
-            #region Loop through the collections, if there are multiples
-            foreach ($collection in $deployments[$deployment].Collections) {
-                #region If the application has not been distributed, append the distribution parameters to the arg list
-                If ($app.TargetedDP -eq 0) {
-                    $newAppArgs["DistributeContent"] = $true
-                    $newAppArgs["DistributionPointGroupName"] = $DistributionPointGroup
-                }
-                #endregion If the application has not been distributed, append the distribution parameters to the arg list
+    if ((Measure-Object -InputObject $FullCategoryAppList).Count -gt 0) {
+        $TargetedCollection = $deployments[$Category].Collection
 
-                #region check if the app is already deployed to the specified collection, move on if it is, deploy if it isn't
-                $IsAppDeployed = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
-                SELECT appass.ApplicationName
-                    , summ.CollectionID
-                    , summ.CollectionName
-                FROM v_DeploymentSummary summ
-                JOIN v_ApplicationAssignment appass ON appass.AssignmentID = summ.AssignmentID
-                    WHERE summ.CollectionName = '$Collection' AND appass.ApplicationName = '$($app.DisplayName)'
-"@
-                if ((Measure-Object -InputObject $IsAppDeployed).Count -gt 0) {
-                    #region App is already deployed
-                    Write-Verbose "Found that $($App.DisplayName) is already deployed to $collection - skipping"
-                    #endregion App is already deployed
+        $groupedFullCategoryAppList = $FullCategoryAppList | Group-Object -Property DisplayName -AsHashTable
+        foreach ($app in $groupedFullCategoryAppList.Keys) {
+            switch ($TargetedCollection -in ($groupedFullCategoryAppList[$app].CollectionName)) {
+                #region App is already deployed
+                $true {
+                    Write-Verbose "Found that $($App) is already deployed to $TargetedCollection - skipping"
                 }
-                Else {
-                    #region Deploy application to the collection
-                    if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.DisplayName)']", "New-CMApplicationDeployment")) {
-                        Write-Verbose "Deploying [Application = '$($app.DisplayName)'] to [CollectionName = '$Collection']"
-
+                #endregion App is already deployed
+    
+                #region Deploy application to the collection
+                $false {
+                    if ($PSCmdlet.ShouldProcess("[CollectionName = '$TargetedCollection'] [Application = '$($app)']", "New-CMApplicationDeployment")) {
+                        Write-Verbose "Deploying [Application = '$($app)'] to [CollectionName = '$TargetedCollection']"
+    
                         #region define the splat to pass to New-CMApplicationDeployment
+                        If ($groupedFullCategoryAppList[$app].TargetedDP -eq 0) {
+                            Write-Verbose "$app found to not be distributed. Will distribute to $DistributionPointGroup as part of app deployment"
+                            $newAppArgs["DistributeContent"] = $true
+                            $newAppArgs["DistributionPointGroupName"] = $DistributionPointGroup
+                        }
+        
                         $newAppArgs = @{
-                            "Name"             = $app.DisplayName
-                            "DeployAction"     = $deployments[$deployment].DeployAction
-                            "DeployPurpose"    = $deployments[$deployment].DeployPurpose
-                            "ApprovalRequired" = $deployments[$deployment].ApprovalRequired
-                            "UserNotification" = $deployments[$deployment].UserNotification
+                            "Name"             = $app
+                            "DeployAction"     = $deployments[$Category].DeployAction
+                            "DeployPurpose"    = $deployments[$Category].DeployPurpose
+                            "ApprovalRequired" = $deployments[$Category].ApprovalRequired
+                            "UserNotification" = $deployments[$Category].UserNotification
                             "TimeBaseOn"       = "LocalTime"
-                            "CollectionName"   = $collection
+                            "CollectionName"   = $TargetedCollection
                             "Verbose"          = $true
                         }
                         #endregion define the splat to pass to New-CMApplicationDeployment
-
-
+    
                         New-CMApplicationDeployment @newAppArgs
                     }
-                    #endregion Deploy application to the collection
                 }
-                #endregion check if the app is already deployed to the specified collection, move on if it is, deploy if it isn't
+                #endregion Deploy application to the collection
             }
-            #endregion Loop through the collections, if there are multiples
         }
     }
     else {
@@ -242,7 +245,7 @@ foreach ($deployment in $deployments.Keys) {
     #endregion Loop over each application that should be deployed and ensure it is
 
     #region Loop over each collection and ensure that there are no deployments that shouldn't be here
-    foreach ($collection in $deployments[$deployment].Collections) {
+    foreach ($collection in $deployments[$Category].Collections) {
         $AppListWhereFilter = switch ($appList.Count) {
             0 {
                 [string]::Empty
