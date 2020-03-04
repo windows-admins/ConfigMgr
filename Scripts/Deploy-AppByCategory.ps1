@@ -58,13 +58,14 @@
         Author:    Vex
         Contributor: Chris Kibble (On a _massive_ level, thanks Chris!!!)
         Contributor: Cody Mathis (On a _miniscule_ level)
-        Version: 1.0.4
+        Version: 1.0.5
         Release Date: 2019-08-13
         Updated:
             Version 1.0.1: 2019-08-14
             Version 1.0.2: 2020-02-26
             Version 1.0.3: 2020-02-27
             Version 1.0.4: 2020-03-03
+            Version 1.0.5: 2020-03-04
 #>
 #Requires -Modules SqlServer
 [CmdletBinding(SupportsShouldProcess = $true)]
@@ -143,7 +144,7 @@ switch ($PSBoundParameters.ContainsKey('DeploymentJSON')) {
     #region if a JSON file is not provided, the below section should be populated to match your desired category based deployments
     $false {
         $deployments = @{
-            Helpdesk     = @{
+            Helpdesk           = @{
                 Collection       = "IT - Helpdesk"
                 ApprovalRequired = $false
                 DeployAction     = "Install"
@@ -187,16 +188,34 @@ GROUP BY apps.DisplayName
 $groupedFullAppDeployList = $FullAppDeployList | Group-Object -Property Category -AsHashTable
 #endregion pull all applications associated with the specified categories
 
+#region pull all applications targeted at our collections, regardless of category
+$CollectionSQLArray = [string]::Format("('{0}')", [string]::Join("', '", @($deployments.Values.Collection -replace "'", "''")))
+$AppDeploysToEvaluate = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
+SELECT appass.ApplicationName
+    , summ.CollectionID
+    , summ.CollectionName
+    , cats.CategoryInstanceName AS [Category]
+FROM v_DeploymentSummary summ
+    JOIN v_ApplicationAssignment appass ON appass.AssignmentID = summ.AssignmentID
+    JOIN fn_ListLatestApplicationCIs(1033) apps ON apps.DisplayName = appass.ApplicationName
+    LEFT JOIN vAdminCategoryMemberships acm ON acm.ObjectKey = apps.CI_UniqueID
+    LEFT JOIN v_LocalizedCategories cats ON cats.CategoryInstanceID = acm.CategoryInstanceID
+WHERE summ.CollectionName IN $CollectionSQLArray
+"@
+$groupedAppDeploysToEvaluate = $AppDeploysToEvaluate | Group-Object -Property CollectionName -AsHashTable
+#endregion pull all applications targeted at our collections, regardless of category
+
 foreach ($Category in $deployments.Keys) {
     #region Pull a list of applications with that category assigned
     $FullCategoryAppList = $groupedFullAppDeployList.$Category
     #endregion Pull a list of applications with that category assigned
 
+    #region store the collection that is targeted for this category
+    $TargetedCollection = $deployments[$Category].Collection
+    #endregion store the collection that is targeted for this category
 
     #region Loop over each application that should be deployed and ensure it is
     if ((Measure-Object -InputObject $FullCategoryAppList).Count -gt 0) {
-        $TargetedCollection = $deployments[$Category].Collection
-
         $groupedFullCategoryAppList = $FullCategoryAppList | Group-Object -Property DisplayName -AsHashTable
         foreach ($app in $groupedFullCategoryAppList.Keys) {
             switch ($TargetedCollection -in ($groupedFullCategoryAppList[$app].CollectionName)) {
@@ -242,42 +261,18 @@ foreach ($Category in $deployments.Keys) {
     }
     #endregion Loop over each application that should be deployed and ensure it is
 
-    #region Loop over each collection and ensure that there are no deployments that shouldn't be here
-    foreach ($collection in $deployments[$Category].Collection) {
-		$CleanCollectionName = $collection -replace "'", "''"
-        $AppListWhereFilter = switch ((Measure-Object -InputObject $FullCategoryAppList).Count -gt 0) {
+    #region Check the collection deployments and ensure that there are no deployments that shouldn't be here
+    foreach ($AppDeploy in $groupedAppDeploysToEvaluate[$TargetedCollection]) {
+        switch ($AppDeploy.ApplicationName -in $FullCategoryAppList.DisplayName) {
             $false {
-                [string]::Empty
-            }
-            $true {
-                [string]::Format("AND appass.ApplicationName NOT IN ('{0}')", [string]::Join("', '", $($FullCategoryAppList.DisplayName -replace "'", "''")))
-            }
-        }
-
-        $AppDeploysToRemove = SqlServer\Invoke-SqlCmd -ServerInstance $CMDBServer -Database $CMDB -Query @"
-        SELECT appass.ApplicationName
-            , summ.CollectionID
-            , summ.CollectionName
-        FROM v_DeploymentSummary summ
-        JOIN v_ApplicationAssignment appass ON appass.AssignmentID = summ.AssignmentID
-            WHERE summ.CollectionName = '$CleanCollectionName'
-            $AppListWhereFilter
-"@
-
-        # Find apps that aren't in our AppList for this collection and remove the deployment
-        if ((Measure-Object -InputObject $AppDeploysToRemove).Count -gt 0) {
-            foreach ($App in $AppDeploysToRemove) {
-                if ($PSCmdlet.ShouldProcess("[CollectionName = '$Collection'] [Application = '$($app.ApplicationName)']", "Remove-CMApplicationDeployment")) {
-                    Write-Verbose "Removing deployment [Application = '$($app.ApplicationName)'] to [CollectionName = '$($app.CollectionName)']"
+                if ($PSCmdlet.ShouldProcess("[CollectionName = '$TargetedCollection'] [Application = '$($AppDeploy.ApplicationName)']", "Remove-CMApplicationDeployment")) {
+                    Write-Verbose "Removing deployment [Application = '$($AppDeploy.ApplicationName)'] to [CollectionName = '$($AppDeploy.CollectionName)']"
                     Remove-CMApplicationDeployment -Name $App.ApplicationName -CollectionID $App.CollectionID -Force
                 }
             }
         }
-        else {
-            Write-Verbose "There are no application deployments to remove for $collection"
-        }
     }
-    #endregion Loop over each collection and ensure that there are no deployments that shouldn't be here
+    #endregion Check the collection deployments and ensure that there are no deployments that shouldn't be here
 }
 #endregion Loop through the $deployments, adding app deployments that are missing, and removing app deployments that do not match the category
 
