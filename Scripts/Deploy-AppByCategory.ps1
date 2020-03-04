@@ -14,22 +14,23 @@
         You can either define your deployments in the script below, or you can provide a JSON file as a parameter,
         which contains an exported hashtable following the deployment template
 
+        Note: The 'Key' for this hashtable is the Category you will associate with apps that need deployed, for example
+        below, Helpdesk, and 'Fast Channel App' are the categories.
+        
         @{
-            "HelpDesk Deployments"     = @{
-                "Category"         = "Helpdesk"
-                "Collections"      = @("IT - Helpdesk")
-                "ApprovalRequired" = $false
-                "DeployAction"     = "Install"
-                "DeployPurpose"    = "Available"
-                "UserNotification" = "DisplayAll"
+            Helpdesk           = @{
+                Collection       = "IT - Helpdesk"
+                ApprovalRequired = $false
+                DeployAction     = "Install"
+                DeployPurpose    = "Available"
+                UserNotification = "DisplayAll"
             }
-            "Fast Channel Deployments" = @{
-                "Category"         = "Fast Channel App"
-                "Collections"      = @("Deploy - Fast Channel Deployment")
-                "ApprovalRequired" = $true
-                "DeployAction"     = "Install"
-                "DeployPurpose"    = "Available"
-                "UserNotification" = "DisplaySoftwareCenterOnly"
+            'Fast Channel App' = @{
+                Collection       = "Deploy - Fast Channel Deployment"
+                ApprovalRequired = $true
+                DeployAction     = "Install"
+                DeployPurpose    = "Available"
+                UserNotification = "DisplaySoftwareCenterOnly"
             }
         }
     .PARAMETER SiteServer
