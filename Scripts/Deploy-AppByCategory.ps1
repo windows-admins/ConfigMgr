@@ -59,7 +59,7 @@
         Author:    Vex
         Contributor: Chris Kibble (On a _massive_ level, thanks Chris!!!)
         Contributor: Cody Mathis (On a _miniscule_ level)
-        Version: 1.0.5
+        Version: 1.0.6
         Release Date: 2019-08-13
         Updated:
             Version 1.0.1: 2019-08-14
@@ -67,6 +67,7 @@
             Version 1.0.3: 2020-02-27
             Version 1.0.4: 2020-03-03
             Version 1.0.5: 2020-03-04
+            Version 1.0.6: 2020-03-05
 #>
 #Requires -Modules SqlServer
 [CmdletBinding(SupportsShouldProcess = $true)]
@@ -239,14 +240,13 @@ foreach ($Category in $deployments.Keys) {
                         }
 
                         $newAppArgs = @{
-                            "Name"             = $app
-                            "DeployAction"     = $deployments[$Category].DeployAction
-                            "DeployPurpose"    = $deployments[$Category].DeployPurpose
-                            "ApprovalRequired" = $deployments[$Category].ApprovalRequired
-                            "UserNotification" = $deployments[$Category].UserNotification
-                            "TimeBaseOn"       = "LocalTime"
-                            "CollectionName"   = $TargetedCollection
-                            "Verbose"          = $true
+                            Name             = $app
+                            DeployAction     = $deployments[$Category].DeployAction
+                            DeployPurpose    = $deployments[$Category].DeployPurpose
+                            ApprovalRequired = $deployments[$Category].ApprovalRequired
+                            UserNotification = $deployments[$Category].UserNotification
+                            TimeBaseOn       = "LocalTime"
+                            CollectionName   = $TargetedCollection
                         }
                         #endregion define the splat to pass to New-CMApplicationDeployment
 
