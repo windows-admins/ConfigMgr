@@ -268,7 +268,7 @@ foreach ($Category in $deployments.Keys) {
             $false {
                 if ($PSCmdlet.ShouldProcess("[CollectionName = '$TargetedCollection'] [Application = '$($AppDeploy.ApplicationName)']", "Remove-CMApplicationDeployment")) {
                     Write-Verbose "Removing deployment [Application = '$($AppDeploy.ApplicationName)'] to [CollectionName = '$($AppDeploy.CollectionName)']"
-                    Remove-CMApplicationDeployment -Name $App.ApplicationName -CollectionID $App.CollectionID -Force
+                    Remove-CMApplicationDeployment -Name $AppDeploy.ApplicationName -CollectionID $AppDeploy.CollectionID -Force
                 }
             }
         }
