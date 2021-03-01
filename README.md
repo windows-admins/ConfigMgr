@@ -1,8 +1,7 @@
-# SystemCenterConfigMgr
+# ConfigMgr
 
+A repo of useful items for the everyday ConfigMgr admin.
 
-A Github repo ~for PoSh scripts~ _all of the things_ for the every day SCCM admin.
+To download, click the big green "Code" button above and click "Download ZIP".
 
-To download, click the big green button and download the ZIP.
-
-Need help? https://aka.ms/WinAdmins
+Need help? Check out our Discord community: https://winadmins.io/discord
