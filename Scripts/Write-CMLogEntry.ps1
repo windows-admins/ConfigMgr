@@ -58,7 +58,7 @@ Function Write-CMLogEntry {
                 $AllLogs = Get-ChildItem -Path $Folder -Name "$($LogFileNameWithoutExt)_*" -File
 
                 # Sort them numerically (so the oldest is first in the list)
-                $AllLogs = $AllLogs | Sort-Object -Descending { $_ -replace '_\d+\.lo_$' }, { [Int]($_ -replace '^.+\d_|\.lo_$') }
+                $AllLogs = $AllLogs | Sort-Object -Descending { $_ -replace '_\d+\.lo_$' }, { [Int]($_ -replace '^.+\d_|\.lo_$') } -ErrorAction Ignore
             
                 ForEach ($Log in $AllLogs) {
                     # Get log number
