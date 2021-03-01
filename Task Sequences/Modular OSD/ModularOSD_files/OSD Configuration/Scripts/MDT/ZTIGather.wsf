@@ -11,7 +11,7 @@
 ' //
 ' // File:      ZTIGather.wsf
 ' // 
-' // Version:   6.3.8443.1000
+' // Version:   6.3.8456.1000
 ' // 
 ' // Purpose:   Gather information and process rules controlling deployment
 ' //            process.
@@ -414,11 +414,11 @@ Class ZTIGather
 					sAssetTag = Trim(objInstance.SMBIOSAssetTag)
 				End if
 				Select Case objInstance.ChassisTypes(0)
-				Case "8", "9", "10", "11", "12", "14", "18", "21"
+				Case "8", "9", "10", "11", "12", "14", "18", "21", "30", "31", "32"
 					bIsLaptop = true
-				Case "3", "4", "5", "6", "7", "15", "16"
+				Case "3", "4", "5", "6", "7", "13", "15", "16", "35", "36"
 					bIsDesktop = true
-				Case "23"
+				Case "23", "28"
 					bIsServer = true
 				Case Else
 					' Do nothing
@@ -1202,6 +1202,7 @@ Class ZTIGather
 
 		' Set variables based on the capabilities of the hardware
 
+		On Error Resume Next
 		oEnvironment.Item("IsHypervisorRunning") = oUtility.ConvertBooleanToString(oUtility.BDDUtility.IsHypervisorRunning)
 		oEnvironment.Item("SupportsVT") = oUtility.ConvertBooleanToString(oUtility.BDDUtility.SupportsVT)
 		oEnvironment.Item("SupportsNX") = oUtility.ConvertBooleanToString(oUtility.BDDUtility.SupportsNX)
@@ -1211,6 +1212,7 @@ Class ZTIGather
 		Else
 			oEnvironment.Item("SupportsHyperVRole") = "False"
 		End if
+		On Error Goto 0
 
 
 		' Determine what virtual machine environment this might be.  Get the BIOS version information
@@ -1228,34 +1230,10 @@ Class ZTIGather
 
 		If oEnvironment.Item("Model") = "Virtual Machine" then
 
-			' Microsoft virtualization technology detected, assign defaults
+			' Microsoft virtualization technology (Hyper-V) detected
 
 			sVMPlatform = "Hyper-V"
 			bIsVM = true
-
-
-			' Try to determine more specific values
-
-			Select Case sVersionString
-			Case "VRTUAL - 1000831"
-				bIsVM = true
-				sVMPlatform = "Hyper-V Beta or RC0"
-			Case "VRTUAL - 5000805", "BIOS Date: 05/05/08 20:35:56  Ver: 08.00.02"
-				bIsVM = true
-				sVMPlatform = "Hyper-V"
-			Case "A M I  - 2000622"
-				bIsVM = true
-				sVMPlatform = "VS2005R2SP1 or VPC2007"
-			Case "A M I  - 9000520"
-				bIsVM = true
-				sVMPlatform = "VS2005R2"
-			Case "A M I  - 9000816", "A M I  - 6000901"
-				bIsVM = true
-				sVMPlatform = "Windows Virtual PC"
-			Case "A M I  - 8000314"
-				bIsVM = true
-				sVMPlatform = "VS2005 or VPC2004"
-			End Select
 
 
 			' Try to get the VM host from the integration components
@@ -1283,7 +1261,14 @@ Class ZTIGather
 			End if
 			On Error Goto 0
 
-		ElseIf oEnvironment.Item("Model") = "VMware Virtual Platform" then
+		ElseIf Instr(UCase(oEnvironment.Item("Make")), "VMWARE") > 0 then
+
+			' VMware detected
+
+			sVMPlatform = "VMware"
+			bIsVM = true
+
+		ElseIf Instr(UCase(oEnvironment.Item("Model")), "VMWARE") > 0 then
 
 			' VMware detected
 
@@ -1303,6 +1288,13 @@ Class ZTIGather
 
 			bIsVM = true
 			sVMPlatform = "Xen"
+
+		ElseIf Instr(UCase(oEnvironment.Item("Make")), "PARALLELS") > 0 then
+
+			' Parallels detected
+
+			bIsVM = true
+			sVMPlatform = "Parallels"
 
 		Else 
 			oLogging.CreateEntry "This computer does not appear to be a virtual machine (BIOS is '" & sVersionString & "').", LogTypeInfo
