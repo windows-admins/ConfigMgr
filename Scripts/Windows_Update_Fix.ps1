@@ -49,7 +49,7 @@ $dllList = @(
     "muweb.dll", # Microsoft Update Web Control
     "wuwebv.dll" # Windows Update Vista Web Control
 )
-$userDL = "$env:ALLUSERSPORFILE\Microsoft\Network\Downloader"
+$userDL = "$env:ALLUSERSPROFILE\Microsoft\Network\Downloader"
 $swdFolder = "$env:WINDIR\SoftwareDistribution"
 $cr2Folder = "$env:WINDIR\system32\catroot2"
 
