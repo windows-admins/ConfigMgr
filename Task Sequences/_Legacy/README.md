@@ -1,1 +1,0 @@
-This is a legacy TS kept here for archival purposes.  It is not recommended you use it.
